@@ -95,6 +95,20 @@ export async function fetchWallet(): Promise<WalletResponse> {
   return r.json();
 }
 
+export interface RatesResponse {
+  kamino_usdc_supply_bps: number;
+  usdy_apy_bps: number;
+  effr_bps: number;
+  kamino_fetched_at: number;
+  kamino_note: "live" | "unavailable" | "loading";
+}
+
+export async function fetchRates(): Promise<RatesResponse> {
+  const r = await fetch(`${API_BASE}/rates`);
+  if (!r.ok) throw new Error(`fetchRates ${r.status}`);
+  return r.json();
+}
+
 export function openEventStream(handlers: {
   onEvent: (e: MeshEvent) => void;
   onError?: (err: Event) => void;

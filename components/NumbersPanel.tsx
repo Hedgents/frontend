@@ -6,11 +6,14 @@ import {
   fetchPnl,
   fetchDaemons,
   fetchWallet,
+  fetchRates,
   AumResponse,
   PnlResponse,
   DaemonHealth,
   WalletResponse,
+  RatesResponse,
 } from "@/lib/api";
+import { YieldBenchmarkCard } from "./YieldBenchmarkCard";
 import { Card, CardContent } from "@/components/ui/card";
 import { DaemonPill } from "./DaemonPill";
 import { formatUsdc } from "@/lib/decode";
@@ -125,24 +128,25 @@ export function NumbersPanel() {
   const [pnl, setPnl] = useState<PnlResponse | null>(null);
   const [daemons, setDaemons] = useState<DaemonHealth[]>([]);
   const [wallet, setWallet] = useState<WalletResponse | null>(null);
+  const [rates, setRates] = useState<RatesResponse | null>(null);
 
   useEffect(() => {
     let cancelled = false;
     const tick = async () => {
       try {
-        const [a, p, d, w] = await Promise.all([
+        const [a, p, d, w, r] = await Promise.all([
           fetchAum(),
           fetchPnl("24h"),
           fetchDaemons(),
-          // /wallet may 404 against an old running dashboard binary;
-          // swallow that so the rest of the panel still renders.
           fetchWallet().catch(() => null),
+          fetchRates().catch(() => null),
         ]);
         if (!cancelled) {
           setAum(a);
           setPnl(p);
           setDaemons(d);
           setWallet(w);
+          setRates(r);
         }
       } catch {
         // dashboard server unreachable; keep previous state
@@ -162,7 +166,7 @@ export function NumbersPanel() {
   const pnlColor = pnlDelta > 0 ? "text-emerald-600" : pnlDelta < 0 ? "text-red-600" : "opacity-60";
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
       <Card>
         <CardContent className="pt-6">
           <div className="text-xs uppercase tracking-wide opacity-60">Total AUM</div>
@@ -195,7 +199,8 @@ export function NumbersPanel() {
         </CardContent>
       </Card>
       <WalletCard wallet={wallet} />
-      <Card className="md:col-span-4">
+      <YieldBenchmarkCard rates={rates} />
+      <Card className="md:col-span-5">
         <CardContent className="pt-6">
           <div className="text-xs uppercase tracking-wide opacity-60 mb-2">Fleet health</div>
           {daemons.length === 0 ? (
