@@ -40,13 +40,22 @@ In active development for the 2026-05 demo. See [the sprint plan](https://github
 
 No hosted infrastructure. No auth. No wallet adapter. The operator's Solana keypair lives in their local `secrets-dir` per daemon convention; this frontend only displays — it doesn't custody.
 
-## Build (when populated)
+## Build
 
 ```bash
 npm install
 npm run dev
 # opens http://localhost:3000
 ```
+
+Requires the [fleet dashboard server](https://github.com/Hedgents/fleet) running at `127.0.0.1:7700`. Override via `NEXT_PUBLIC_API_BASE` if running elsewhere.
+
+## Stack
+
+- Next.js 16 + React 19
+- Tailwind CSS v4 + shadcn/ui
+- recharts (24h activity chart)
+- Native WebSocket for the live mesh feed (auto-reconnect every 2s)
 
 ## License
 
