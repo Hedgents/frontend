@@ -39,6 +39,14 @@ export interface DaemonHealth {
   status: "green" | "yellow" | "red" | "unknown";
 }
 
+export interface WalletResponse {
+  pubkey: string;
+  sol_lamports: number;
+  usdc_lamports: number;
+  jlp_lamports: number;
+  rpc_url: string;
+}
+
 export interface PositionsResponse {
   multiply: { obligation_pubkey: string; ltv_bps: number; deposited_usd: number; borrowed_usd: number } | null;
   stable_yield: { reserve_pubkey: string; deposited_usdc: number } | null;
@@ -78,6 +86,12 @@ export async function fetchPositions(): Promise<PositionsResponse> {
 export async function fetchDaemons(): Promise<DaemonHealth[]> {
   const r = await fetch(`${API_BASE}/daemons`);
   if (!r.ok) throw new Error(`fetchDaemons ${r.status}`);
+  return r.json();
+}
+
+export async function fetchWallet(): Promise<WalletResponse> {
+  const r = await fetch(`${API_BASE}/wallet`);
+  if (!r.ok) throw new Error(`fetchWallet ${r.status}`);
   return r.json();
 }
 
