@@ -3,12 +3,10 @@
 import { useEffect, useState } from "react";
 import {
   fetchAum,
-  fetchPnl,
   fetchDaemons,
   fetchWallet,
   fetchRates,
   AumResponse,
-  PnlResponse,
   DaemonHealth,
   WalletResponse,
   RatesResponse,
@@ -125,7 +123,6 @@ function WalletCard({ wallet }: { wallet: WalletResponse | null }) {
 
 export function NumbersPanel() {
   const [aum, setAum] = useState<AumResponse | null>(null);
-  const [pnl, setPnl] = useState<PnlResponse | null>(null);
   const [daemons, setDaemons] = useState<DaemonHealth[]>([]);
   const [wallet, setWallet] = useState<WalletResponse | null>(null);
   const [rates, setRates] = useState<RatesResponse | null>(null);
@@ -134,16 +131,14 @@ export function NumbersPanel() {
     let cancelled = false;
     const tick = async () => {
       try {
-        const [a, p, d, w, r] = await Promise.all([
+        const [a, d, w, r] = await Promise.all([
           fetchAum(),
-          fetchPnl("24h"),
           fetchDaemons(),
           fetchWallet().catch(() => null),
           fetchRates().catch(() => null),
         ]);
         if (!cancelled) {
           setAum(a);
-          setPnl(p);
           setDaemons(d);
           setWallet(w);
           setRates(r);
@@ -161,26 +156,14 @@ export function NumbersPanel() {
   }, []);
 
   const total = aum?.total_usdc ?? 0;
-  const pnlDelta = pnl?.delta_usdc ?? 0;
-  const pnlPct = pnl?.percent_bps ?? 0;
-  const pnlColor = pnlDelta > 0 ? "text-emerald-600" : pnlDelta < 0 ? "text-red-600" : "opacity-60";
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
       <Card>
         <CardContent className="pt-6">
           <div className="text-xs uppercase tracking-wide opacity-60">Total AUM</div>
           <div className="text-3xl font-semibold mt-1 tabular-nums">{formatUsdc(total)}</div>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardContent className="pt-6">
-          <div className="text-xs uppercase tracking-wide opacity-60">24h P&amp;L</div>
-          <div className={`text-3xl font-semibold mt-1 tabular-nums ${pnlColor}`}>
-            {pnlDelta >= 0 ? "+" : ""}
-            {formatUsdc(pnlDelta)}
-          </div>
-          <div className={`text-xs mt-1 ${pnlColor}`}>{(pnlPct / 100).toFixed(2)}%</div>
+          <div className="text-xs mt-1 opacity-40">on-chain positions</div>
         </CardContent>
       </Card>
       <Card>
@@ -200,7 +183,7 @@ export function NumbersPanel() {
       </Card>
       <WalletCard wallet={wallet} />
       <YieldBenchmarkCard rates={rates} />
-      <Card className="md:col-span-5">
+      <Card className="md:col-span-4">
         <CardContent className="pt-6">
           <div className="text-xs uppercase tracking-wide opacity-60 mb-2">Fleet health</div>
           {daemons.length === 0 ? (

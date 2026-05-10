@@ -30,6 +30,9 @@ export interface PnlResponse {
   end_aum_usdc: number;
   delta_usdc: number;
   percent_bps: number;
+  elapsed_secs: number;
+  /** Per-daemon APY averaged — correct even when daemons have different elapsed (restarts). */
+  annualised_apy_pct: number;
   note?: string;
 }
 
