@@ -74,6 +74,17 @@ export async function fetchAum(): Promise<AumResponse> {
   return r.json();
 }
 
+export interface ActivityBucket {
+  ts_ms: number;
+  events: number;
+}
+
+export async function fetchActivity(hours = 24): Promise<ActivityBucket[]> {
+  const r = await fetch(`${API_BASE}/events/activity?hours=${hours}`);
+  if (!r.ok) throw new Error(`fetchActivity ${r.status}`);
+  return r.json();
+}
+
 export async function fetchPnl(window: "1h" | "24h" | "all" = "24h"): Promise<PnlResponse> {
   const r = await fetch(`${API_BASE}/pnl?window=${window}`);
   if (!r.ok) throw new Error(`fetchPnl ${r.status}`);

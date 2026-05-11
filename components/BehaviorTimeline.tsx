@@ -3,41 +3,45 @@
 import { useEffect, useState } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip } from "recharts";
-import { fetchEvents } from "@/lib/api";
+import { fetchActivity, ActivityBucket } from "@/lib/api";
 
-interface ActivityBucket {
-  hour: string;
+interface ChartRow {
+  ts_ms: number;
+  label: string;
   events: number;
 }
 
+function bucketLabel(ts_ms: number): string {
+  const d = new Date(ts_ms);
+  return d.getHours().toString().padStart(2, "0") + ":00";
+}
+
 export function BehaviorTimeline() {
-  const [buckets, setBuckets] = useState<ActivityBucket[]>([]);
+  const [rows, setRows] = useState<ChartRow[]>([]);
 
   useEffect(() => {
     let cancelled = false;
     const tick = async () => {
       try {
-        const since = Date.now() - 24 * 3_600_000;
-        const events = await fetchEvents({ since, limit: 1000 });
+        const buckets: ActivityBucket[] = await fetchActivity(24);
         if (cancelled) return;
-        const counts = new Array(24).fill(0);
-        events.forEach((e) => {
-          const eventHour = new Date(e.ts_ms).getHours();
-          counts[eventHour]++;
-        });
-        const next: ActivityBucket[] = counts.map((c, i) => ({
-          hour: `${i.toString().padStart(2, "0")}:00`,
-          events: c,
-        }));
-        setBuckets(next);
+        setRows(
+          buckets.map((b) => ({
+            ts_ms: b.ts_ms,
+            label: bucketLabel(b.ts_ms),
+            events: b.events,
+          })),
+        );
       } catch {
-        if (!cancelled && buckets.length === 0) {
-          // Show empty 24h grid even if backend is unreachable
-          const empty: ActivityBucket[] = new Array(24).fill(0).map((_, i) => ({
-            hour: `${i.toString().padStart(2, "0")}:00`,
-            events: 0,
-          }));
-          setBuckets(empty);
+        if (!cancelled && rows.length === 0) {
+          const now = Date.now();
+          const hourMs = 3_600_000;
+          const bucketStart = Math.floor(now / hourMs) * hourMs;
+          const empty: ChartRow[] = Array.from({ length: 24 }, (_, i) => {
+            const ts = bucketStart - (23 - i) * hourMs;
+            return { ts_ms: ts, label: bucketLabel(ts), events: 0 };
+          });
+          setRows(empty);
         }
       }
     };
@@ -57,10 +61,19 @@ export function BehaviorTimeline() {
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={120}>
-          <LineChart data={buckets}>
-            <XAxis dataKey="hour" tick={{ fontSize: 10 }} />
+          <LineChart data={rows}>
+            <XAxis dataKey="label" tick={{ fontSize: 10 }} interval={3} />
             <YAxis tick={{ fontSize: 10 }} width={28} />
-            <Tooltip contentStyle={{ fontSize: 11 }} />
+            <Tooltip
+              contentStyle={{ fontSize: 11 }}
+              labelFormatter={(label, payload) => {
+                const ts = payload?.[0]?.payload?.ts_ms;
+                if (typeof ts === "number") {
+                  return new Date(ts).toLocaleString();
+                }
+                return label;
+              }}
+            />
             <Line type="monotone" dataKey="events" stroke="#06b6d4" strokeWidth={2} dot={false} />
           </LineChart>
         </ResponsiveContainer>
