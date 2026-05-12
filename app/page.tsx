@@ -2,7 +2,6 @@ import { MeshFeed } from "@/components/MeshFeed";
 import { NumbersPanel } from "@/components/NumbersPanel";
 import { BehaviorTimeline } from "@/components/BehaviorTimeline";
 import { PaperTradingCard } from "@/components/PaperTradingCard";
-import { HourlyBriefing } from "@/components/HourlyBriefing";
 
 export default function Page() {
   return (
@@ -13,7 +12,6 @@ export default function Page() {
       </header>
       <NumbersPanel />
       <PaperTradingCard />
-      <HourlyBriefing />
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div className="lg:col-span-2">
           <MeshFeed />
