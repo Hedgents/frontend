@@ -1,7 +1,6 @@
 import { MeshFeed } from "@/components/MeshFeed";
 import { NumbersPanel } from "@/components/NumbersPanel";
 import { BehaviorTimeline } from "@/components/BehaviorTimeline";
-import { PaperTradingCard } from "@/components/PaperTradingCard";
 
 export default function Page() {
   return (
@@ -11,7 +10,6 @@ export default function Page() {
         <div className="text-xs opacity-60">Local operator dashboard · localhost:7700</div>
       </header>
       <NumbersPanel />
-      <PaperTradingCard />
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div className="lg:col-span-2">
           <MeshFeed />
