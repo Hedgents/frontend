@@ -113,8 +113,45 @@ export interface RatesResponse {
   kamino_usdc_supply_bps: number;
   usdy_apy_bps: number;
   effr_bps: number;
+  /** BlackRock BUIDL dividend rate, bps. Static — no public live feed. */
+  buidl_apy_bps: number;
   kamino_fetched_at: number;
   kamino_note: "live" | "unavailable" | "loading";
+}
+
+export interface StrategyCard {
+  id: "stable_yield" | "multiply" | "hedgedjlp";
+  name: string;
+  tagline: string;
+  description: string;
+  status: "live" | "idle";
+  deployed_usdc: number;
+  current_apr_bps: number;
+  last_sig: string | null;
+}
+
+export interface StrategiesResponse {
+  strategies: StrategyCard[];
+}
+
+export async function fetchStrategies(): Promise<StrategiesResponse> {
+  const r = await fetch(`${API_BASE}/strategies`);
+  if (!r.ok) throw new Error(`fetchStrategies ${r.status}`);
+  return r.json();
+}
+
+export interface OnchainActivityItem {
+  ts_ms: number;
+  sender_role: string;
+  msg_type: string;
+  payload_summary: string;
+  tx_signature: string;
+}
+
+export async function fetchOnchainActivity(limit = 20): Promise<OnchainActivityItem[]> {
+  const r = await fetch(`${API_BASE}/onchain/activity?limit=${limit}`);
+  if (!r.ok) throw new Error(`fetchOnchainActivity ${r.status}`);
+  return r.json();
 }
 
 export async function fetchRates(): Promise<RatesResponse> {
