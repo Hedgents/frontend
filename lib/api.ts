@@ -154,6 +154,35 @@ export async function fetchOnchainActivity(limit = 20): Promise<OnchainActivityI
   return r.json();
 }
 
+export interface AprSample {
+  ts_ms: number;
+  apr_bps: number;
+}
+
+export interface AprStats {
+  min_bps: number;
+  max_bps: number;
+  mean_bps: number;
+  p50_bps: number;
+  samples_count: number;
+}
+
+export interface AprHistoryResponse {
+  strategy: string;
+  hours: number;
+  samples: AprSample[];
+  stats: AprStats;
+}
+
+export async function fetchAprHistory(
+  strategy: "stable_yield" | "multiply" | "hedgedjlp",
+  hours = 24,
+): Promise<AprHistoryResponse> {
+  const r = await fetch(`${API_BASE}/apr/history?strategy=${strategy}&hours=${hours}`);
+  if (!r.ok) throw new Error(`fetchAprHistory ${r.status}`);
+  return r.json();
+}
+
 export async function fetchRates(): Promise<RatesResponse> {
   const r = await fetch(`${API_BASE}/rates`);
   if (!r.ok) throw new Error(`fetchRates ${r.status}`);

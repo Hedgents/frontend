@@ -1,6 +1,6 @@
 import { MeshFeed } from "@/components/MeshFeed";
 import { NumbersPanel } from "@/components/NumbersPanel";
-import { BehaviorTimeline } from "@/components/BehaviorTimeline";
+import { AprHistoryChart } from "@/components/AprHistoryChart";
 import { StrategyCardsRow } from "@/components/StrategyCardsRow";
 import { BenchmarkComparisonBar } from "@/components/BenchmarkComparisonBar";
 import { OnchainActivityRail } from "@/components/OnchainActivityRail";
@@ -16,14 +16,14 @@ export default function Page() {
       <StrategyCardsRow />
       <BenchmarkComparisonBar />
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <div className="lg:col-span-2 space-y-4">
+        <div className="lg:col-span-2">
           <MeshFeed />
-          <BehaviorTimeline />
         </div>
         <div>
           <OnchainActivityRail />
         </div>
       </div>
+      <AprHistoryChart />
     </main>
   );
 }
