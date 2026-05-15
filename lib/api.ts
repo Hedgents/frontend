@@ -22,6 +22,10 @@ export interface AumResponse {
     hedgedjlp_jlp_value_usd: number;
     idle_usdc: number;
   };
+  /** v0.2.8: deployed-USD-weighted average APR across live strategies (bps). */
+  combined_apr_bps?: number;
+  /** v0.2.8: projected USD/year at the current combined APR + deployed USD. */
+  combined_annualised_usd?: number;
 }
 
 export interface PnlResponse {

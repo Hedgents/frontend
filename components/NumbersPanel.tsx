@@ -156,6 +156,8 @@ export function NumbersPanel() {
   }, []);
 
   const total = aum?.total_usdc ?? 0;
+  const combinedAprBps = aum?.combined_apr_bps ?? 0;
+  const annualisedUsd = aum?.combined_annualised_usd ?? 0;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -164,6 +166,17 @@ export function NumbersPanel() {
           <div className="text-xs uppercase tracking-wide opacity-60">Total AUM</div>
           <div className="text-3xl font-semibold mt-1 tabular-nums">{formatUsdc(total)}</div>
           <div className="text-xs mt-1 opacity-40">on-chain positions</div>
+          {combinedAprBps > 0 && (
+            <div className="mt-3 pt-3 border-t border-white/5">
+              <div className="text-xs uppercase tracking-wide opacity-60">Combined APR</div>
+              <div className="text-2xl font-semibold tabular-nums text-emerald-500 dark:text-emerald-400">
+                {(combinedAprBps / 100).toFixed(2)}%
+              </div>
+              <div className="text-xs mt-1 opacity-50 tabular-nums">
+                ≈ ${annualisedUsd.toFixed(2)} / year
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
       <Card>
