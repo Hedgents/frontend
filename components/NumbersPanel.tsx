@@ -195,7 +195,7 @@ export function NumbersPanel() {
         </CardContent>
       </Card>
       <WalletCard wallet={wallet} />
-      <YieldBenchmarkCard rates={rates} />
+      <YieldBenchmarkCard rates={rates} hedgentsAprBps={combinedAprBps} />
       <Card className="md:col-span-4">
         <CardContent className="pt-6">
           <div className="text-xs uppercase tracking-wide opacity-60 mb-2">Fleet health</div>

@@ -5,6 +5,8 @@ import { RatesResponse } from "@/lib/api";
 
 interface Props {
   rates: RatesResponse | null;
+  /** Fleet's deployed-USD-weighted APR (bps), from /aum.combined_apr_bps. */
+  hedgentsAprBps?: number;
 }
 
 interface Row {
@@ -34,10 +36,11 @@ function Bar({ bps, maxBps, highlight }: { bps: number; maxBps: number; highligh
   );
 }
 
-export function YieldBenchmarkCard({ rates }: Props) {
-  const kamino = rates?.kamino_usdc_supply_bps ?? 0;
+export function YieldBenchmarkCard({ rates, hedgentsAprBps }: Props) {
+  const hedgents = hedgentsAprBps ?? 0;
   const usdy = rates?.usdy_apy_bps ?? 490;
   const effr = rates?.effr_bps ?? 433;
+  const buidl = rates?.buidl_apy_bps ?? 475;
   const note = rates?.kamino_note;
 
   const rows: Row[] = [
@@ -48,21 +51,27 @@ export function YieldBenchmarkCard({ rates }: Props) {
       highlight: false,
     },
     {
+      label: "BUIDL",
+      sublabel: "BlackRock, tokenised T-bills",
+      bps: buidl,
+      highlight: false,
+    },
+    {
       label: "USDY",
       sublabel: "Ondo, Solana — tokenised T-bills",
       bps: usdy,
       highlight: false,
     },
     {
-      label: "Kamino USDC",
-      sublabel: "Hedgents stable-yield strategy",
-      bps: kamino,
+      label: "Hedgents",
+      sublabel: "Fleet combined APR (3 strategies)",
+      bps: hedgents,
       highlight: true,
     },
   ];
 
   const maxBps = Math.max(...rows.map((r) => r.bps), 1);
-  const spread = kamino > usdy ? kamino - usdy : null;
+  const spread = hedgents > usdy ? hedgents - usdy : null;
 
   return (
     <Card>
@@ -111,7 +120,7 @@ export function YieldBenchmarkCard({ rates }: Props) {
         ) : null}
 
         <div className="mt-2 text-[10px] opacity-30">
-          USDY {bpsToPercent(usdy)} · EFFR {bpsToPercent(effr)} · rates as of May 2026
+          BUIDL {bpsToPercent(buidl)} · USDY {bpsToPercent(usdy)} · EFFR {bpsToPercent(effr)} · live rates
         </div>
       </CardContent>
     </Card>
