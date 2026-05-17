@@ -193,6 +193,26 @@ export async function fetchRates(): Promise<RatesResponse> {
   return r.json();
 }
 
+export interface OrchestratorDecision {
+  ts_unix: number;
+  mode: "dry-run" | "execute" | string;
+  /** `"no_action" | "deposit" | "withdraw"`. */
+  action: string;
+  reason: string;
+  /** `"sent" | "failed:<…>" | "skipped:<…>"` or empty. */
+  envelope_result: string;
+  strategy: string | null;
+  amount_usd: number;
+}
+
+export async function fetchOrchestratorDecisions(
+  limit = 20,
+): Promise<OrchestratorDecision[]> {
+  const r = await fetch(`${API_BASE}/orchestrator/decisions?limit=${limit}`);
+  if (!r.ok) throw new Error(`fetchOrchestratorDecisions ${r.status}`);
+  return r.json();
+}
+
 export function openEventStream(handlers: {
   onEvent: (e: MeshEvent) => void;
   onError?: (err: Event) => void;
