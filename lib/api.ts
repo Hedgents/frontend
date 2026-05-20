@@ -1,6 +1,26 @@
 export const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://localhost:7700";
 export const WS_BASE = API_BASE.replace(/^http/, "ws");
 
+// ── Lifetime (hero banner) ──────────────────────────────────────────────────
+
+export interface LifetimeResponse {
+  /** Unix seconds. Genesis of the live mainnet reference deployment. */
+  live_since_unix: number;
+  /** Server time at response. Use this as the t0 for client-side counters
+   *  so the displayed uptime doesn't drift from the server clock. */
+  now_unix: number;
+  /** Pre-computed `now_unix - live_since_unix`. */
+  uptime_secs: number;
+  /** Count of rc-tagged incidents documented in DEVLOG with a regression test. */
+  incidents_resolved: number;
+}
+
+export async function fetchLifetime(): Promise<LifetimeResponse> {
+  const r = await fetch(`${API_BASE}/lifetime`);
+  if (!r.ok) throw new Error(`fetchLifetime ${r.status}`);
+  return r.json();
+}
+
 export interface MeshEvent {
   id: number | null;
   ts_unix: number;
