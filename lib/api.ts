@@ -20,6 +20,11 @@ export interface AumResponse {
     multiply: number;
     stable_yield: number;
     hedgedjlp_jlp_value_usd: number;
+    /**
+     * rc16: USDC locked as Jupiter Perps short collateral. Already
+     * included in `total_usdc`; broken out here for visibility.
+     */
+    hedgedjlp_collateral_usd: number;
     idle_usdc: number;
   };
   /** v0.2.8: deployed-USD-weighted average APR across live strategies (bps). */
@@ -129,7 +134,22 @@ export interface StrategyCard {
   tagline: string;
   description: string;
   status: "live" | "idle";
+  /**
+   * Primary deployed value. For stable_yield + multiply: live net equity.
+   * For hedgedjlp: mark-to-market JLP value only. The hedge collateral
+   * sitting inside Jupiter Perps short positions is reported separately
+   * in `hedge_collateral_usdc` — sum the two to show the operator's
+   * total capital committed to the strategy.
+   */
   deployed_usdc: number;
+  /**
+   * rc16: USDC locked as collateral inside Jupiter Perps shorts.
+   * `undefined` for strategies that don't have a separate collateral
+   * surface (currently anything other than hedgedjlp). Rendered as a
+   * secondary "+ $X collateral" line beneath the primary deployed
+   * figure.
+   */
+  hedge_collateral_usdc?: number;
   current_apr_bps: number;
   last_sig: string | null;
 }

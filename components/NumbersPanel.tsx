@@ -186,7 +186,16 @@ export function NumbersPanel() {
             <div className="text-xs mt-2 space-y-1">
               <Row label="Multiply" value={aum.per_strategy.multiply} />
               <Row label="Stable-yield" value={aum.per_strategy.stable_yield} />
-              <Row label="HedgedJLP" value={aum.per_strategy.hedgedjlp_jlp_value_usd} />
+              <Row label="HedgedJLP (JLP)" value={aum.per_strategy.hedgedjlp_jlp_value_usd} />
+              {/* rc16: surface perp short collateral so the Allocation rows
+                  sum to Total AUM. Hidden when zero to keep the panel
+                  uncluttered on tiers without an open hedgedjlp position. */}
+              {aum.per_strategy.hedgedjlp_collateral_usd > 0 && (
+                <Row
+                  label="HedgedJLP (collateral)"
+                  value={aum.per_strategy.hedgedjlp_collateral_usd}
+                />
+              )}
               <Row label="Idle USDC" value={aum.per_strategy.idle_usdc} />
             </div>
           ) : (

@@ -30,11 +30,16 @@ function solscanTx(sig: string, cluster: string): string {
 
 function StatusBadge({ s }: { s: StrategyCard }) {
   if (s.status === "live") {
+    // For hedgedjlp, "deployed" the operator cares about is JLP value +
+    // perp short collateral. Show the sum in the badge so the headline
+    // matches the on-chain capital actually committed.
+    const total =
+      s.deployed_usdc + (s.hedge_collateral_usdc ?? 0);
     return (
       <div className="flex items-center gap-1.5">
         <span className="inline-block h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
         <span className="text-[10px] uppercase tracking-wide text-emerald-600 dark:text-emerald-400 font-medium">
-          Live · ${s.deployed_usdc.toFixed(2)} deployed
+          Live · ${total.toFixed(2)} deployed
         </span>
       </div>
     );
@@ -75,6 +80,17 @@ function StrategyCardView({
             <div className="text-xl font-semibold tabular-nums mt-0.5">
               {isLive ? `$${s.deployed_usdc.toFixed(2)}` : "—"}
             </div>
+            {/* rc16: hedgedjlp's perp-short collateral lives outside the
+                wallet ATA and outside the JLP value surface. Show it as a
+                secondary line so operators can see total committed capital
+                without thinking the wallet leaked money into "nowhere". */}
+            {isLive &&
+              s.hedge_collateral_usdc !== undefined &&
+              s.hedge_collateral_usdc > 0 && (
+                <div className="text-[10px] opacity-60 tabular-nums mt-0.5">
+                  + ${s.hedge_collateral_usdc.toFixed(2)} collateral
+                </div>
+              )}
           </div>
           <div className="text-right">
             <div className="text-[10px] uppercase tracking-wide opacity-50">APR</div>
