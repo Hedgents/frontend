@@ -1,6 +1,23 @@
 export const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://localhost:7700";
 export const WS_BASE = API_BASE.replace(/^http/, "ws");
 
+// rc21 audit L1: warn at build time (server-side render) AND at first
+// client render if the bundle is shipping with the localhost fallback.
+// This is the same trap that bit rc18 — `NEXT_PUBLIC_API_BASE` unset in
+// CI silently bakes localhost into the production bundle. The warning
+// makes the misconfiguration loud at the operator's logs and devtools.
+if (
+  typeof console !== "undefined" &&
+  (API_BASE.includes("localhost") || API_BASE.includes("127.0.0.1"))
+) {
+  // eslint-disable-next-line no-console
+  console.warn(
+    `[Hedgents] NEXT_PUBLIC_API_BASE is "${API_BASE}". This is the local-dev fallback. ` +
+      `Production builds MUST set NEXT_PUBLIC_API_BASE at build time, or every fetch ` +
+      `from this bundle will target the operator's own machine.`,
+  );
+}
+
 // ── Lifetime (hero banner) ──────────────────────────────────────────────────
 
 export interface LifetimeResponse {

@@ -55,23 +55,46 @@ export function LifetimeBanner() {
   const [fetchedAtMs, setFetchedAtMs] = useState<number | null>(null);
   const [nowMs, setNowMs] = useState<number>(Date.now());
 
+  // rc21 audit (H3): fetch on mount AND on visibilitychange. A tab
+  // left open for a week was ticking its uptime counter purely off the
+  // client clock; refetching when the tab becomes visible re-anchors
+  // the displayed uptime to the server's authoritative value (and
+  // catches a bumped INCIDENTS_RESOLVED on rc rolls).
   useEffect(() => {
     let cancelled = false;
-    fetchLifetime()
-      .then((d) => {
-        if (cancelled) return;
-        setData(d);
-        setFetchedAtMs(Date.now());
-      })
-      .catch(() => {
-        // Silent failure — banner renders a graceful "—" state below.
-      });
+    const load = () => {
+      fetchLifetime()
+        .then((d) => {
+          if (cancelled) return;
+          setData(d);
+          setFetchedAtMs(Date.now());
+        })
+        .catch((err) => {
+          // rc21 audit (H3): surface fetch failures to the console
+          // instead of rendering "—" forever in silence. The banner is
+          // the hero placement; "—" should be loud at the operator's
+          // dev console even if it's quiet in the UI.
+          if (!cancelled) {
+            // eslint-disable-next-line no-console
+            console.error("LifetimeBanner: /lifetime fetch failed", err);
+          }
+        });
+    };
+    load();
+    const onVisibility = () => {
+      if (document.visibilityState === "visible") load();
+    };
+    document.addEventListener("visibilitychange", onVisibility);
     return () => {
       cancelled = true;
+      document.removeEventListener("visibilitychange", onVisibility);
     };
   }, []);
 
   // Tick the local clock once per second so the uptime counter scrolls.
+  // Browser throttles background tabs to ~1/min; on tab resume the
+  // arithmetic in `liveUptimeSecs` (Date.now() - fetchedAtMs) catches
+  // up automatically — no requestAnimationFrame loop needed.
   useEffect(() => {
     const id = setInterval(() => setNowMs(Date.now()), 1000);
     return () => clearInterval(id);
@@ -96,8 +119,12 @@ export function LifetimeBanner() {
 
       <CardContent className="pt-6 pb-5">
         <div className="flex items-center gap-2 mb-3">
-          <span className="relative flex h-2 w-2">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+          <span className="relative flex h-2 w-2" aria-hidden="true">
+            {/* rc21 audit (H3): respect prefers-reduced-motion. Tailwind's
+                `motion-safe:` variant gates the animation on the OS-level
+                accessibility setting; users who opt out of motion get the
+                static dot only. */}
+            <span className="absolute inline-flex h-full w-full motion-safe:animate-ping rounded-full bg-emerald-400 opacity-75" />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
           </span>
           <span className="text-[10px] uppercase tracking-[0.18em] font-medium text-emerald-600 dark:text-emerald-400">

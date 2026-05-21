@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { API_BASE } from "@/lib/api";
 
 interface NavItem {
   href: string;
@@ -13,8 +14,25 @@ const ITEMS: NavItem[] = [
   { href: "/devlog", label: "Devlog" },
 ];
 
+/**
+ * rc21 audit L1: pre-rc21 this footer hardcoded "localhost:7700" no
+ * matter which API the dashboard was actually talking to — misleading
+ * on the public reference deployment and a real footgun for
+ * self-hosters who'd see "localhost" on a "self-hosted" install. Now
+ * we display the API host the bundle was built against.
+ */
+function apiHostLabel(): string {
+  try {
+    const u = new URL(API_BASE);
+    return u.host;
+  } catch {
+    return API_BASE;
+  }
+}
+
 export function Navbar() {
   const pathname = usePathname();
+  const apiHost = apiHostLabel();
   return (
     <header className="border-b border-white/5 mb-6">
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-baseline justify-between">
@@ -47,8 +65,8 @@ export function Navbar() {
             })}
           </nav>
         </div>
-        <div className="text-xs opacity-60">
-          Local operator dashboard · localhost:7700
+        <div className="text-xs opacity-60 tabular-nums">
+          API · <span className="font-medium">{apiHost}</span>
         </div>
       </div>
     </header>
