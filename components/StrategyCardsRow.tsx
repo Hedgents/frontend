@@ -104,28 +104,51 @@ function StrategyCardView({
           </div>
         </div>
 
-        {/* rc43: real-time on-chain earned (vs first observed position).
-            Shown for live strategies that have at least one baseline. */}
-        {isLive &&
-          s.lifetime_earned_usdc !== undefined &&
-          s.lifetime_earned_since_unix !== undefined && (
-            <div className="mt-3 pt-3 border-t border-white/5 flex items-baseline justify-between">
-              <div className="text-[10px] uppercase tracking-wide opacity-50">
-                Earned on-chain
-              </div>
-              <div
-                className={`text-sm font-semibold tabular-nums ${
-                  s.lifetime_earned_usdc >= 0
-                    ? "text-emerald-600 dark:text-emerald-400"
-                    : "text-amber-600 dark:text-amber-400"
-                }`}
-                title={`Since ${new Date(s.lifetime_earned_since_unix * 1000).toLocaleString()}`}
-              >
-                {s.lifetime_earned_usdc >= 0 ? "+" : ""}$
-                {s.lifetime_earned_usdc.toFixed(2)}
-              </div>
+        {/* rc44: prefer realtime protocol-native PnL when available
+            (hedgedjlp: Jupiter Perps API). Falls back to rc43's
+            "delta since first observed" otherwise, with a clearer label
+            so the flow-vs-interest framing isn't mistaken for pure earn. */}
+        {isLive && s.realtime_protocol_pnl_usdc !== undefined ? (
+          <div className="mt-3 pt-3 border-t border-white/5 flex items-baseline justify-between">
+            <div
+              className="text-[10px] uppercase tracking-wide opacity-50"
+              title="Sum of pnlAfterFeesUsd across open Jupiter Perps shorts. Includes settled funding and close fees."
+            >
+              Realtime perp PnL
             </div>
-          )}
+            <div
+              className={`text-sm font-semibold tabular-nums ${
+                s.realtime_protocol_pnl_usdc >= 0
+                  ? "text-emerald-600 dark:text-emerald-400"
+                  : "text-amber-600 dark:text-amber-400"
+              }`}
+            >
+              {s.realtime_protocol_pnl_usdc >= 0 ? "+" : ""}$
+              {s.realtime_protocol_pnl_usdc.toFixed(2)}
+            </div>
+          </div>
+        ) : isLive &&
+          s.lifetime_earned_usdc !== undefined &&
+          s.lifetime_earned_since_unix !== undefined ? (
+          <div className="mt-3 pt-3 border-t border-white/5 flex items-baseline justify-between">
+            <div
+              className="text-[10px] uppercase tracking-wide opacity-50"
+              title="Current value minus first observed position value. Includes operator-funded capital flows in the delta — not pure interest accrual."
+            >
+              Position Δ since {new Date(s.lifetime_earned_since_unix * 1000).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
+            </div>
+            <div
+              className={`text-sm font-semibold tabular-nums ${
+                s.lifetime_earned_usdc >= 0
+                  ? "text-emerald-600 dark:text-emerald-400"
+                  : "text-amber-600 dark:text-amber-400"
+              }`}
+            >
+              {s.lifetime_earned_usdc >= 0 ? "+" : ""}$
+              {s.lifetime_earned_usdc.toFixed(2)}
+            </div>
+          </div>
+        ) : null}
 
         <p className="mt-3 text-[11px] opacity-60 leading-relaxed">{s.description}</p>
 

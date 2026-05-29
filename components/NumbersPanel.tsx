@@ -160,6 +160,7 @@ export function NumbersPanel() {
   const annualisedUsd = aum?.combined_annualised_usd ?? 0;
   const lifetimeEarned = aum?.lifetime_earned_usdc;
   const lifetimeEarnedSince = aum?.lifetime_earned_since_unix;
+  const realtimePerpPnl = aum?.realtime_protocol_pnl_usdc;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -168,9 +169,36 @@ export function NumbersPanel() {
           <div className="text-xs uppercase tracking-wide opacity-60">Total AUM</div>
           <div className="text-3xl font-semibold mt-1 tabular-nums">{formatUsdc(total)}</div>
           <div className="text-xs mt-1 opacity-40">on-chain positions</div>
+          {realtimePerpPnl !== undefined && (
+            <div className="mt-3 pt-3 border-t border-white/5">
+              <div
+                className="text-xs uppercase tracking-wide opacity-60"
+                title="Sum of pnlAfterFeesUsd across open Jupiter Perps shorts. Includes settled funding and close fees."
+              >
+                Realtime perp PnL
+              </div>
+              <div
+                className={`text-2xl font-semibold tabular-nums ${
+                  realtimePerpPnl >= 0
+                    ? "text-emerald-600 dark:text-emerald-400"
+                    : "text-amber-600 dark:text-amber-400"
+                }`}
+              >
+                {realtimePerpPnl >= 0 ? "+" : ""}${realtimePerpPnl.toFixed(2)}
+              </div>
+              <div className="text-[10px] mt-1 opacity-50">
+                Jupiter Perps · hedgedjlp shorts (no flow noise)
+              </div>
+            </div>
+          )}
           {lifetimeEarned !== undefined && lifetimeEarnedSince !== undefined && (
             <div className="mt-3 pt-3 border-t border-white/5">
-              <div className="text-xs uppercase tracking-wide opacity-60">Earned on-chain</div>
+              <div
+                className="text-xs uppercase tracking-wide opacity-60"
+                title="Current AUM minus first observed AUM. Includes operator capital flows in the delta — not pure interest accrual."
+              >
+                Position Δ since {new Date(lifetimeEarnedSince * 1000).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
+              </div>
               <div
                 className={`text-2xl font-semibold tabular-nums ${
                   lifetimeEarned >= 0
@@ -181,7 +209,7 @@ export function NumbersPanel() {
                 {lifetimeEarned >= 0 ? "+" : ""}${lifetimeEarned.toFixed(2)}
               </div>
               <div className="text-[10px] mt-1 opacity-50">
-                since {new Date(lifetimeEarnedSince * 1000).toLocaleDateString()}
+                includes capital flows (rebalances, deposits, withdraws)
               </div>
             </div>
           )}

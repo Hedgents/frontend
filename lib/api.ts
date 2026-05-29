@@ -76,6 +76,12 @@ export interface AumResponse {
   lifetime_earned_usdc?: number;
   /** rc43: UNIX-seconds timestamp of the first observed non-zero total AUM. */
   lifetime_earned_since_unix?: number;
+  /**
+   * rc44: realtime protocol-native PnL (fleet). Today this is
+   * hedgedjlp's perp PnL only (Jupiter Perps API). Pure number,
+   * no capital-flow noise.
+   */
+  realtime_protocol_pnl_usdc?: number;
 }
 
 export interface PnlResponse {
@@ -206,6 +212,14 @@ export interface StrategyCard {
   lifetime_earned_usdc?: number;
   /** rc43: UNIX-seconds timestamp of the first observed non-zero position. */
   lifetime_earned_since_unix?: number;
+  /**
+   * rc44: realtime protocol-native PnL for the strategy. Only set
+   * for hedgedjlp today (Jupiter Perps API's pnlAfterFeesUsd summed
+   * across open shorts). Includes settled funding + close fees,
+   * ignores capital flows entirely — this is the cleanest "real
+   * on-chain earn" number for hedgedjlp and matches Jupiter's own UI.
+   */
+  realtime_protocol_pnl_usdc?: number;
 }
 
 export interface StrategiesResponse {
