@@ -104,17 +104,25 @@ function StrategyCardView({
           </div>
         </div>
 
-        {/* rc44: prefer realtime protocol-native PnL when available
-            (hedgedjlp: Jupiter Perps API). Falls back to rc43's
-            "delta since first observed" otherwise, with a clearer label
-            so the flow-vs-interest framing isn't mistaken for pure earn. */}
+        {/* rc44 + rc45: prefer realtime protocol-native PnL when
+            available. hedgedjlp = Jupiter Perps API; stable_yield =
+            Kamino exchange-rate accrual. Falls back to rc43's
+            position-delta otherwise so the framing is unambiguous. */}
         {isLive && s.realtime_protocol_pnl_usdc !== undefined ? (
           <div className="mt-3 pt-3 border-t border-white/5 flex items-baseline justify-between">
             <div
               className="text-[10px] uppercase tracking-wide opacity-50"
-              title="Sum of pnlAfterFeesUsd across open Jupiter Perps shorts. Includes settled funding and close fees."
+              title={
+                s.id === "hedgedjlp"
+                  ? "Sum of pnlAfterFeesUsd across open Jupiter Perps shorts. Includes settled funding and close fees."
+                  : s.id === "stable_yield"
+                  ? "Pure Kamino interest accrual: current cToken balance × (current exchange rate − baseline rate). Anchored from the first observed snapshot; grows as the reserve's index moves."
+                  : "Real-time on-chain unrealised earn."
+              }
             >
-              Realtime perp PnL
+              {s.id === "hedgedjlp"
+                ? "Realtime perp PnL"
+                : "Pure interest accrued"}
             </div>
             <div
               className={`text-sm font-semibold tabular-nums ${
@@ -124,7 +132,12 @@ function StrategyCardView({
               }`}
             >
               {s.realtime_protocol_pnl_usdc >= 0 ? "+" : ""}$
-              {s.realtime_protocol_pnl_usdc.toFixed(2)}
+              {/* rc45: stable_yield interest is in cents-fractions for the
+                  first hours after baseline; use 4 decimals so users see
+                  it accumulate. hedgedjlp is in dollars; keep 2 decimals. */}
+              {Math.abs(s.realtime_protocol_pnl_usdc) < 1 && s.id !== "hedgedjlp"
+                ? s.realtime_protocol_pnl_usdc.toFixed(4)
+                : s.realtime_protocol_pnl_usdc.toFixed(2)}
             </div>
           </div>
         ) : isLive &&

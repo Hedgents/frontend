@@ -173,9 +173,9 @@ export function NumbersPanel() {
             <div className="mt-3 pt-3 border-t border-white/5">
               <div
                 className="text-xs uppercase tracking-wide opacity-60"
-                title="Sum of pnlAfterFeesUsd across open Jupiter Perps shorts. Includes settled funding and close fees."
+                title="Combined realtime protocol-native earn: hedgedjlp Jupiter Perps PnL (rc44) + stable_yield Kamino interest accrual (rc45). Zero capital-flow noise."
               >
-                Realtime perp PnL
+                Pure earn (real-time)
               </div>
               <div
                 className={`text-2xl font-semibold tabular-nums ${
@@ -187,7 +187,7 @@ export function NumbersPanel() {
                 {realtimePerpPnl >= 0 ? "+" : ""}${realtimePerpPnl.toFixed(2)}
               </div>
               <div className="text-[10px] mt-1 opacity-50">
-                Jupiter Perps · hedgedjlp shorts (no flow noise)
+                Jupiter Perps PnL + Kamino interest · no flow noise
               </div>
             </div>
           )}
