@@ -104,6 +104,29 @@ function StrategyCardView({
           </div>
         </div>
 
+        {/* rc43: real-time on-chain earned (vs first observed position).
+            Shown for live strategies that have at least one baseline. */}
+        {isLive &&
+          s.lifetime_earned_usdc !== undefined &&
+          s.lifetime_earned_since_unix !== undefined && (
+            <div className="mt-3 pt-3 border-t border-white/5 flex items-baseline justify-between">
+              <div className="text-[10px] uppercase tracking-wide opacity-50">
+                Earned on-chain
+              </div>
+              <div
+                className={`text-sm font-semibold tabular-nums ${
+                  s.lifetime_earned_usdc >= 0
+                    ? "text-emerald-600 dark:text-emerald-400"
+                    : "text-amber-600 dark:text-amber-400"
+                }`}
+                title={`Since ${new Date(s.lifetime_earned_since_unix * 1000).toLocaleString()}`}
+              >
+                {s.lifetime_earned_usdc >= 0 ? "+" : ""}$
+                {s.lifetime_earned_usdc.toFixed(2)}
+              </div>
+            </div>
+          )}
+
         <p className="mt-3 text-[11px] opacity-60 leading-relaxed">{s.description}</p>
 
         <div className="mt-auto pt-3 text-[10px]">

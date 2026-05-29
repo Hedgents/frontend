@@ -68,6 +68,14 @@ export interface AumResponse {
   combined_apr_bps?: number;
   /** v0.2.8: projected USD/year at the current combined APR + deployed USD. */
   combined_annualised_usd?: number;
+  /**
+   * rc43: real-time on-chain unrealised earn (whole fleet). Delta of
+   * current total_usdc vs the first observed non-zero total snapshot.
+   * Includes operator inflows — UI labels with "since {date}".
+   */
+  lifetime_earned_usdc?: number;
+  /** rc43: UNIX-seconds timestamp of the first observed non-zero total AUM. */
+  lifetime_earned_since_unix?: number;
 }
 
 export interface PnlResponse {
@@ -189,6 +197,15 @@ export interface StrategyCard {
   hedge_collateral_usdc?: number;
   current_apr_bps: number;
   last_sig: string | null;
+  /**
+   * rc43: real-time on-chain unrealised earn since the strategy's
+   * first observed non-zero position. Includes operator-funded
+   * inflows in the delta — UI labels it "since {date} opened" to
+   * make the framing unambiguous.
+   */
+  lifetime_earned_usdc?: number;
+  /** rc43: UNIX-seconds timestamp of the first observed non-zero position. */
+  lifetime_earned_since_unix?: number;
 }
 
 export interface StrategiesResponse {

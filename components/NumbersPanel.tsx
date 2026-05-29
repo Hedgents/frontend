@@ -158,6 +158,8 @@ export function NumbersPanel() {
   const total = aum?.total_usdc ?? 0;
   const combinedAprBps = aum?.combined_apr_bps ?? 0;
   const annualisedUsd = aum?.combined_annualised_usd ?? 0;
+  const lifetimeEarned = aum?.lifetime_earned_usdc;
+  const lifetimeEarnedSince = aum?.lifetime_earned_since_unix;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -166,6 +168,23 @@ export function NumbersPanel() {
           <div className="text-xs uppercase tracking-wide opacity-60">Total AUM</div>
           <div className="text-3xl font-semibold mt-1 tabular-nums">{formatUsdc(total)}</div>
           <div className="text-xs mt-1 opacity-40">on-chain positions</div>
+          {lifetimeEarned !== undefined && lifetimeEarnedSince !== undefined && (
+            <div className="mt-3 pt-3 border-t border-white/5">
+              <div className="text-xs uppercase tracking-wide opacity-60">Earned on-chain</div>
+              <div
+                className={`text-2xl font-semibold tabular-nums ${
+                  lifetimeEarned >= 0
+                    ? "text-emerald-600 dark:text-emerald-400"
+                    : "text-amber-600 dark:text-amber-400"
+                }`}
+              >
+                {lifetimeEarned >= 0 ? "+" : ""}${lifetimeEarned.toFixed(2)}
+              </div>
+              <div className="text-[10px] mt-1 opacity-50">
+                since {new Date(lifetimeEarnedSince * 1000).toLocaleDateString()}
+              </div>
+            </div>
+          )}
           {combinedAprBps > 0 && (
             <div className="mt-3 pt-3 border-t border-white/5">
               <div className="text-xs uppercase tracking-wide opacity-60">Combined APR</div>
