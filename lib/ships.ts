@@ -13,6 +13,13 @@ export interface Ship {
 
 export const SHIPS: Ship[] = [
   {
+    version: "v0.4.8",
+    date: "2026-06-01",
+    headline: "Trailing 24-hour APR as the headline number",
+    detail:
+      "Strategy cards now lead with the 24-hour mean APR (smoothed against realtime noise) instead of the second-by-second tick. Bitwise USCC reports a single dated yield — Hedgents does the same. Live APR is still shown underneath for transparency.",
+  },
+  {
     version: "v0.4.7",
     date: "2026-06-01",
     headline: "Multiply APR estimate fixed (was using USDC borrow, multiply borrows SOL)",

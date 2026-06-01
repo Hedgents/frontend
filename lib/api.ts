@@ -202,6 +202,14 @@ export interface StrategyCard {
    */
   hedge_collateral_usdc?: number;
   current_apr_bps: number;
+  /**
+   * v0.4.8: trailing 24-hour mean APR (bps). Primary headline number on
+   * the card; `current_apr_bps` is the secondary "live" number underneath.
+   * Smooths the second-by-second jitter that made the realtime number
+   * swing 0 → 1000 → 0 throughout the day. `undefined` until ~1 hour of
+   * samples are available (fresh deploys / db resets).
+   */
+  apr_24h_bps?: number;
   last_sig: string | null;
   /**
    * rc43: real-time on-chain unrealised earn since the strategy's

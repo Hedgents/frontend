@@ -62,7 +62,16 @@ function StrategyCardView({
   cluster: string;
 }) {
   const isLive = s.status === "live";
-  const aprShown = s.current_apr_bps > 0;
+  // v0.4.8: prefer the trailing 24h mean as the headline APR. It's
+  // backend-smoothed against the second-by-second noise that made the
+  // realtime number swing 0 → 1000 → 0 throughout the day. The realtime
+  // figure is still shown beneath as "live: X%" for transparency.
+  const headlineApr = s.apr_24h_bps ?? s.current_apr_bps;
+  const aprShown = headlineApr > 0;
+  const showRealtimeSecondary =
+    s.apr_24h_bps !== undefined &&
+    s.current_apr_bps > 0 &&
+    s.current_apr_bps !== s.apr_24h_bps;
   return (
     <Card>
       <CardContent className="pt-6 flex flex-col h-full">
@@ -93,14 +102,31 @@ function StrategyCardView({
               )}
           </div>
           <div className="text-right">
-            <div className="text-[10px] uppercase tracking-wide opacity-50">APR</div>
+            <div
+              className="text-[10px] uppercase tracking-wide opacity-50"
+              title={
+                s.apr_24h_bps !== undefined
+                  ? "Trailing 24-hour mean APR. Smoothed against second-by-second noise; the realtime number is shown below."
+                  : "Live APR. Trailing average will appear once ~1 hour of samples is collected."
+              }
+            >
+              APR{s.apr_24h_bps !== undefined ? " · 24h" : ""}
+            </div>
             <div
               className={`text-xl font-semibold tabular-nums mt-0.5 ${
                 isLive && aprShown ? "text-emerald-600 dark:text-emerald-400" : ""
               }`}
             >
-              {aprShown ? bpsToPercent(s.current_apr_bps) : "—"}
+              {aprShown ? bpsToPercent(headlineApr) : "—"}
             </div>
+            {showRealtimeSecondary && (
+              <div
+                className="text-[10px] opacity-60 tabular-nums mt-0.5"
+                title="Realtime APR — the live tick. Swings throughout the day; the trailing 24h figure above is the more honest number."
+              >
+                live: {bpsToPercent(s.current_apr_bps)}
+              </div>
+            )}
           </div>
         </div>
 
