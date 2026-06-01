@@ -13,6 +13,13 @@ export interface Ship {
 
 export const SHIPS: Ship[] = [
   {
+    version: "v0.4.7",
+    date: "2026-06-01",
+    headline: "Multiply APR estimate fixed (was using USDC borrow, multiply borrows SOL)",
+    detail:
+      "Dashboard's multiply APR was swinging to 0 / blank whenever Kamino's USDC borrow rate spiked. Strategy itself was unaffected — only the forward-looking APR estimate. Formula now uses Kamino SOL borrow (stable ~6%) instead of USDC borrow (volatile 4–47%).",
+  },
+  {
     version: "v0.4.6",
     date: "2026-06-01",
     headline: "rc54 — SOL reserve farm constant updated (Kamino added a farm)",
