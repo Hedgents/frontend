@@ -13,6 +13,48 @@ export interface Ship {
 
 export const SHIPS: Ship[] = [
   {
+    version: "v0.4.6",
+    date: "2026-06-01",
+    headline: "rc54 — SOL reserve farm constant updated (Kamino added a farm)",
+    detail:
+      "Kamino enabled a collateral farm on the SOL reserve after rc49 shipped. The expected_farm_collateral table now matches on-chain reality so the stale-RPC defender stops false-tripping on every SOL reserve load.",
+  },
+  {
+    version: "v0.4.5",
+    date: "2026-06-01",
+    headline: "rc53 — always sweep idle wallet SOL into the multiply obligation",
+    detail:
+      "Multiply seed no longer gates on usdc_lamports > 0; any wallet SOL above the fee buffer gets staked into the obligation each tick. Recovered 3.5 SOL of parked capital on the first live run.",
+  },
+  {
+    version: "v0.4.4",
+    date: "2026-06-01",
+    headline: "rc52 — refresh all obligation reserves before RefreshObligation",
+    detail:
+      "Existing-position seed previously refreshed only jitoSOL, then RefreshObligation failed (klend 0x1776) because the SOL reserve in the obligation was stale. Now refreshes every reserve the obligation references.",
+  },
+  {
+    version: "v0.4.3",
+    date: "2026-06-01",
+    headline: "rc47 — existing-position USDC seeding bug fix",
+    detail:
+      "Allocator's USDC envelope reached multiply but never entered the obligation because the seed path skipped when the obligation already held jitoSOL collateral. Forced top-up when usdc_lamports > 0.",
+  },
+  {
+    version: "v0.4.2",
+    date: "2026-05-31",
+    headline: "Over-engineering pass — paper-trading + stablefloor-daemon deleted",
+    detail:
+      "Removed dead paper-trading scaffolding and the unused stablefloor-daemon crate. Smaller surface area, fewer compilation units, no behavior change.",
+  },
+  {
+    version: "v0.4.1",
+    date: "2026-05-30",
+    headline: "Beta vault tracking — founder seed + per-user shares",
+    detail:
+      "Mutual-fund-style share accounting; NAV-priced deposits/withdrawals. Admin endpoints behind a shared bearer token for the closed beta.",
+  },
+  {
     version: "v0.4.0",
     date: "2026-05-17",
     headline: "Orchestrator daemon — autonomous regime-aware allocator",
