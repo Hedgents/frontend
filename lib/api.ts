@@ -62,7 +62,15 @@ export interface AumResponse {
      * included in `total_usdc`; broken out here for visibility.
      */
     hedgedjlp_collateral_usd: number;
+    /** Idle USDC in the wallet ATA. Already included in `total_usdc`. */
     idle_usdc: number;
+    /**
+     * v0.4.12: native SOL in the wallet, valued at the live SOL/USD
+     * mark. Pre-rc12 the dashboard's AUM silently undercounted this
+     * (it only counted USDC). Already included in `total_usdc`.
+     * `0` when the SOL price feed is unavailable.
+     */
+    idle_sol_usd: number;
   };
   /** v0.2.8: deployed-USD-weighted average APR across live strategies (bps). */
   combined_apr_bps?: number;

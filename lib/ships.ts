@@ -13,6 +13,13 @@ export interface Ship {
 
 export const SHIPS: Ship[] = [
   {
+    version: "v0.4.12",
+    date: "2026-06-02",
+    headline: "Idle wallet SOL counted in AUM (was silently dropped)",
+    detail:
+      "Pre-rc12 the dashboard only valued the USDC residual; native SOL sitting outside strategies was invisible. The 0.62 SOL of recovered capital that hid here on 2026-06-01 is what motivated the fix. SOL price comes from Jupiter Lite Price API, cached 30s.",
+  },
+  {
     version: "v0.4.11",
     date: "2026-06-02",
     headline: "Multiply card shows per-leg APR (jitoSOL yield, SOL borrow cost)",

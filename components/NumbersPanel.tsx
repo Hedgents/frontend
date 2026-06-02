@@ -244,6 +244,13 @@ export function NumbersPanel() {
                 />
               )}
               <Row label="Idle USDC" value={aum.per_strategy.idle_usdc} />
+              {/* v0.4.12: surface native SOL residual. Previously
+                  invisible to the dashboard's AUM; the 0.62 SOL of
+                  recovered capital that hid here on 2026-06-01 is
+                  what motivated the fix. */}
+              {aum.per_strategy.idle_sol_usd > 0 && (
+                <Row label="Idle SOL (USD)" value={aum.per_strategy.idle_sol_usd} />
+              )}
             </div>
           ) : (
             <div className="text-xs mt-2 opacity-50">No data</div>
