@@ -13,6 +13,13 @@ export interface Ship {
 
 export const SHIPS: Ship[] = [
   {
+    version: "v0.4.13",
+    date: "2026-06-02",
+    headline: "Allocator now credits risk reduction in cross-strategy rebalance",
+    detail:
+      "Pre-rc13 the cost-benefit gate was blind to directional exposure: it would refuse to move capital from multiply (β=1) to hedgedjlp (β=0) at a small APR gap, even though the rebalance materially reduces SOL exposure. v0.4.13 adds a one-sided risk-reduction credit so moves toward delta-neutral get scored on apr_gain + risk_gain, not just apr_gain.",
+  },
+  {
     version: "v0.4.12",
     date: "2026-06-02",
     headline: "Idle wallet SOL counted in AUM (was silently dropped)",
