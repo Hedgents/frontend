@@ -13,6 +13,13 @@ export interface Ship {
 
 export const SHIPS: Ship[] = [
   {
+    version: "v0.4.11",
+    date: "2026-06-02",
+    headline: "Multiply card shows per-leg APR (jitoSOL yield, SOL borrow cost)",
+    detail:
+      "Strategy card now reads '$X @ 7.29% − $Y @ 5.52%' instead of just the dollar split. Yield % in green, cost % in amber so the directional sign is readable in one glance. Completes the v0.4.9 collateral/debt decomposition.",
+  },
+  {
     version: "v0.4.10",
     date: "2026-06-02",
     headline: "Hedgedjlp resize closes over-hedged legs (was: open-only)",

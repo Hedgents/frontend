@@ -223,6 +223,18 @@ export interface StrategyCard {
    * this is the SOL borrow principal mark-to-market.
    */
   debt_usd?: number;
+  /**
+   * v0.4.11: gross yield rate on the collateral leg (bps). For multiply
+   * this is jitoSOL APY (~7%). Renders as "@ X% yield" next to the
+   * collateral $.
+   */
+  collateral_apr_bps?: number;
+  /**
+   * v0.4.11: cost rate on the debt leg (bps). For multiply this is the
+   * Kamino SOL borrow rate (~5-6%). Renders as "@ X% cost" next to the
+   * debt $.
+   */
+  debt_apr_bps?: number;
   last_sig: string | null;
   /**
    * rc43: real-time on-chain unrealised earn since the strategy's

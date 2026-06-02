@@ -103,17 +103,34 @@ function StrategyCardView({
             {/* v0.4.9: collateral / debt decomposition for strategies that
                 borrow (multiply today). Lets the operator see that "$287
                 net" is actually "$495 collateral − $208 debt" and answers
-                the recurring "what is this number made of?" question. */}
+                the recurring "what is this number made of?" question.
+                v0.4.11: per-leg APR appended when available (jitoSOL APY
+                on the collateral side, SOL borrow on the debt side).
+                Format pulls the numbers next to the leg they describe so
+                the math is readable in one glance. */}
             {isLive &&
               s.collateral_usd !== undefined &&
               s.debt_usd !== undefined &&
               s.collateral_usd > 0 && (
                 <div
                   className="text-[10px] opacity-60 tabular-nums mt-0.5"
-                  title="Gross collateral minus gross debt equals the net position shown above. Move with the underlying asset prices."
+                  title="Collateral grows at the jitoSOL APY; debt accrues interest at the Kamino SOL borrow rate. Net position is collateral − debt at current spot prices."
                 >
-                  ${s.collateral_usd.toFixed(2)} collateral − $
-                  {s.debt_usd.toFixed(2)} debt
+                  ${s.collateral_usd.toFixed(2)}
+                  {s.collateral_apr_bps !== undefined &&
+                    s.collateral_apr_bps > 0 && (
+                      <span className="text-emerald-600 dark:text-emerald-400">
+                        {" "}
+                        @ {(s.collateral_apr_bps / 100).toFixed(2)}%
+                      </span>
+                    )}{" "}
+                  − ${s.debt_usd.toFixed(2)}
+                  {s.debt_apr_bps !== undefined && s.debt_apr_bps > 0 && (
+                    <span className="text-amber-600 dark:text-amber-400">
+                      {" "}
+                      @ {(s.debt_apr_bps / 100).toFixed(2)}%
+                    </span>
+                  )}
                 </div>
               )}
           </div>
