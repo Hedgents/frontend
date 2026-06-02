@@ -13,6 +13,13 @@ export interface Ship {
 
 export const SHIPS: Ship[] = [
   {
+    version: "v0.4.10",
+    date: "2026-06-02",
+    headline: "Hedgedjlp resize closes over-hedged legs (was: open-only)",
+    detail:
+      "When JLP value dropped, the hedge previously never resized down — cycles 2 (3.80x) and 5 (3.91x) both ran over-hedged on production. Resize now identifies legs where existing > target and issues partial decrease_position requests symmetrically with the open-side path.",
+  },
+  {
     version: "v0.4.9",
     date: "2026-06-02",
     headline: "Multiply card shows gross collateral / debt decomposition",
