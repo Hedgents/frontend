@@ -13,6 +13,13 @@ export interface Ship {
 
 export const SHIPS: Ship[] = [
   {
+    version: "v0.4.9",
+    date: "2026-06-02",
+    headline: "Multiply card shows gross collateral / debt decomposition",
+    detail:
+      "Strategy card now renders \"$X collateral − $Y debt\" under the net figure for multiply. Answers the recurring 'what is this number made of?' question without re-deriving the position from chain state every time. Inspired by USCC's per-holding allocation table.",
+  },
+  {
     version: "v0.4.8",
     date: "2026-06-01",
     headline: "Trailing 24-hour APR as the headline number",

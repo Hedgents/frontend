@@ -100,6 +100,22 @@ function StrategyCardView({
                   + ${s.hedge_collateral_usdc.toFixed(2)} collateral
                 </div>
               )}
+            {/* v0.4.9: collateral / debt decomposition for strategies that
+                borrow (multiply today). Lets the operator see that "$287
+                net" is actually "$495 collateral − $208 debt" and answers
+                the recurring "what is this number made of?" question. */}
+            {isLive &&
+              s.collateral_usd !== undefined &&
+              s.debt_usd !== undefined &&
+              s.collateral_usd > 0 && (
+                <div
+                  className="text-[10px] opacity-60 tabular-nums mt-0.5"
+                  title="Gross collateral minus gross debt equals the net position shown above. Move with the underlying asset prices."
+                >
+                  ${s.collateral_usd.toFixed(2)} collateral − $
+                  {s.debt_usd.toFixed(2)} debt
+                </div>
+              )}
           </div>
           <div className="text-right">
             <div

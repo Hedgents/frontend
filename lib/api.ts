@@ -210,6 +210,19 @@ export interface StrategyCard {
    * samples are available (fresh deploys / db resets).
    */
   apr_24h_bps?: number;
+  /**
+   * v0.4.9: gross collateral value (USD) for strategies that borrow.
+   * For multiply this is the jitoSOL deposit mark-to-market. Paired
+   * with `debt_usd` so the dashboard can render the decomposition
+   * ("$495 collateral − $208 debt = $287 net") instead of just the
+   * net figure. Undefined for stable_yield + hedgedjlp.
+   */
+  collateral_usd?: number;
+  /**
+   * v0.4.9: gross debt (USD) for strategies that borrow. For multiply
+   * this is the SOL borrow principal mark-to-market.
+   */
+  debt_usd?: number;
   last_sig: string | null;
   /**
    * rc43: real-time on-chain unrealised earn since the strategy's
