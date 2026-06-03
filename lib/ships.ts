@@ -13,6 +13,13 @@ export interface Ship {
 
 export const SHIPS: Ship[] = [
   {
+    version: "v0.4.16",
+    date: "2026-06-03",
+    headline: "MarketSignal consumer audit — explicit log per daemon, honest mesh truth table",
+    detail:
+      "The LITEPAPER claimed execution daemons subscribe to MarketSignal. They do at the delivery layer, but only orchestrator (rc14) actually consumes. rc16 adds an explicit per-MarketSignal log branch in each daemon's dispatch so the operator sees them, plus a docs/mesh-consumers.md truth table documenting reality and the priority-ordered wiring follow-ups.",
+  },
+  {
     version: "v0.4.15",
     date: "2026-06-03",
     headline: "Riskwatcher classifier functions for previously-stub RiskKinds",
