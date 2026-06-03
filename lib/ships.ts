@@ -13,6 +13,13 @@ export interface Ship {
 
 export const SHIPS: Ship[] = [
   {
+    version: "v0.4.17",
+    date: "2026-06-03",
+    headline: "Orchestrator's Withdraw{multiply} now actually deleverages on-chain",
+    detail:
+      "Pre-rc17 the orchestrator's Withdraw{multiply} emitted AssignMultiply{target_ltv_bps=0} as a workaround. The multiply daemon's leverage handler bailed out at current_ltv >= target_ltv → 'already at or above target; no work to do'. Every rebalance proposal from rc1 through rc16 was silently swallowed. Today's SOL drop made that visible. Fix: emit the real WithdrawMultiply envelope which routes to the existing unwind path.",
+  },
+  {
     version: "v0.4.16",
     date: "2026-06-03",
     headline: "MarketSignal consumer audit — explicit log per daemon, honest mesh truth table",
