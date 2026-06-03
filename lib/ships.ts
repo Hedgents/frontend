@@ -13,6 +13,13 @@ export interface Ship {
 
 export const SHIPS: Ship[] = [
   {
+    version: "v0.4.19",
+    date: "2026-06-04",
+    headline: "Multiply unwind retries with smaller delta when Kamino's max_withdraw_value is binding",
+    detail:
+      "v0.4.17 made the orchestrator's Withdraw{multiply} envelopes actually reach multiply's unwind handler. v0.4.18 fixed the vault validation. v0.4.19 fixes the sizing bug: at low SOL prices the position's headroom shrinks and 16.67% per round exceeds Kamino's max_withdraw_value. The unwind now halves delta and re-sims when WithdrawTooLarge fires, up to 6 attempts per round.",
+  },
+  {
     version: "v0.4.17",
     date: "2026-06-03",
     headline: "Orchestrator's Withdraw{multiply} now actually deleverages on-chain",
