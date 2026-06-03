@@ -13,6 +13,13 @@ export interface Ship {
 
 export const SHIPS: Ship[] = [
   {
+    version: "v0.4.15",
+    date: "2026-06-03",
+    headline: "Riskwatcher classifier functions for previously-stub RiskKinds",
+    detail:
+      "RiskKind enum has carried OracleStaleness, DeltaDrift, and PerpFundingSpike for months — but classify() only emitted LiquidationDistance. v0.4.15 adds the pure-logic classifier functions for all three, with band boundaries tuned against production telemetry. Wiring each into a real poller follows in rc16+ as per-poller work.",
+  },
+  {
     version: "v0.4.14",
     date: "2026-06-03",
     headline: "Orchestrator subscribes to researcher's MarketSignals (closes the loop)",
