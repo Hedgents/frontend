@@ -13,6 +13,13 @@ export interface Ship {
 
 export const SHIPS: Ship[] = [
   {
+    version: "v0.4.14",
+    date: "2026-06-03",
+    headline: "Orchestrator subscribes to researcher's MarketSignals (closes the loop)",
+    detail:
+      "Pre-rc14 the orchestrator only emitted envelopes. Now it consumes researcher's PriceMovedBps signals into a market cache; the allocator's cost-benefit gate suppresses SOL-sale rebalances when SOL is in a sharp downward move. Closes a real architectural gap — the LITEPAPER's 'execution daemons subscribe to MarketSignal' silently excluded the orchestrator.",
+  },
+  {
     version: "v0.4.13",
     date: "2026-06-02",
     headline: "Allocator now credits risk reduction in cross-strategy rebalance",
