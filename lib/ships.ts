@@ -13,6 +13,13 @@ export interface Ship {
 
 export const SHIPS: Ship[] = [
   {
+    version: "v0.4.21",
+    date: "2026-06-04",
+    headline: "Multiply unwind sweeps freed SOL → USDC (closes the rc20 loop)",
+    detail:
+      "rc20 fully drained the leveraged obligation on-chain but left the freed SOL sitting in the wallet, blocking the orchestrator's next-tick hedgedjlp deposit (which expects USDC). rc21 adds a Jupiter SOL→USDC sweep step at the tail of the unwind. Best-effort: any sweep failure downgrades to a warn and reports final_usdc_lamports=0; the structural unwind is already complete and the operator can retry manually.",
+  },
+  {
     version: "v0.4.19",
     date: "2026-06-04",
     headline: "Multiply unwind retries with smaller delta when Kamino's max_withdraw_value is binding",
