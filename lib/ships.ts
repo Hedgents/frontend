@@ -13,6 +13,13 @@ export interface Ship {
 
 export const SHIPS: Ship[] = [
   {
+    version: "v0.4.25",
+    date: "2026-06-05",
+    headline: "Dashboard: dynamic incidents-resolved counter + combined APR matches strategy card",
+    detail:
+      "Two dashboard fixes in one ship. (1) `incidents_resolved` in /lifetime was a hand-bumped constant stuck at 18 since the rc-era — replaced with a const-fn that counts release headings in the embedded DEVLOG.md at compile time, so it advances with every ship. (2) /aum's `combined_apr_bps` used live-spot APR while strategy cards display the 24h-mean headline (`apr_24h_bps ?? current_apr_bps`), so the two diverged whenever Kamino moved — today the card showed stable_yield at 5.36% while combined read 3.74% with 100% of funds in stable_yield. Same fallback chain in both places now.",
+  },
+  {
     version: "v0.4.24",
     date: "2026-06-05",
     headline: "Cap Kamino-SOL-borrow proxy so hedgedjlp net APR survives Kamino spikes",
