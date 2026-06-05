@@ -13,6 +13,13 @@ export interface Ship {
 
 export const SHIPS: Ship[] = [
   {
+    version: "v0.4.24",
+    date: "2026-06-05",
+    headline: "Cap Kamino-SOL-borrow proxy so hedgedjlp net APR survives Kamino spikes",
+    detail:
+      "Dashboard reported hedgedjlp at 0.51% net APR while JLP fees still yielded 17.70% — same shape as the rc36 multiply bug, but for hedgedjlp's hedge cost. The proxy uses Kamino's SOL borrow rate to estimate Jupiter Perps funding; that proxy holds at 4–8% in normal conditions but Kamino's borrow rate hit 22.89% today during a SOL liquidity squeeze. Cap the proxy at 8% so spikes can't poison the estimate. Net APR with cap = 17.70 − 8×0.75 = 11.70%, comfortably above the 6.85% carry hurdle. Proper fix (read custody.funding_rate_state on-chain per open short) is a follow-up rc.",
+  },
+  {
     version: "v0.4.23",
     date: "2026-06-05",
     headline: "Orchestrator's /strategies fetch timeout raised 15s → 90s",
