@@ -13,6 +13,13 @@ export interface Ship {
 
 export const SHIPS: Ship[] = [
   {
+    version: "v0.4.23",
+    date: "2026-06-05",
+    headline: "Orchestrator's /strategies fetch timeout raised 15s → 90s",
+    detail:
+      "After v0.4.22 the unwind→sweep→redeploy chain worked end-to-end and the first $135 deposit landed in stable_yield. Subsequent ticks then failed every cycle: the dashboard's /strategies endpoint makes four sequential RPC calls (multiply, stable_yield, hedgedjlp, rates) and routinely takes 22–60s under Helius load. The orchestrator's fetch_snapshot client was built with a 15s timeout that was always going to lose. Bumped to 90s so ticks complete; the proper fix (parallelise the four chain reads with tokio::join!) belongs in a future dashboard PR.",
+  },
+  {
     version: "v0.4.21",
     date: "2026-06-04",
     headline: "Multiply unwind sweeps freed SOL → USDC (closes the rc20 loop)",
