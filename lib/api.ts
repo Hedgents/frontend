@@ -71,6 +71,14 @@ export interface AumResponse {
      * `0` when the SOL price feed is unavailable.
      */
     idle_sol_usd: number;
+    /**
+     * v0.5.0: ONyc deployed equity = deposited_usd - borrowed_usd from
+     * the Kamino isolated ONyc market obligation. Already included in
+     * `total_usdc`. Optional because pre-v0.5.0 dashboards may not
+     * emit it and the frontend should degrade gracefully on older
+     * servers during a rolling upgrade.
+     */
+    onyc?: number;
   };
   /** v0.2.8: deployed-USD-weighted average APR across live strategies (bps). */
   combined_apr_bps?: number;
@@ -188,7 +196,7 @@ export interface RatesResponse {
 }
 
 export interface StrategyCard {
-  id: "stable_yield" | "multiply" | "hedgedjlp";
+  id: "stable_yield" | "multiply" | "hedgedjlp" | "onyc";
   name: string;
   tagline: string;
   description: string;
@@ -308,7 +316,7 @@ export interface AprHistoryResponse {
 }
 
 export async function fetchAprHistory(
-  strategy: "stable_yield" | "multiply" | "hedgedjlp",
+  strategy: "stable_yield" | "multiply" | "hedgedjlp" | "onyc",
   hours = 24,
 ): Promise<AprHistoryResponse> {
   const r = await fetch(`${API_BASE}/apr/history?strategy=${strategy}&hours=${hours}`);

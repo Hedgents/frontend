@@ -231,8 +231,14 @@ export function NumbersPanel() {
           <div className="text-xs uppercase tracking-wide opacity-60">Allocation</div>
           {aum ? (
             <div className="text-xs mt-2 space-y-1">
-              <Row label="Multiply" value={aum.per_strategy.multiply} />
               <Row label="Stable-yield" value={aum.per_strategy.stable_yield} />
+              {/* v0.5.0: multiply (leveraged jitoSOL) abandoned —
+                  retained as a Row only when the legacy obligation
+                  still holds capital (e.g. mid-unwind during rollover),
+                  otherwise hidden. */}
+              {aum.per_strategy.multiply > 0 && (
+                <Row label="Multiply (legacy)" value={aum.per_strategy.multiply} />
+              )}
               <Row label="HedgedJLP (JLP)" value={aum.per_strategy.hedgedjlp_jlp_value_usd} />
               {/* rc16: surface perp short collateral so the Allocation rows
                   sum to Total AUM. Hidden when zero to keep the panel
@@ -242,6 +248,12 @@ export function NumbersPanel() {
                   label="HedgedJLP (collateral)"
                   value={aum.per_strategy.hedgedjlp_collateral_usd}
                 />
+              )}
+              {/* v0.5.0: ONyc added as fourth strategy. Hidden when zero
+                  to keep panel uncluttered on tiers without an open ONyc
+                  position. */}
+              {(aum.per_strategy.onyc ?? 0) > 0 && (
+                <Row label="ONyc" value={aum.per_strategy.onyc ?? 0} />
               )}
               <Row label="Idle USDC" value={aum.per_strategy.idle_usdc} />
               {/* v0.4.12: surface native SOL residual. Previously

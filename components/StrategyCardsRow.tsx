@@ -284,6 +284,8 @@ export function StrategyCardsRow() {
   }
 
   return (
+    // v0.5.0: still 3 strategies (multiply abandoned, onyc replaces it).
+    // 3-col layout on md+ keeps the original institutional density.
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       {data.map((s) => (
         <StrategyCardView key={s.id} s={s} cluster={cluster} />

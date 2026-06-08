@@ -5,11 +5,16 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { fetchAprHistory, AprHistoryResponse } from "@/lib/api";
 
 // Match the institutional strategy card palette used elsewhere on the
-// dashboard: emerald (stable-yield), amber (multiply), sky (hedgedjlp).
+// dashboard: emerald (stable-yield), sky (hedgedjlp), violet (onyc).
+// v0.5.0: multiply (leveraged jitoSOL) was abandoned — it failed the
+// USD-yield-vault thesis (net +1.0 SOL beta) and was replaced by onyc
+// which delivers USD-denominated delta-neutral yield via leveraged
+// reinsurance NAV. The multiply daemon binary still exists for
+// archaeology but is no longer in the live strategy mix.
 const STRATEGIES = [
   { id: "stable_yield", label: "Stable Yield", color: "#10b981" },
-  { id: "multiply", label: "Multiply", color: "#f59e0b" },
   { id: "hedgedjlp", label: "Hedged JLP", color: "#0ea5e9" },
+  { id: "onyc", label: "ONyc", color: "#8b5cf6" },
 ] as const;
 
 type StrategyId = (typeof STRATEGIES)[number]["id"];
@@ -36,8 +41,8 @@ function timeLabel(ts_ms: number, now_ms: number): string {
 export function AprHistoryChart() {
   const [data, setData] = useState<Record<StrategyId, AprHistoryResponse | null>>({
     stable_yield: null,
-    multiply: null,
     hedgedjlp: null,
+    onyc: null,
   });
   const [err, setErr] = useState<string | null>(null);
 
@@ -45,13 +50,13 @@ export function AprHistoryChart() {
     let cancelled = false;
     const tick = async () => {
       try {
-        const [sy, mu, hj] = await Promise.all([
+        const [sy, hj, on] = await Promise.all([
           fetchAprHistory("stable_yield", 24),
-          fetchAprHistory("multiply", 24),
           fetchAprHistory("hedgedjlp", 24),
+          fetchAprHistory("onyc", 24),
         ]);
         if (cancelled) return;
-        setData({ stable_yield: sy, multiply: mu, hedgedjlp: hj });
+        setData({ stable_yield: sy, hedgedjlp: hj, onyc: on });
         setErr(null);
       } catch (e) {
         if (!cancelled) setErr(String(e));

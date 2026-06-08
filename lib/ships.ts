@@ -13,6 +13,27 @@ export interface Ship {
 
 export const SHIPS: Ship[] = [
   {
+    version: "v0.5.0",
+    date: "2026-06-08",
+    headline: "ONyc replaces Multiply — leveraged on-chain reinsurance NAV, USD-denominated, delta-neutral",
+    detail:
+      "First minor-version bump in the fleet. Multiply (leveraged jitoSOL) is abandoned: its net +1.0 SOL beta failed the USD-yield-vault thesis — you can't pitch a Solana-native USD yield product whose biggest leg is leveraged SOL exposure. ONyc takes its slot. Mechanics: deposit ONyc (OnRe's Bermuda-licensed tokenized reinsurance token) as collateral in Kamino's isolated ONyc market, borrow USDC at a conservative 40% LTV, recycle into more ONyc. Yield is reinsurance premium income (~11% base) amplified by ~1.5-2× leverage. USD-denominated, delta-neutral, uncorrelated to crypto regimes — the portfolio's first RWA leg. The 'build above the protocol' element is a NAV-aware LTV controller that encodes OnRe's monthly Apex Group attestation cadence: dampens alerts on routine 30-80bps NAV steps but escalates on real impairment (5%+ single steps or 3+ consecutive downward streaks). ~5,500 lines of new daemon code, 98 tests pass. The fleet stays at three strategies: stable_yield + hedgedjlp + onyc.",
+  },
+  {
+    version: "v0.4.27",
+    date: "2026-06-06",
+    headline: "Orchestrator harvest: hedgedjlp PnL realize via full-unwind auto-accept",
+    detail:
+      "Closes the gap left by v0.4.26: the harvest loop now actually realizes accumulated perp PnL instead of just logging it. New opt-in --auto-allow-full-withdraw flag in hedgedjlp-daemon unlocks auto-accept for WithdrawHedgedJlp{jlp_lamports=u64::MAX} (full-unwind sentinel) from the configured orchestrator. The original 'always manual' policy still applies to partial-size withdraws — only full unwinds get the auto-execute exception. Standard daemon-side gates (sender allowlist, master switch, cooldown) still enforced. Combined with v0.4.26's harvest loop, the orchestrator now: (1) sees PnL > $5 threshold, (2) emits WithdrawHedgedJlp full-unwind, (3) daemon auto-accepts and unwinds, (4) freed USDC redeploys via 60s allocator tick. End-to-end PnL realization in autonomous mode.",
+  },
+  {
+    version: "v0.4.26",
+    date: "2026-06-06",
+    headline: "Orchestrator harvest loop: per-strategy yield watching every 6h",
+    detail:
+      "New harvest module in the orchestrator runs alongside the 60s allocator tick at a slower 6h cadence. Three jobs: (1) stable_yield observed only — auto-compounds inside Kamino; (2) multiply re-leveraged when collateral appreciation drops LTV by >150bps (target 60% restored via AssignMultiply with usdc_lamports=0); (3) hedgedjlp PnL above $5 threshold logged as 'manual harvest recommended'. CLI knobs for cadence, drift threshold, PnL threshold, target LTV. Distinct cooldown keys (harvest_multiply vs allocator's multiply) so both loops can fire independently. JSONL audit log captures every harvest decision. 12 unit tests pin the decision boundaries.",
+  },
+  {
     version: "v0.4.25",
     date: "2026-06-05",
     headline: "Dashboard: dynamic incidents-resolved counter + combined APR matches strategy card",
