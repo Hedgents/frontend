@@ -17,7 +17,7 @@ Designed for institutional treasury operators watching their own fleet execute s
 ## What you'll see
 
 - **Numbers panel**: total AUM, 24h P&L, allocation pie, 5 daemon health pills
-- **Mesh feed**: live envelope stream — "researcher saw SOL move +2.3% over 1h", "orchestrator asked multiply to lever to 70% LTV", "riskwatcher noticed multiply LTV drift, distance 487bps", etc.
+- **Mesh feed**: live envelope stream — "researcher saw SOL move +2.3% over 1h", "orchestrator asked onyc to lever to 40% LTV", "riskwatcher noticed onyc LTV drift, distance 487bps", etc.
 - **Behavior timeline**: 24h activity heatmap + grouped events
 
 ## Status

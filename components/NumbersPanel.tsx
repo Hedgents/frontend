@@ -232,13 +232,6 @@ export function NumbersPanel() {
           {aum ? (
             <div className="text-xs mt-2 space-y-1">
               <Row label="Stable-yield" value={aum.per_strategy.stable_yield} />
-              {/* v0.5.0: multiply (leveraged jitoSOL) abandoned —
-                  retained as a Row only when the legacy obligation
-                  still holds capital (e.g. mid-unwind during rollover),
-                  otherwise hidden. */}
-              {aum.per_strategy.multiply > 0 && (
-                <Row label="Multiply (legacy)" value={aum.per_strategy.multiply} />
-              )}
               <Row label="HedgedJLP (JLP)" value={aum.per_strategy.hedgedjlp_jlp_value_usd} />
               {/* rc16: surface perp short collateral so the Allocation rows
                   sum to Total AUM. Hidden when zero to keep the panel

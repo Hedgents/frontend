@@ -6,11 +6,6 @@ import { fetchAprHistory, AprHistoryResponse } from "@/lib/api";
 
 // Match the institutional strategy card palette used elsewhere on the
 // dashboard: emerald (stable-yield), sky (hedgedjlp), violet (onyc).
-// v0.5.0: multiply (leveraged jitoSOL) was abandoned — it failed the
-// USD-yield-vault thesis (net +1.0 SOL beta) and was replaced by onyc
-// which delivers USD-denominated delta-neutral yield via leveraged
-// reinsurance NAV. The multiply daemon binary still exists for
-// archaeology but is no longer in the live strategy mix.
 const STRATEGIES = [
   { id: "stable_yield", label: "Stable Yield", color: "#10b981" },
   { id: "hedgedjlp", label: "Hedged JLP", color: "#0ea5e9" },

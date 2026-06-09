@@ -54,7 +54,6 @@ export interface MeshEvent {
 export interface AumResponse {
   total_usdc: number;
   per_strategy: {
-    multiply: number;
     stable_yield: number;
     hedgedjlp_jlp_value_usd: number;
     /**
@@ -127,7 +126,7 @@ export interface WalletResponse {
 }
 
 export interface PositionsResponse {
-  multiply: { obligation_pubkey: string; ltv_bps: number; deposited_usd: number; borrowed_usd: number } | null;
+  onyc: { obligation_pubkey: string; ltv_bps: number; deposited_usd: number; borrowed_usd: number } | null;
   stable_yield: { reserve_pubkey: string; deposited_usdc: number } | null;
   hedgedjlp: { jlp_balance_lamports: number; jlp_value_usd: number; hedge_positions: unknown[] } | null;
 }
@@ -196,13 +195,13 @@ export interface RatesResponse {
 }
 
 export interface StrategyCard {
-  id: "stable_yield" | "multiply" | "hedgedjlp" | "onyc";
+  id: "stable_yield" | "hedgedjlp" | "onyc";
   name: string;
   tagline: string;
   description: string;
   status: "live" | "idle";
   /**
-   * Primary deployed value. For stable_yield + multiply: live net equity.
+   * Primary deployed value. For stable_yield + onyc: live net equity.
    * For hedgedjlp: mark-to-market JLP value only. The hedge collateral
    * sitting inside Jupiter Perps short positions is reported separately
    * in `hedge_collateral_usdc` — sum the two to show the operator's
@@ -228,26 +227,26 @@ export interface StrategyCard {
   apr_24h_bps?: number;
   /**
    * v0.4.9: gross collateral value (USD) for strategies that borrow.
-   * For multiply this is the jitoSOL deposit mark-to-market. Paired
-   * with `debt_usd` so the dashboard can render the decomposition
-   * ("$495 collateral − $208 debt = $287 net") instead of just the
-   * net figure. Undefined for stable_yield + hedgedjlp.
+   * For onyc this is the ONyc deposit mark-to-market (NAV × deposited
+   * lamports). Paired with `debt_usd` so the dashboard can render the
+   * decomposition ("$495 collateral − $208 debt = $287 net") instead
+   * of just the net figure. Undefined for stable_yield + hedgedjlp.
    */
   collateral_usd?: number;
   /**
-   * v0.4.9: gross debt (USD) for strategies that borrow. For multiply
-   * this is the SOL borrow principal mark-to-market.
+   * v0.4.9: gross debt (USD) for strategies that borrow. For onyc this
+   * is the USDC borrow principal mark-to-market.
    */
   debt_usd?: number;
   /**
-   * v0.4.11: gross yield rate on the collateral leg (bps). For multiply
-   * this is jitoSOL APY (~7%). Renders as "@ X% yield" next to the
+   * v0.4.11: gross yield rate on the collateral leg (bps). For onyc this
+   * is ONyc base NAV growth (~11%). Renders as "@ X% yield" next to the
    * collateral $.
    */
   collateral_apr_bps?: number;
   /**
-   * v0.4.11: cost rate on the debt leg (bps). For multiply this is the
-   * Kamino SOL borrow rate (~5-6%). Renders as "@ X% cost" next to the
+   * v0.4.11: cost rate on the debt leg (bps). For onyc this is the
+   * Kamino USDC borrow rate (~5%). Renders as "@ X% cost" next to the
    * debt $.
    */
   debt_apr_bps?: number;
@@ -316,7 +315,7 @@ export interface AprHistoryResponse {
 }
 
 export async function fetchAprHistory(
-  strategy: "stable_yield" | "multiply" | "hedgedjlp" | "onyc",
+  strategy: "stable_yield" | "hedgedjlp" | "onyc",
   hours = 24,
 ): Promise<AprHistoryResponse> {
   const r = await fetch(`${API_BASE}/apr/history?strategy=${strategy}&hours=${hours}`);

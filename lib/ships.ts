@@ -13,6 +13,13 @@ export interface Ship {
 
 export const SHIPS: Ship[] = [
   {
+    version: "v0.5.7",
+    date: "2026-06-09",
+    headline: "ONyc leverage path live on mainnet — first USDC borrow tx confirmed",
+    detail:
+      "End-to-end ONyc leverage smoke test on mainnet: $50 USDC → ONyc deposit (Jupiter swap + Kamino deposit) → InitObligationFarmsForReserve(Debt) → BorrowObligationLiquidityV2 at 40% target LTV. v0.5.5–v0.5.7 burned three bugs in sequence: (1) Kamino's ONyc reserve uses Chainlink Data Streams (not Pyth/Scope) so the on-chain market_value_sf doesn't propagate — added a NAV-fallback ($1.11) for borrow sizing; (2) RefreshObligation expected only currently-referenced reserves (1, ONyc deposit) but the bundle passed both ONyc + USDC, triggering 0x1776 InvalidAccountInput — bundle now reads the obligation and passes only existing reserves; (3) the ONyc-market USDC reserve has farm_debt enabled, so the first borrow needs InitObligationFarmsForReserve(mode=1) to create the user's debt-farm state PDA. Position now live: $41 ONyc collateral, $14.75 USDC debt, ~36% LTV, current_apr_bps=1100.",
+  },
+  {
     version: "v0.5.0",
     date: "2026-06-08",
     headline: "ONyc replaces Multiply — leveraged on-chain reinsurance NAV, USD-denominated, delta-neutral",
@@ -31,7 +38,7 @@ export const SHIPS: Ship[] = [
     date: "2026-06-06",
     headline: "Orchestrator harvest loop: per-strategy yield watching every 6h",
     detail:
-      "New harvest module in the orchestrator runs alongside the 60s allocator tick at a slower 6h cadence. Three jobs: (1) stable_yield observed only — auto-compounds inside Kamino; (2) multiply re-leveraged when collateral appreciation drops LTV by >150bps (target 60% restored via AssignMultiply with usdc_lamports=0); (3) hedgedjlp PnL above $5 threshold logged as 'manual harvest recommended'. CLI knobs for cadence, drift threshold, PnL threshold, target LTV. Distinct cooldown keys (harvest_multiply vs allocator's multiply) so both loops can fire independently. JSONL audit log captures every harvest decision. 12 unit tests pin the decision boundaries.",
+      "New harvest module in the orchestrator runs alongside the 60s allocator tick at a slower 6h cadence. Three jobs: (1) stable_yield observed only — auto-compounds inside Kamino; (2) leveraged onyc re-leveraged when NAV appreciation drops LTV by >150bps (target 40% restored via AssignOnyc with usdc_lamports=0); (3) hedgedjlp PnL above $5 threshold logged as 'manual harvest recommended'. CLI knobs for cadence, drift threshold, PnL threshold, target LTV. Distinct cooldown keys (harvest_onyc vs allocator's onyc) so both loops can fire independently. JSONL audit log captures every harvest decision. 12 unit tests pin the decision boundaries.",
   },
   {
     version: "v0.4.25",
@@ -45,35 +52,14 @@ export const SHIPS: Ship[] = [
     date: "2026-06-05",
     headline: "Cap Kamino-SOL-borrow proxy so hedgedjlp net APR survives Kamino spikes",
     detail:
-      "Dashboard reported hedgedjlp at 0.51% net APR while JLP fees still yielded 17.70% — same shape as the rc36 multiply bug, but for hedgedjlp's hedge cost. The proxy uses Kamino's SOL borrow rate to estimate Jupiter Perps funding; that proxy holds at 4–8% in normal conditions but Kamino's borrow rate hit 22.89% today during a SOL liquidity squeeze. Cap the proxy at 8% so spikes can't poison the estimate. Net APR with cap = 17.70 − 8×0.75 = 11.70%, comfortably above the 6.85% carry hurdle. Proper fix (read custody.funding_rate_state on-chain per open short) is a follow-up rc.",
+      "Dashboard reported hedgedjlp at 0.51% net APR while JLP fees still yielded 17.70%. The proxy uses Kamino's SOL borrow rate to estimate Jupiter Perps funding; that proxy holds at 4–8% in normal conditions but Kamino's borrow rate hit 22.89% today during a SOL liquidity squeeze. Cap the proxy at 8% so spikes can't poison the estimate. Net APR with cap = 17.70 − 8×0.75 = 11.70%, comfortably above the 6.85% carry hurdle. Proper fix (read custody.funding_rate_state on-chain per open short) is a follow-up rc.",
   },
   {
     version: "v0.4.23",
     date: "2026-06-05",
     headline: "Orchestrator's /strategies fetch timeout raised 15s → 90s",
     detail:
-      "After v0.4.22 the unwind→sweep→redeploy chain worked end-to-end and the first $135 deposit landed in stable_yield. Subsequent ticks then failed every cycle: the dashboard's /strategies endpoint makes four sequential RPC calls (multiply, stable_yield, hedgedjlp, rates) and routinely takes 22–60s under Helius load. The orchestrator's fetch_snapshot client was built with a 15s timeout that was always going to lose. Bumped to 90s so ticks complete; the proper fix (parallelise the four chain reads with tokio::join!) belongs in a future dashboard PR.",
-  },
-  {
-    version: "v0.4.21",
-    date: "2026-06-04",
-    headline: "Multiply unwind sweeps freed SOL → USDC (closes the rc20 loop)",
-    detail:
-      "rc20 fully drained the leveraged obligation on-chain but left the freed SOL sitting in the wallet, blocking the orchestrator's next-tick hedgedjlp deposit (which expects USDC). rc21 adds a Jupiter SOL→USDC sweep step at the tail of the unwind. Best-effort: any sweep failure downgrades to a warn and reports final_usdc_lamports=0; the structural unwind is already complete and the operator can retry manually.",
-  },
-  {
-    version: "v0.4.19",
-    date: "2026-06-04",
-    headline: "Multiply unwind retries with smaller delta when Kamino's max_withdraw_value is binding",
-    detail:
-      "v0.4.17 made the orchestrator's Withdraw{multiply} envelopes actually reach multiply's unwind handler. v0.4.18 fixed the vault validation. v0.4.19 fixes the sizing bug: at low SOL prices the position's headroom shrinks and 16.67% per round exceeds Kamino's max_withdraw_value. The unwind now halves delta and re-sims when WithdrawTooLarge fires, up to 6 attempts per round.",
-  },
-  {
-    version: "v0.4.17",
-    date: "2026-06-03",
-    headline: "Orchestrator's Withdraw{multiply} now actually deleverages on-chain",
-    detail:
-      "Pre-rc17 the orchestrator's Withdraw{multiply} emitted AssignMultiply{target_ltv_bps=0} as a workaround. The multiply daemon's leverage handler bailed out at current_ltv >= target_ltv → 'already at or above target; no work to do'. Every rebalance proposal from rc1 through rc16 was silently swallowed. Today's SOL drop made that visible. Fix: emit the real WithdrawMultiply envelope which routes to the existing unwind path.",
+      "After v0.4.22 the unwind→sweep→redeploy chain worked end-to-end and the first $135 deposit landed in stable_yield. Subsequent ticks then failed every cycle: the dashboard's /strategies endpoint makes four sequential RPC calls per strategy and routinely takes 22–60s under Helius load. The orchestrator's fetch_snapshot client was built with a 15s timeout that was always going to lose. Bumped to 90s so ticks complete; the proper fix (parallelise the chain reads with tokio::join!) belongs in a future dashboard PR.",
   },
   {
     version: "v0.4.16",
@@ -94,14 +80,14 @@ export const SHIPS: Ship[] = [
     date: "2026-06-03",
     headline: "Orchestrator subscribes to researcher's MarketSignals (closes the loop)",
     detail:
-      "Pre-rc14 the orchestrator only emitted envelopes. Now it consumes researcher's PriceMovedBps signals into a market cache; the allocator's cost-benefit gate suppresses SOL-sale rebalances when SOL is in a sharp downward move. Closes a real architectural gap — the LITEPAPER's 'execution daemons subscribe to MarketSignal' silently excluded the orchestrator.",
+      "Pre-rc14 the orchestrator only emitted envelopes. Now it consumes researcher's PriceMovedBps signals into a market cache; the allocator's cost-benefit gate suppresses rebalance moves when SOL is in a sharp downward window. Closes a real architectural gap — the LITEPAPER's 'execution daemons subscribe to MarketSignal' silently excluded the orchestrator.",
   },
   {
     version: "v0.4.13",
     date: "2026-06-02",
     headline: "Allocator now credits risk reduction in cross-strategy rebalance",
     detail:
-      "Pre-rc13 the cost-benefit gate was blind to directional exposure: it would refuse to move capital from multiply (β=1) to hedgedjlp (β=0) at a small APR gap, even though the rebalance materially reduces SOL exposure. v0.4.13 adds a one-sided risk-reduction credit so moves toward delta-neutral get scored on apr_gain + risk_gain, not just apr_gain.",
+      "Pre-rc13 the cost-benefit gate was blind to directional exposure: it refused to move capital between strategies at small APR gaps even when the rebalance materially reduces directional exposure. v0.4.13 adds a one-sided risk-reduction credit so moves toward delta-neutral get scored on apr_gain + risk_gain, not just apr_gain.",
   },
   {
     version: "v0.4.12",
@@ -111,13 +97,6 @@ export const SHIPS: Ship[] = [
       "Pre-rc12 the dashboard only valued the USDC residual; native SOL sitting outside strategies was invisible. The 0.62 SOL of recovered capital that hid here on 2026-06-01 is what motivated the fix. SOL price comes from Jupiter Lite Price API, cached 30s.",
   },
   {
-    version: "v0.4.11",
-    date: "2026-06-02",
-    headline: "Multiply card shows per-leg APR (jitoSOL yield, SOL borrow cost)",
-    detail:
-      "Strategy card now reads '$X @ 7.29% − $Y @ 5.52%' instead of just the dollar split. Yield % in green, cost % in amber so the directional sign is readable in one glance. Completes the v0.4.9 collateral/debt decomposition.",
-  },
-  {
     version: "v0.4.10",
     date: "2026-06-02",
     headline: "Hedgedjlp resize closes over-hedged legs (was: open-only)",
@@ -125,53 +104,11 @@ export const SHIPS: Ship[] = [
       "When JLP value dropped, the hedge previously never resized down — cycles 2 (3.80x) and 5 (3.91x) both ran over-hedged on production. Resize now identifies legs where existing > target and issues partial decrease_position requests symmetrically with the open-side path.",
   },
   {
-    version: "v0.4.9",
-    date: "2026-06-02",
-    headline: "Multiply card shows gross collateral / debt decomposition",
-    detail:
-      "Strategy card now renders \"$X collateral − $Y debt\" under the net figure for multiply. Answers the recurring 'what is this number made of?' question without re-deriving the position from chain state every time. Inspired by USCC's per-holding allocation table.",
-  },
-  {
     version: "v0.4.8",
     date: "2026-06-01",
     headline: "Trailing 24-hour APR as the headline number",
     detail:
       "Strategy cards now lead with the 24-hour mean APR (smoothed against realtime noise) instead of the second-by-second tick. Bitwise USCC reports a single dated yield — Hedgents does the same. Live APR is still shown underneath for transparency.",
-  },
-  {
-    version: "v0.4.7",
-    date: "2026-06-01",
-    headline: "Multiply APR estimate fixed (was using USDC borrow, multiply borrows SOL)",
-    detail:
-      "Dashboard's multiply APR was swinging to 0 / blank whenever Kamino's USDC borrow rate spiked. Strategy itself was unaffected — only the forward-looking APR estimate. Formula now uses Kamino SOL borrow (stable ~6%) instead of USDC borrow (volatile 4–47%).",
-  },
-  {
-    version: "v0.4.6",
-    date: "2026-06-01",
-    headline: "rc54 — SOL reserve farm constant updated (Kamino added a farm)",
-    detail:
-      "Kamino enabled a collateral farm on the SOL reserve after rc49 shipped. The expected_farm_collateral table now matches on-chain reality so the stale-RPC defender stops false-tripping on every SOL reserve load.",
-  },
-  {
-    version: "v0.4.5",
-    date: "2026-06-01",
-    headline: "rc53 — always sweep idle wallet SOL into the multiply obligation",
-    detail:
-      "Multiply seed no longer gates on usdc_lamports > 0; any wallet SOL above the fee buffer gets staked into the obligation each tick. Recovered 3.5 SOL of parked capital on the first live run.",
-  },
-  {
-    version: "v0.4.4",
-    date: "2026-06-01",
-    headline: "rc52 — refresh all obligation reserves before RefreshObligation",
-    detail:
-      "Existing-position seed previously refreshed only jitoSOL, then RefreshObligation failed (klend 0x1776) because the SOL reserve in the obligation was stale. Now refreshes every reserve the obligation references.",
-  },
-  {
-    version: "v0.4.3",
-    date: "2026-06-01",
-    headline: "rc47 — existing-position USDC seeding bug fix",
-    detail:
-      "Allocator's USDC envelope reached multiply but never entered the obligation because the seed path skipped when the obligation already held jitoSOL collateral. Forced top-up when usdc_lamports > 0.",
   },
   {
     version: "v0.4.2",
@@ -193,34 +130,6 @@ export const SHIPS: Ship[] = [
     headline: "Orchestrator daemon — autonomous regime-aware allocator",
     detail:
       "New compile-time-isolated daemon. Dispatches Assign/Withdraw envelopes on a tick; per-strategy cooldown + stale-snapshot guard; dry-run → execute promotion path documented.",
-  },
-  {
-    version: "v0.3.3",
-    date: "2026-05-16",
-    headline: "klend repay account-list fix",
-    detail:
-      "Multiply unwind round-trip proven on mainnet — position drained 35% → 2.5% LTV across two rounds.",
-  },
-  {
-    version: "v0.3.2",
-    date: "2026-05-16",
-    headline: "wSOL wrap inserted in unwind bundle",
-    detail:
-      "CreateATA + system transfer + sync_native bridge between Jito WithdrawSol and klend RepayV2.",
-  },
-  {
-    version: "v0.3.1",
-    date: "2026-05-16",
-    headline: "Jito WithdrawSol as iterative swap leg",
-    detail:
-      "Iterative deleverage now closes the loop: withdraw jitoSOL collateral → redeem to SOL → repay USDC borrow.",
-  },
-  {
-    version: "v0.3.0",
-    date: "2026-05-16",
-    headline: "WithdrawMultiply protocol + iterative unwind",
-    detail:
-      "Pure round-builder. v2 klend ixns for repay + withdraw_collateral. Approval queue routing.",
   },
   {
     version: "v0.2.9",
@@ -269,6 +178,6 @@ export const SHIPS: Ship[] = [
     date: "2026-04-22",
     headline: "Full fleet on devnet → mainnet bring-up",
     detail:
-      "5 daemons end-to-end: stable-yield, multiply, hedgedjlp, riskwatcher, researcher. Approval queues, libp2p mesh with role-bound keys, dashboard.",
+      "Daemons end-to-end: stable-yield, hedgedjlp, riskwatcher, researcher, orchestrator. Approval queues, libp2p mesh with role-bound keys, dashboard.",
   },
 ];

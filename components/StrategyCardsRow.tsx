@@ -101,20 +101,18 @@ function StrategyCardView({
                 </div>
               )}
             {/* v0.4.9: collateral / debt decomposition for strategies that
-                borrow (multiply today). Lets the operator see that "$287
-                net" is actually "$495 collateral − $208 debt" and answers
-                the recurring "what is this number made of?" question.
-                v0.4.11: per-leg APR appended when available (jitoSOL APY
-                on the collateral side, SOL borrow on the debt side).
-                Format pulls the numbers next to the leg they describe so
-                the math is readable in one glance. */}
+                borrow (onyc today). Lets the operator see that "$287 net"
+                is actually "$495 collateral − $208 debt" and answers the
+                recurring "what is this number made of?" question.
+                Per-leg APR is appended when available (ONyc NAV growth on
+                the collateral side, USDC borrow on the debt side). */}
             {isLive &&
               s.collateral_usd !== undefined &&
               s.debt_usd !== undefined &&
               s.collateral_usd > 0 && (
                 <div
                   className="text-[10px] opacity-60 tabular-nums mt-0.5"
-                  title="Collateral grows at the jitoSOL APY; debt accrues interest at the Kamino SOL borrow rate. Net position is collateral − debt at current spot prices."
+                  title="Collateral grows at the ONyc NAV growth rate; debt accrues interest at the Kamino USDC borrow rate. Net position is collateral − debt at current spot prices."
                 >
                   ${s.collateral_usd.toFixed(2)}
                   {s.collateral_apr_bps !== undefined &&
@@ -284,7 +282,7 @@ export function StrategyCardsRow() {
   }
 
   return (
-    // v0.5.0: still 3 strategies (multiply abandoned, onyc replaces it).
+    // v0.5.0: three strategies — stable_yield, hedgedjlp, onyc.
     // 3-col layout on md+ keeps the original institutional density.
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       {data.map((s) => (
