@@ -4,6 +4,12 @@ import { loadScarcityDeployment } from "@/lib/scarcity-deployment";
 import { onlineDetectorStorageConfigured } from "@/lib/scarcity-detector-store";
 import { loadScarcityOperatorConfig } from "@/lib/scarcity-operator";
 import { getExecutionControls } from "@/lib/execution-controls";
+import { getPublicTerminalFeatures } from "@/lib/terminal-feature-controls";
+import {
+  configuredMaximumSolDebitLamports,
+  configuredProgramFingerprintAllowlist,
+} from "@/lib/solana-transaction-guard";
+import { executionAuditConfigurationStatus } from "@/lib/execution-audit-store";
 
 export type ReadinessStatus = "ready" | "blocked" | "external";
 
@@ -54,7 +60,29 @@ export async function getBetaReadiness() {
   }
 
   const executionControls = getExecutionControls();
+  const terminalFeatures = getPublicTerminalFeatures();
   const executionRpcCount = configuredExecutionRpcCount();
+  let walletDebitConfigured = false;
+  let walletDebitDetail = "The exact wallet SOL-debit cap is not configured.";
+  try {
+    const lamports = configuredMaximumSolDebitLamports();
+    walletDebitConfigured = true;
+    walletDebitDetail = `Exact simulation permits at most ${lamports} lamports of net taker SOL debit.`;
+  } catch (error) {
+    walletDebitDetail = error instanceof Error ? error.message : walletDebitDetail;
+  }
+  let fingerprintConfigured = false;
+  let fingerprintDetail = "No reviewed route-program fingerprint is configured.";
+  try {
+    const fingerprints = configuredProgramFingerprintAllowlist();
+    fingerprintConfigured = Boolean(fingerprints?.size);
+    if (fingerprints?.size) {
+      fingerprintDetail = `${fingerprints.size} reviewed Solana route-program fingerprint(s) are allowlisted.`;
+    }
+  } catch (error) {
+    fingerprintDetail = error instanceof Error ? error.message : fingerprintDetail;
+  }
+  const auditConfiguration = executionAuditConfigurationStatus({ production: true });
   const checks: ReadinessCheck[] = [
     check("auth-secrets", "Access sessions", present("HEDGENTS_AUTH_SECRET") && present("HEDGENTS_ADMIN_CODE_HASH"), "Administrator and signed session configuration is complete; beta access uses individually revocable stored grants."),
     check("execution-secrets", "Execution receipts", present("HEDGENTS_ORDER_SIGNING_SECRET") && present("HEDGENTS_RECOVERY_SIGNING_SECRET"), "Order intents and recovery receipts use dedicated signing secrets."),
@@ -85,6 +113,17 @@ export async function getBetaReadiness() {
         ?? (executionControls.productAllowlistConfigured
           ? `${executionControls.allowedProductIds.length} product(s) enabled server-side: ${executionControls.allowedProductIds.join(", ")}.`
           : `No explicit production allowlist is configured; non-production currently permits all ${executionControls.allowedProductIds.length} registry product(s).`),
+    ),
+    check("execution-wallet-debit", "Wallet SOL-debit cap", walletDebitConfigured, walletDebitDetail),
+    check("execution-programs", "Route-program review", fingerprintConfigured, fingerprintDetail),
+    check("execution-audit", "Execution audit ledger", auditConfiguration.ready, auditConfiguration.detail),
+    check(
+      "rail-funding",
+      "Cross-chain rail funding",
+      !terminalFeatures.railFundingEnabled,
+      terminalFeatures.railFundingEnabled
+        ? "HEDGENTS_RAIL_FUNDING_ENABLED=true exposes terminal-initiated Ethereum/Base USDC funding. The first Solana-USDC beta requires it off."
+        : "Terminal-initiated Ethereum/Base funding is off; the beta funds in native Solana USDC only. Verification of an already-broadcast source burn stays available.",
     ),
     check("storage", "Durable evidence", onlineDetectorStorageConfigured(), "Private durable storage is configured for evidence, reviewed markets, analytics, and detector state."),
     check("origins", "Mutation origins", present("HEDGENTS_ALLOWED_ORIGINS"), "Explicit production browser origins are allowlisted."),

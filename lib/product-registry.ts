@@ -56,7 +56,7 @@ export const solanaSettlementAssets = {
 
 export function getSolanaSettlementAsset(value: unknown): SolanaSettlementAsset | null {
   if (typeof value !== "string") return null;
-  return (solanaSettlementAssets as Record<string, SolanaSettlementAsset>)[value] ?? null;
+  return ownEntry(solanaSettlementAssets as Record<string, SolanaSettlementAsset>, value);
 }
 
 export interface RegistrySource {
@@ -386,10 +386,17 @@ export const solanaExecutionProducts = {
 
 export type ExecutableProductId = keyof typeof solanaExecutionProducts;
 
+// Registry lookups must be own-property-only. A plain index walks the prototype chain, so a
+// caller-supplied "__proto__" or "constructor" would resolve to an inherited object instead of
+// null and pass every `product === null` guard downstream.
+function ownEntry<T>(registry: Record<string, T>, key: string): T | null {
+  return Object.prototype.hasOwnProperty.call(registry, key) ? registry[key] : null;
+}
+
 export function getSolanaExecutionProduct(productId: string): SolanaExecutionProduct | null {
-  return (solanaExecutionProducts as Record<string, SolanaExecutionProduct>)[productId] ?? null;
+  return ownEntry(solanaExecutionProducts as Record<string, SolanaExecutionProduct>, productId);
 }
 
 export function isSolanaExecutionProduct(productId: string): productId is ExecutableProductId {
-  return productId in solanaExecutionProducts;
+  return Object.prototype.hasOwnProperty.call(solanaExecutionProducts, productId);
 }

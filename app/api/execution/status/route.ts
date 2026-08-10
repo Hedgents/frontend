@@ -3,6 +3,8 @@ import { apiSecurityError, readJsonBody, secureMutation } from "@/lib/api-securi
 import { validateRecoveryAuthorization } from "@/lib/execution-authorization";
 import { ExecutionValidationError, validateTransactionSignature } from "@/lib/execution-validation";
 import { verifySolanaSettlement } from "@/lib/jupiter-server";
+import { submissionStateFromSettlement } from "@/lib/execution-records";
+import { scheduleExecutionAuditObservation } from "@/lib/execution-audit-after";
 
 export const dynamic = "force-dynamic";
 
@@ -14,6 +16,12 @@ export async function POST(request: Request) {
     const signature = validateTransactionSignature(body.signature);
     const claims = validateRecoveryAuthorization(body.recoveryAuthorization);
     const settlement = await verifySolanaSettlement(signature, claims, "finalized");
+    scheduleExecutionAuditObservation({
+      signature,
+      submissionState: submissionStateFromSettlement(settlement),
+      settlementState: settlement.status,
+      errorCode: settlement.errorCode ?? null,
+    });
     return NextResponse.json(
       { signature, status: settlement.status === "verified" ? "Success" : settlement.status === "failed" ? "Failed" : "Pending", settlement },
       { headers: { ...responseHeaders, "cache-control": "no-store" } },

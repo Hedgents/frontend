@@ -23,14 +23,38 @@ if (configuredBuyTaker && (configuredBuyTaker.length < 32 || configuredBuyTaker.
   throw new Error("HEDGENTS_SIMULATION_WALLET must be a valid Solana public address. No private key is used.");
 }
 
-const rpcUrls = [...new Set([
+const configuredRpcUrls = [...new Set([
   ...(process.env.HEDGENTS_SOLANA_MAINNET_RPC_URLS ?? "").split(","),
   process.env.HEDGENTS_SOLANA_MAINNET_RPC_URL ?? "",
   process.env.NEXT_PUBLIC_SOLANA_MAINNET_RPC_URL ?? "",
   process.env.NEXT_PUBLIC_SOLANA_CLUSTER !== "devnet" ? process.env.HEDGENTS_SOLANA_RPC_URL ?? "" : "",
   process.env.NEXT_PUBLIC_SOLANA_CLUSTER !== "devnet" ? process.env.NEXT_PUBLIC_SOLANA_RPC_URL ?? "" : "",
-  DEFAULT_SOLANA_RPC,
 ].map((value) => value.trim()).filter(Boolean))];
+
+function rpcHost(url: string) {
+  try {
+    return new URL(url).host;
+  } catch {
+    return url;
+  }
+}
+
+// The public endpoint is never appended silently. Without the opt-in, a typo in the RPC variable
+// would produce a clean-looking artifact that was actually served by one rate-limited endpoint.
+const allowPublicRpc = process.env.HEDGENTS_ALLOW_PUBLIC_RPC?.trim() === "true";
+const rpcUrls = [...new Set(
+  allowPublicRpc ? [...configuredRpcUrls, DEFAULT_SOLANA_RPC] : configuredRpcUrls,
+)];
+if (rpcUrls.length === 0) {
+  throw new Error(
+    "Set HEDGENTS_SOLANA_MAINNET_RPC_URLS to two independent providers, or set HEDGENTS_ALLOW_PUBLIC_RPC=true to accept the public endpoint.",
+  );
+}
+const rpcHosts = [...new Set(rpcUrls.map(rpcHost))];
+// "Two independent RPCs" means the simulation is confirmed against a second provider, not that a
+// second URL exists to fail over to. Distinct hosts, not distinct strings.
+const primaryRpcUrl = rpcUrls[0];
+const confirmationRpcUrl = rpcUrls.find((url) => rpcHost(url) !== rpcHost(primaryRpcUrl)) ?? null;
 const requestedAmount = process.argv[2] ? Number(process.argv[2]) : null;
 if (requestedAmount !== null && (!Number.isFinite(requestedAmount) || requestedAmount <= 0)) {
   throw new Error("Pass a positive optional USDC simulation amount.");
@@ -51,26 +75,41 @@ interface ParsedAccountInfo {
 
 const wait = (milliseconds: number) => new Promise((resolve) => setTimeout(resolve, milliseconds));
 
-async function rpcRequest<T>(method: string, params: unknown[]) {
+const RPC_TIMEOUT_MS = 20_000;
+
+async function rpcRequest<T>(method: string, params: unknown[], endpoints: string[] = rpcUrls) {
   let lastError = "Solana RPC unavailable.";
-  for (const rpcUrl of rpcUrls) {
+  for (const rpcUrl of endpoints) {
     for (let attempt = 0; attempt < 3; attempt += 1) {
-      const response = await fetch(rpcUrl, {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          jsonrpc: "2.0",
-          id: `hedgents-matrix-${method}`,
-          method,
-          params,
-        }),
-      });
-      if (response.status === 429 || response.status >= 500) {
-        lastError = `Solana RPC returned ${response.status}.`;
+      let response: Response;
+      try {
+        response = await fetch(rpcUrl, {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({
+            jsonrpc: "2.0",
+            id: `hedgents-matrix-${method}`,
+            method,
+            params,
+          }),
+          signal: AbortSignal.timeout(RPC_TIMEOUT_MS),
+        });
+      } catch (error) {
+        // A transport failure or timeout must fail over to the next provider rather than abort the
+        // whole matrix, exactly like a 429 or a 5xx.
+        lastError = `${rpcHost(rpcUrl)}: ${error instanceof Error ? error.message : String(error)}`;
         await wait(300 * (attempt + 1));
         continue;
       }
-      if (!response.ok) throw new Error(`Solana RPC returned ${response.status}.`);
+      if (response.status === 429 || response.status >= 500) {
+        lastError = `${rpcHost(rpcUrl)} returned ${response.status}.`;
+        await wait(300 * (attempt + 1));
+        continue;
+      }
+      if (!response.ok) {
+        lastError = `${rpcHost(rpcUrl)} returned ${response.status}.`;
+        break;
+      }
       const payload = (await response.json()) as { result?: T; error?: { message?: string } };
       if (payload.error) throw new Error(payload.error.message ?? "Solana RPC rejected the request.");
       if (payload.result === undefined) throw new Error("Solana RPC returned no result.");
@@ -97,9 +136,10 @@ async function jupiterOrder(params: URLSearchParams) {
   throw new Error(lastError);
 }
 
-async function simulateTransaction(
+async function guardOnEndpoints(
   transaction: string,
   expectation: Omit<TransactionGuardExpectation, "maximumSolDebitLamports">,
+  endpoints: string[],
 ) {
   const payload = await rpcRequest<{ value?: SolanaSimulationValue }>("simulateTransaction", [
     transaction,
@@ -110,9 +150,12 @@ async function simulateTransaction(
       replaceRecentBlockhash: false,
       innerInstructions: true,
     },
-  ]);
+  ], endpoints);
   const result = payload?.value;
   if (!result) throw new Error("Solana RPC returned no simulation result.");
+  // The guard requires err === null. A provider that omits the field entirely would otherwise be
+  // rejected here as a route failure rather than reported as a provider defect.
+  if (!("err" in result)) throw new Error("Solana RPC omitted the simulation error field.");
   if (result.err) {
     const usefulLog = result.logs?.slice().reverse().find((line) => line.includes("Error") || line.includes("failed"));
     throw new Error(usefulLog ?? `Simulation failed: ${JSON.stringify(result.err)}`);
@@ -121,6 +164,26 @@ async function simulateTransaction(
     ...expectation,
     maximumSolDebitLamports,
   });
+}
+
+async function simulateTransaction(
+  transaction: string,
+  expectation: Omit<TransactionGuardExpectation, "maximumSolDebitLamports">,
+) {
+  const primary = await guardOnEndpoints(transaction, expectation, [primaryRpcUrl]);
+  if (!confirmationRpcUrl) return { guard: primary, crossChecked: false };
+  // Confirm the exact same signed bytes against a second, independent provider. A disagreement
+  // means one provider's accounting cannot be trusted for a real-funds decision.
+  const confirmation = await guardOnEndpoints(transaction, expectation, [confirmationRpcUrl]);
+  if (confirmation.reportDigest !== primary.reportDigest) {
+    throw new Error(
+      `Independent RPC disagreement between ${rpcHost(primaryRpcUrl)} and ${rpcHost(confirmationRpcUrl)}: `
+      + `SOL debit ${primary.takerSolDebitLamports} vs ${confirmation.takerSolDebitLamports}, `
+      + `fee ${primary.networkFeeLamports} vs ${confirmation.networkFeeLamports}, `
+      + `programs ${primary.programFingerprint.slice(0, 12)} vs ${confirmation.programFingerprint.slice(0, 12)}.`,
+    );
+  }
+  return { guard: primary, crossChecked: true };
 }
 
 async function findPublicHolder(mint: string, minimumAmount: bigint) {
@@ -213,7 +276,7 @@ for (const product of Object.values(solanaExecutionProducts)) {
     });
     buyOutputAmount = validated.outputAmount;
     phase = "simulation";
-    const guard = await simulateTransaction(validated.transaction, {
+    const { guard, crossChecked } = await simulateTransaction(validated.transaction, {
       taker: buyTaker,
       inputMint: product.execution.inputMint,
       outputMint: product.mint,
@@ -232,6 +295,8 @@ for (const product of Object.values(solanaExecutionProducts)) {
       router: typeof payload.router === "string" ? payload.router : null,
       unitsConsumed: guard.unitsConsumed,
       programFingerprint: guard.programFingerprint,
+      programIds: guard.programIds,
+      crossCheckedOnSecondRpc: crossChecked,
       takerSolDebitLamports: guard.takerSolDebitLamports,
       networkFeeLamports: guard.networkFeeLamports,
       latencyMs: Date.now() - buyStartedAt,
@@ -286,7 +351,7 @@ for (const product of Object.values(solanaExecutionProducts)) {
         maximumPriceImpactPct: product.execution.maximumPriceImpactPct,
       });
       phase = "simulation";
-      const guard = await simulateTransaction(validated.transaction, {
+      const { guard, crossChecked } = await simulateTransaction(validated.transaction, {
         taker: sellTaker,
         inputMint: product.mint,
         outputMint: settlement.mint,
@@ -305,6 +370,8 @@ for (const product of Object.values(solanaExecutionProducts)) {
         router: typeof payload.router === "string" ? payload.router : null,
         unitsConsumed: guard.unitsConsumed,
         programFingerprint: guard.programFingerprint,
+        programIds: guard.programIds,
+        crossCheckedOnSecondRpc: crossChecked,
         takerSolDebitLamports: guard.takerSolDebitLamports,
         networkFeeLamports: guard.networkFeeLamports,
         holder: `${sellTaker.slice(0, 5)}…${sellTaker.slice(-4)}`,
@@ -331,24 +398,47 @@ for (const product of Object.values(solanaExecutionProducts)) {
 const failed = results.filter((result) => result.status === "failed");
 const buyResults = results.filter((result) => result.direction === "buy");
 const sellResults = results.filter((result) => result.direction === "sell");
-const programFingerprints = [...new Set(
-  results
-    .map((result) => result.programFingerprint)
-    .filter((value): value is string => typeof value === "string"),
-)].sort();
+// Emit each candidate fingerprint together with the exact program set it authorizes. Reviewing a
+// bare hash is not something an operator can actually do.
+const fingerprintPrograms = new Map<string, string[]>();
+for (const result of results) {
+  if (typeof result.programFingerprint !== "string") continue;
+  if (!fingerprintPrograms.has(result.programFingerprint)) {
+    fingerprintPrograms.set(result.programFingerprint, (result.programIds as string[] | undefined) ?? []);
+  }
+}
+const programFingerprints = [...fingerprintPrograms.keys()].sort();
+const passedResults = results.filter((result) => result.status === "passed");
 console.log(JSON.stringify({
   checkedAt: new Date().toISOString(),
   mode: "read-only simulation; public state only; no signature and no submission",
   buyWallet: `${buyTaker.slice(0, 5)}…${buyTaker.slice(-4)}`,
+  rpcEndpointHosts: rpcHosts,
+  independentRpcCount: rpcHosts.length,
+  publicRpcAccepted: allowPublicRpc,
+  crossCheckedOnSecondRpc: confirmationRpcUrl !== null,
   adapterCount: Object.keys(solanaExecutionProducts).length,
   routeCount: results.length,
   buyPassed: buyResults.filter((result) => result.status === "passed").length,
   sellPassed: sellResults.filter((result) => result.status === "passed").length,
   failedCount: failed.length,
   allPassed: failed.length === 0,
-  reviewedProgramFingerprintCandidates: programFingerprints,
+  twoRpcGateSatisfied: confirmationRpcUrl !== null
+    && passedResults.length > 0
+    && passedResults.every((result) => result.crossCheckedOnSecondRpc === true),
+  reviewedProgramFingerprintCandidates: programFingerprints.map((fingerprint) => ({
+    fingerprint,
+    programIds: fingerprintPrograms.get(fingerprint) ?? [],
+  })),
   results,
 }, null, 2));
+
+if (!confirmationRpcUrl) {
+  console.error(
+    "WARNING: only one independent RPC host was configured, so no simulation was cross-checked. "
+    + "This artifact does not satisfy the two-independent-RPC launch gate.",
+  );
+}
 
 if (failed.length > 0) process.exitCode = 1;
 }

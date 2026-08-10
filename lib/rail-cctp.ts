@@ -11,6 +11,14 @@ import { parseDecimalToBaseUnits, validateSolanaAddress } from "./execution-vali
 export const CCTP_PROVIDER_ID = "circle-cctp-v2-solana";
 export const CCTP_USDC_DECIMALS = 6;
 
+/**
+ * The CCTP plugin calls Circle's attestation service directly from the browser. The terminal's
+ * page CSP is an explicit allowlist, so this origin has to appear in `connect-src` or the
+ * documented "resume an already-broadcast source burn" path fails with a blocked fetch.
+ * Keep this in sync with the plugin's default API base URL.
+ */
+export const CCTP_ATTESTATION_ORIGIN = "https://iris-api.circle.com";
+
 export type CctpSourceId = "ethereum" | "base";
 
 export interface CctpSourceDefinition {

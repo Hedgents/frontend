@@ -93,6 +93,13 @@ interface NormalizedTokenBalance {
   amount: bigint;
 }
 
+interface TakerTokenAccounts {
+  /** Taker-owned token accounts that already existed before this transaction. */
+  preExisting: Set<string>;
+  /** Every taker-owned token account, including any the route creates in flight. */
+  owned: Set<string>;
+}
+
 function guardFailure(message: string, status = 502): never {
   throw new ExecutionValidationError(`Unsafe Solana transaction: ${message}`, status);
 }
@@ -170,10 +177,42 @@ function littleEndianU32(data: Uint8Array) {
   return data[0] | (data[1] << 8) | (data[2] << 16) | (data[3] << 24);
 }
 
+function assertTokenAuthorityInstructionSafe(
+  name: string,
+  target: string | null,
+  destination: string | null,
+  taker: string,
+  takerAccounts: TakerTokenAccounts,
+) {
+  if (!target) {
+    guardFailure(`the route can ${name} an unresolved token account.`);
+  }
+  if (name === "closeAccount") {
+    // A route may close a token account it created inside the same transaction — that is how
+    // wrapped SOL is unwrapped. It may never close an account the taker already held, and the
+    // reclaimed rent must return to the taker rather than to a route-controlled address.
+    if (takerAccounts.preExisting.has(target)) {
+      guardFailure("the route can closeAccount a pre-existing taker token account.");
+    }
+    if (takerAccounts.owned.has(target) && destination !== taker) {
+      guardFailure("the route closes a taker token account to a destination other than the taker.");
+    }
+    return;
+  }
+  // approve/setAuthority/freeze/thaw against any taker-owned account is rejected whether or not
+  // that account existed before this transaction. A token account created for the taker inside
+  // the route still holds the taker's metal once the swap settles, so delegating or seizing
+  // authority over it is a post-settlement drain even though every balance delta looks correct.
+  if (takerAccounts.owned.has(target)) {
+    guardFailure(`the route can ${name} a taker token account.`);
+  }
+}
+
 function analyzeTokenInstruction(
   data: Uint8Array,
   accounts: string[],
-  preExistingTakerAccounts: Set<string>,
+  taker: string,
+  takerAccounts: TakerTokenAccounts,
 ) {
   if (data.length === 0) guardFailure("a token instruction is truncated.");
   const opcode = data[0];
@@ -194,9 +233,13 @@ function analyzeTokenInstruction(
     if (dangerousName.includes("burn")) {
       guardFailure(`the route contains a ${dangerousName} token instruction.`);
     }
-    if (!target || preExistingTakerAccounts.has(target)) {
-      guardFailure(`the route can ${dangerousName} a pre-existing taker token account.`);
-    }
+    assertTokenAuthorityInstructionSafe(
+      dangerousName,
+      target,
+      accounts[1] ?? null,
+      taker,
+      takerAccounts,
+    );
     return `token:opcode-${opcode}:transient:${target}`;
   }
   if (!safeOpcodes.has(opcode)) {
@@ -207,7 +250,8 @@ function analyzeTokenInstruction(
 
 function analyzeParsedTokenInstruction(
   parsed: Record<string, unknown>,
-  preExistingTakerAccounts: Set<string>,
+  taker: string,
+  takerAccounts: TakerTokenAccounts,
 ) {
   const type = stringField(parsed.type);
   const info = record(parsed.info);
@@ -258,9 +302,14 @@ function analyzeParsedTokenInstruction(
     guardFailure(`the route contains a ${type} token instruction.`);
   }
   if (dangerous.has(normalized)) {
-    if (!target || preExistingTakerAccounts.has(target)) {
-      guardFailure(`the route can ${type} a pre-existing taker token account.`);
-    }
+    const rawDestination = stringField(info?.destination);
+    assertTokenAuthorityInstructionSafe(
+      normalized === "closeaccount" ? "closeAccount" : type,
+      target,
+      rawDestination ? canonicalAddress(rawDestination, `parsed token ${type} destination`) : null,
+      taker,
+      takerAccounts,
+    );
     return `token:opcode-${opcode}:transient:${target}`;
   }
   const safe = new Set([
@@ -289,10 +338,17 @@ function analyzeParsedTokenInstruction(
 function analyzeSystemInstruction(data: Uint8Array, accounts: string[], taker: string) {
   const opcode = littleEndianU32(data);
   const targetOrSource = accounts[0] ?? null;
-  if ((opcode === 2 || opcode === 11) && targetOrSource === taker) {
+  // AllocateWithSeed (9), AssignWithSeed (10), and TransferWithSeed (11) address the derived
+  // account at index 0 and the signing base at index 1. Checking index 0 alone would miss a
+  // seed-derived account funded from the taker's own key.
+  const seedBase = opcode === 9 || opcode === 10 || opcode === 11 ? accounts[1] ?? null : null;
+  if ((opcode === 2 || opcode === 11) && (targetOrSource === taker || seedBase === taker)) {
     guardFailure("the route contains an arbitrary System Program transfer from the taker.");
   }
-  if ((opcode === 1 || opcode === 8 || opcode === 9 || opcode === 10) && targetOrSource === taker) {
+  if (
+    (opcode === 1 || opcode === 8 || opcode === 9 || opcode === 10)
+    && (targetOrSource === taker || seedBase === taker)
+  ) {
     guardFailure("the route can assign or allocate the taker's wallet account.");
   }
   const safe = new Set([0, 1, 2, 3, 8, 9, 10, 11]);
@@ -309,14 +365,18 @@ function analyzeParsedSystemInstruction(parsed: Record<string, unknown>, taker: 
   const normalized = type.toLowerCase();
   const rawSource = stringField(info?.source) ?? stringField(info?.fromPubkey);
   const rawTarget = stringField(info?.account) ?? rawSource;
+  // The seed variants report the derived account in source/account and the signing key that
+  // authorizes it in sourceBase/base. Only the base identifies the taker.
+  const rawBase = stringField(info?.sourceBase) ?? stringField(info?.base);
   const source = rawSource ? canonicalAddress(rawSource, `parsed System ${type} source`) : null;
   const target = rawTarget ? canonicalAddress(rawTarget, `parsed System ${type} target`) : null;
-  if ((normalized === "transfer" || normalized === "transferwithseed") && source === taker) {
+  const base = rawBase ? canonicalAddress(rawBase, `parsed System ${type} base`) : null;
+  if ((normalized === "transfer" || normalized === "transferwithseed") && (source === taker || base === taker)) {
     guardFailure("the route contains an arbitrary System Program transfer from the taker.");
   }
   if (
     (normalized === "assign" || normalized === "assignwithseed" || normalized === "allocate" || normalized === "allocatewithseed")
-    && target === taker
+    && (target === taker || base === taker)
   ) {
     guardFailure("the route can assign or allocate the taker's wallet account.");
   }
@@ -359,13 +419,13 @@ function analyzeInstruction(
   data: unknown,
   parsed: unknown,
   taker: string,
-  preExistingTakerAccounts: Set<string>,
+  takerAccounts: TakerTokenAccounts,
 ) {
   const parsedRecord = record(parsed);
   if (SUPPORTED_TOKEN_PROGRAMS.has(programId)) {
     return parsedRecord
-      ? analyzeParsedTokenInstruction(parsedRecord, preExistingTakerAccounts)
-      : analyzeTokenInstruction(decodeInstructionData(data), accounts, preExistingTakerAccounts);
+      ? analyzeParsedTokenInstruction(parsedRecord, taker, takerAccounts)
+      : analyzeTokenInstruction(decodeInstructionData(data), accounts, taker, takerAccounts);
   }
   if (programId === SYSTEM_PROGRAM) {
     return parsedRecord
@@ -416,7 +476,8 @@ function tokenDeltas(
   taker: string,
 ) {
   const deltas = new Map<string, bigint>();
-  const preExistingTakerAccounts = new Set<string>();
+  const preExisting = new Set<string>();
+  const owned = new Set<string>();
   const indexes = new Set([...before.keys(), ...after.keys()]);
   for (const index of indexes) {
     const pre = before.get(index);
@@ -432,12 +493,16 @@ function tokenDeltas(
     }
     const metadata = pre ?? post;
     if (!metadata) continue;
-    if (pre?.owner === taker) preExistingTakerAccounts.add(pre.address);
+    if (pre?.owner === taker) preExisting.add(pre.address);
+    // An account the route creates for the taker inside this transaction appears only in the
+    // post set. It still belongs to the taker afterwards, so it must be protected too.
+    if (post?.owner === taker) owned.add(post.address);
     if (metadata.owner !== taker) continue;
+    owned.add(metadata.address);
     const delta = (post?.amount ?? 0n) - (pre?.amount ?? 0n);
     deltas.set(metadata.mint, (deltas.get(metadata.mint) ?? 0n) + delta);
   }
-  return { deltas, preExistingTakerAccounts };
+  return { deltas, takerAccounts: { preExisting, owned } satisfies TakerTokenAccounts };
 }
 
 function requireStringArray(value: unknown, label: string) {
@@ -578,7 +643,7 @@ export function guardSolanaTransaction(
 
   const before = normalizeTokenBalances(simulation.preTokenBalances, resolvedAccounts, "preTokenBalances");
   const after = normalizeTokenBalances(simulation.postTokenBalances, resolvedAccounts, "postTokenBalances");
-  const { deltas, preExistingTakerAccounts } = tokenDeltas(before, after, expectedTaker);
+  const { deltas, takerAccounts } = tokenDeltas(before, after, expectedTaker);
   const inputDelta = deltas.get(expectedInputMint) ?? 0n;
   const outputDelta = deltas.get(expectedOutputMint) ?? 0n;
   const inputDebit = inputDelta < 0n ? -inputDelta : 0n;
@@ -623,7 +688,7 @@ export function guardSolanaTransaction(
       instruction.data,
       null,
       expectedTaker,
-      preExistingTakerAccounts,
+      takerAccounts,
     ));
   }
   const seenInnerGroups = new Set<number>();
@@ -671,7 +736,7 @@ export function guardSolanaTransaction(
         instruction.data,
         instruction.parsed,
         expectedTaker,
-        preExistingTakerAccounts,
+        takerAccounts,
       ));
     }
   }

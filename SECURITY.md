@@ -24,15 +24,16 @@
 - Mainnet scarcity manifests fail closed without canonical Solana USDC, declared multisig approvals, and published audit, dispute, incident-response, and manual challenge-window commitments.
 - Durable invite, market, and detector indexes use conditional Blob writes; bounded datasets and analytics scans prevent silent unbounded growth. Dataset publication fails on a concurrent conflicting write.
 - Beta cookies carry a durable invite grant/version and expire within 12 hours. Proxy strips caller-supplied internal proofs and mints a short-lived request-bound attestation that protected handlers independently verify. Real-funds order and submission boundaries recheck the uncached grant; read-only traffic uses the private Blob CDN for at most 60 seconds. Revocation blocks new trades immediately and propagates through read-only access within one minute.
+- Immediately before Jupiter submission, Hedgents writes an immutable private intent keyed by an HMAC of the authenticated Solana signature and bound to the transaction/guard digests and block-height expiry. Duplicate intent fails closed without another venue call; storage uncertainty never becomes a retry. Bounded post-response and recovery observations are best effort, integrity-HMACed, and exclude raw signatures, wallet addresses, exact amounts, signed transactions, IP/location, and raw request/session identifiers.
 
 ## Secrets
 
-Production requires independent random `HEDGENTS_ORDER_SIGNING_SECRET` and `HEDGENTS_RECOVERY_SIGNING_SECRET` values. `JUPITER_API_KEY` is never a production signing fallback. Rotate a signing secret only after accepting that outstanding tokens signed by the old value will stop validating.
+Production requires independent random `HEDGENTS_ORDER_SIGNING_SECRET`, `HEDGENTS_RECOVERY_SIGNING_SECRET`, and `HEDGENTS_EXECUTION_AUDIT_SECRET` values. `JUPITER_API_KEY` is never a production signing fallback. Rotate a signing secret only after accepting that outstanding tokens signed by the old value will stop validating; rotating the audit secret also makes prior record-integrity HMACs unverifiable unless the old key is retained offline.
 
 ## Deliberate closed-beta limitations
 
 - Rate-limit counters live in each server instance. They are not a substitute for distributed WAF/rate-limit storage at public scale.
-- Execution history is local-first. Signed recovery receipts plus Solana are the durable source of truth; every non-failed record loaded or imported is downgraded to Pending and reverified before it can affect accounting. Users must export receipts before clearing site data.
+- Detailed execution history is local-first. The server audit ledger records a deliberately minimal intent and bounded status observations, not wallet addresses, exact amounts, or portable recovery credentials. Signed recovery receipts plus Solana remain the settlement source of truth; every non-failed record loaded or imported is downgraded to Pending and reverified before it can affect accounting. Users must export receipts before clearing site data.
 - FIFO cost basis is a convenience calculation from verified Hedgents fills, not tax advice. External transfers and trades reduce history coverage.
 - Wallet-extension behavior and paid mainnet settlement require the manual canary matrix.
 - Issuer/jurisdiction approval and an independent security review remain external gates before public launch.

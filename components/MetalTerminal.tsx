@@ -91,7 +91,7 @@ import {
 import type { LiveQuote, MetalQuoteResponse } from "@/lib/quote-types";
 import type { CctpSourceId } from "@/lib/rail-cctp";
 import type { PublicTerminalFeatures } from "@/lib/terminal-feature-controls";
-import { defaultAmountForTradeSide } from "@/lib/trade-ticket-state";
+import { defaultAmountForTradeSide, maximumSellAmount } from "@/lib/trade-ticket-state";
 import { SCARCITY_TRACKED_ELEMENT_COUNT } from "@/lib/scarcity/registry";
 import type { ScarcityMarket } from "./ScarcityExchange";
 import {
@@ -530,8 +530,21 @@ export function MetalTerminal({
   const selectedProductBalance = portfolio.data?.balances.find(
     (balance) => balance.productId === selectedProduct.id,
   );
-  const hasEnoughMetal = tradeSide === "buy" || !selectedExactRoute?.inputAmount ||
-    BigInt(selectedProductBalance?.rawAmount ?? "0") >= BigInt(selectedExactRoute.inputAmount);
+  const maxSellAmount = maximumSellAmount(
+    executionControl.maxUsd,
+    selectedProductBalance?.amount,
+    selectedProductPrice,
+  );
+  // The exact route lags the typed amount by the comparison debounce, so a route-only balance
+  // check leaves Review clickable for a size the ticket already labels as unaffordable. Judge the
+  // live amount first, then keep the exact base-unit check for the settled route.
+  const insufficientMetal = tradeSide === "sell"
+    && parsedAmount > 0
+    && Number(selectedProductBalance?.amount ?? "0") < parsedAmount;
+  const hasEnoughMetal = tradeSide === "buy"
+    || (!insufficientMetal
+      && (!selectedExactRoute?.inputAmount
+        || BigInt(selectedProductBalance?.rawAmount ?? "0") >= BigInt(selectedExactRoute.inputAmount)));
   const registryReady = tradeSide === "buy"
     ? registry.data?.ready === true
     : registry.data?.identity.status === "verified" && registry.data?.onchain.status === "verified";
@@ -733,6 +746,7 @@ export function MetalTerminal({
   const chooseMarket = (market: MetalMarket) => {
     setSelectedMetalId(market.id);
     setSelectedProductId(null);
+    setEligibilityAccepted(false);
     setHedgeEnabled(false);
     updateTerminalUrl({ metalId: market.id, productId: null });
     scrollToTerminalTarget("selected-product");
@@ -740,6 +754,7 @@ export function MetalTerminal({
 
   const chooseProduct = (productId: string) => {
     setSelectedProductId(productId);
+    setEligibilityAccepted(false);
     updateTerminalUrl({ metalId: selectedMarket.id, productId });
     scrollToTerminalTarget("order-ticket");
   };
@@ -751,7 +766,11 @@ export function MetalTerminal({
       side,
       executionControl.maxUsd,
       selectedProductBalance?.amount,
+      selectedProductPrice,
     ));
+    // The attestation text and the issuer terms differ per direction and per product, so a
+    // previous affirmative click must not carry over to a different one.
+    setEligibilityAccepted(false);
     if (side === "buy") {
       setSettlementAssetId("usdc");
       setFundingSourceId("solana");
@@ -1248,6 +1267,8 @@ export function MetalTerminal({
             tradeSide={tradeSide}
             settlementAssetId={settlementAssetId}
             selectedProductBalance={selectedProductBalance?.amount ?? "0"}
+            maxSellAmount={maxSellAmount}
+            insufficientMetal={insufficientMetal}
             routeFee={routeFee}
             estimatedUnits={estimatedUnits}
             hedgeEnabled={hedgeEnabled}
@@ -1314,7 +1335,12 @@ export function MetalTerminal({
               setTradeSide("sell");
               setFundingSourceId("solana");
               setHedgeEnabled(false);
-              setAmount(balance);
+              setEligibilityAccepted(false);
+              setAmount(maximumSellAmount(
+                executionControl.maxUsd,
+                balance,
+                liveQuotes.data?.products[productId]?.priceUsd ?? null,
+              ));
               setView("markets");
               updateTerminalUrl({ view: "markets", metalId: market?.id ?? selectedMetalId, productId });
             }}
@@ -1405,6 +1431,8 @@ interface MarketsViewProps {
   tradeSide: TradeSide;
   settlementAssetId: SettlementAssetId;
   selectedProductBalance: string;
+  maxSellAmount: string;
+  insufficientMetal: boolean;
   routeFee: number;
   estimatedUnits: number;
   hedgeEnabled: boolean;
@@ -1460,6 +1488,8 @@ function MarketsView({
   tradeSide,
   settlementAssetId,
   selectedProductBalance,
+  maxSellAmount,
+  insufficientMetal,
   routeFee,
   estimatedUnits,
   hedgeEnabled,
@@ -1847,6 +1877,8 @@ function MarketsView({
           tradeSide={tradeSide}
           settlementAssetId={settlementAssetId}
           selectedProductBalance={selectedProductBalance}
+          maxSellAmount={maxSellAmount}
+          insufficientMetal={insufficientMetal}
           routeFee={routeFee}
           estimatedUnits={estimatedUnits}
           hedgeEnabled={hedgeEnabled}
@@ -1896,6 +1928,8 @@ interface OrderTicketProps {
   tradeSide: TradeSide;
   settlementAssetId: SettlementAssetId;
   selectedProductBalance: string;
+  maxSellAmount: string;
+  insufficientMetal: boolean;
   routeFee: number;
   estimatedUnits: number;
   hedgeEnabled: boolean;
@@ -1939,6 +1973,8 @@ function OrderTicket({
   tradeSide,
   settlementAssetId,
   selectedProductBalance,
+  maxSellAmount,
+  insufficientMetal,
   routeFee,
   estimatedUnits,
   hedgeEnabled,
@@ -1983,7 +2019,6 @@ function OrderTicket({
     ? fundingSources.find((source) => source.id === pendingFundingSourceId) ?? null
     : null;
   const crossChainFundingSelected = tradeSide === "buy" && fundingSourceId !== "solana";
-  const insufficientMetal = tradeSide === "sell" && Number(amount) > Number(selectedProductBalance);
   const shouldConnectWallet =
     executionControl.enabled && executionAdapterReady && executionServiceReady && exactRoute?.available === true && !walletConnected;
   const displayedRouteNodes = crossChainFundingSelected
@@ -2146,7 +2181,7 @@ function OrderTicket({
           aria-describedby="amount-output"
         />
         {tradeSide === "sell" ? (
-          <button type="button" onClick={() => onAmountChange(selectedProductBalance)}>Max</button>
+          <button type="button" onClick={() => onAmountChange(maxSellAmount)}>Max</button>
         ) : <span>USDC</span>}
       </div>
       {tradeSide === "buy" ? (

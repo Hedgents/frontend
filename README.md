@@ -23,7 +23,8 @@ Cross-chain stablecoin transport is supplied by the external Rail SDK. Hedgents 
 - Optional privacy-preserving beta diagnostics, off by default
 - A production fail-closed execution switch and exact server-side closed-beta transaction cap; receipt recovery remains available during a pause
 - A production fail-closed product execution allowlist, initially intended for `gold-paxg`; the full registry remains available for read-only discovery
-- Twelve-hour beta sessions bound to individually revocable durable invite grants; revoked sessions are rejected on their next protected request
+- Twelve-hour beta sessions bound to individually revocable durable invite grants; revocation blocks order/submission immediately and read-only access within 60 seconds
+- A private immutable pre-Jupiter intent ledger plus bounded best-effort settlement observations, without wallet addresses, exact amounts, or signed transactions
 
 ## Local development
 

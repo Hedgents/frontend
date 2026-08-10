@@ -429,3 +429,112 @@ test("operator SOL cap and production fingerprint policy fail closed when unconf
     else mutableEnv.NODE_ENV = previousNodeEnv;
   }
 });
+
+function firstEverBuy(options: Parameters<typeof scenario>[0] = {}) {
+  // A first-ever buy creates the taker's output token account inside the swap itself, so that
+  // account appears only in postTokenBalances.
+  const input = scenario(options);
+  input.simulation.preTokenBalances = input.simulation.preTokenBalances!.filter(
+    (balance) => balance.accountIndex !== input.outputIndex,
+  );
+  return input;
+}
+
+test("protects a taker token account the route creates in flight", () => {
+  // Baseline: the post-only output account is still an ordinary, acceptable transfer target.
+  const honest = firstEverBuy({});
+  assert.equal(guardSolanaTransaction(honest.encoded, honest.simulation, honest.expectation).outputCreditAmount, "50");
+
+  for (const opcode of [4, 6, 10, 11, 13]) {
+    const input = firstEverBuy({ instructionData: [opcode], instructionAccounts: [2, 0] });
+    assert.throws(
+      () => guardSolanaTransaction(input.encoded, input.simulation, input.expectation),
+      /can (approve|setAuthority|freezeAccount|thawAccount|approveChecked) a taker token account/,
+      `compiled token opcode ${opcode} against an in-flight taker account`,
+    );
+  }
+
+  const parsedApprove = firstEverBuy({
+    innerInstructions: [{
+      index: 0,
+      instructions: [{
+        programId: TOKEN_PROGRAM,
+        program: "spl-token",
+        parsed: { type: "approve", info: { source: outputAccount } },
+      }],
+    }],
+  });
+  assert.throws(
+    () => guardSolanaTransaction(parsedApprove.encoded, parsedApprove.simulation, parsedApprove.expectation),
+    /can approve a taker token account/,
+  );
+});
+
+test("a route may only close an in-flight taker token account back to the taker", () => {
+  const toTaker = firstEverBuy({ instructionData: [9], instructionAccounts: [2, 0, 0] });
+  assert.equal(
+    guardSolanaTransaction(toTaker.encoded, toTaker.simulation, toTaker.expectation).inputDebitAmount,
+    "100",
+  );
+
+  const toStranger = firstEverBuy({ instructionData: [9], instructionAccounts: [2, 3, 0] });
+  assert.throws(
+    () => guardSolanaTransaction(toStranger.encoded, toStranger.simulation, toStranger.expectation),
+    /closes a taker token account to a destination other than the taker/,
+  );
+
+  const parsedToStranger = firstEverBuy({
+    innerInstructions: [{
+      index: 0,
+      instructions: [{
+        programId: TOKEN_PROGRAM,
+        program: "spl-token",
+        parsed: { type: "closeAccount", info: { account: outputAccount, destination: unrelatedAccount } },
+      }],
+    }],
+  });
+  assert.throws(
+    () => guardSolanaTransaction(parsedToStranger.encoded, parsedToStranger.simulation, parsedToStranger.expectation),
+    /closes a taker token account to a destination other than the taker/,
+  );
+
+  // A pre-existing taker account still may never be closed at all.
+  const preExisting = scenario({ instructionData: [9], instructionAccounts: [2, 0, 0] });
+  assert.throws(
+    () => guardSolanaTransaction(preExisting.encoded, preExisting.simulation, preExisting.expectation),
+    /pre-existing taker token account/,
+  );
+});
+
+test("rejects System seed variants that authorize the taker at the base account index", () => {
+  for (const opcode of [9, 10, 11]) {
+    const input = scenario({
+      programId: SYSTEM_PROGRAM,
+      instructionData: [opcode, 0, 0, 0, ...Array.from({ length: 8 }, () => 0)],
+      instructionAccounts: [3, 0, 2],
+    });
+    assert.throws(
+      () => guardSolanaTransaction(input.encoded, input.simulation, input.expectation),
+      /(arbitrary System Program transfer|assign or allocate) /,
+      `System opcode ${opcode} with the taker as seed base`,
+    );
+  }
+
+  const parsedSeedTransfer = scenario({
+    innerInstructions: [{
+      index: 0,
+      instructions: [{
+        programId: SYSTEM_PROGRAM,
+        program: "system",
+        parsed: {
+          type: "transferWithSeed",
+          info: { source: unrelatedAccount, sourceBase: taker, destination: outputAccount },
+        },
+      }],
+    }],
+  });
+  assert.throws(
+    () => guardSolanaTransaction(parsedSeedTransfer.encoded, parsedSeedTransfer.simulation, parsedSeedTransfer.expectation),
+    /arbitrary System Program transfer/,
+  );
+});

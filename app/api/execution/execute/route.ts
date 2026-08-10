@@ -30,6 +30,12 @@ import {
   requireExecutionSubmissionEnabled,
 } from "@/lib/execution-controls";
 import { assertTransactionGuardCompatible } from "@/lib/solana-transaction-guard";
+import {
+  ExecutionAuditDuplicateIntentError,
+  ExecutionAuditWriteOutcomeUnknownError,
+  recordExecutionSubmissionIntent,
+} from "@/lib/execution-audit-store";
+import { scheduleExecutionAuditObservation } from "@/lib/execution-audit-after";
 
 export const dynamic = "force-dynamic";
 
@@ -45,8 +51,10 @@ function nullableNumber(value: unknown) {
 export async function POST(request: Request) {
   let responseHeaders: Record<string, string> = {};
   let submissionState: "not-submitted" | "unknown" = "not-submitted";
+  let auditSignature: string | null = null;
+  let auditObservationScheduled = false;
   try {
-    requireInviteAccess(request);
+    const access = requireInviteAccess(request);
     const executionControls = requireExecutionSubmissionEnabled();
     responseHeaders = secureMutation(request, { key: "execution-submit", limit: 8, windowMs: 60_000 }).headers;
     const body = await readJsonBody(request, 32_768);
@@ -99,6 +107,21 @@ export async function POST(request: Request) {
       { sigVerify: true },
     );
     assertTransactionGuardCompatible(claims.transactionGuard, observedGuard);
+    const signature = submittedBinding.firstSignature;
+    await recordExecutionSubmissionIntent({
+      signature,
+      requestId,
+      sessionId: access.sessionId,
+      grantId: access.grantId,
+      productId: claims.productId,
+      side: claims.side,
+      settlementAssetId: claims.settlementAssetId,
+      transactionMessageDigest: claims.transactionMessageDigest,
+      transactionGuardReportDigest: claims.transactionGuard.reportDigest,
+      programFingerprint: claims.transactionGuard.programFingerprint,
+      lastValidBlockHeight: claims.lastValidBlockHeight,
+    });
+    auditSignature = signature;
     submissionState = "unknown";
     const raw = await executeJupiterOrder({
       signedTransaction,
@@ -107,7 +130,6 @@ export async function POST(request: Request) {
     });
     const venueStatus = raw.status === "Success" ? "Success" : "Failed";
     const venueSignature = nullableString(raw.signature);
-    const signature = submittedBinding.firstSignature;
     if (venueSignature && venueSignature !== signature) {
       throw new ExecutionValidationError(
         "Jupiter returned a signature that does not match the authenticated signed transaction.",
@@ -117,6 +139,13 @@ export async function POST(request: Request) {
     const settlement = await verifySolanaSettlement(signature, claims, "finalized");
     const status = executionStatusFromSettlement("Success", settlement);
     const verifiedSubmissionState = submissionStateFromSettlement(settlement);
+    scheduleExecutionAuditObservation({
+      signature,
+      submissionState: verifiedSubmissionState,
+      settlementState: settlement.status,
+      errorCode: settlement.errorCode ?? null,
+    });
+    auditObservationScheduled = true;
     const venueError = nullableString(raw.error)
       ?? nullableString(raw.errorMessage)
       ?? (venueStatus === "Failed" ? "Jupiter did not report a successful execution." : null);
@@ -141,11 +170,33 @@ export async function POST(request: Request) {
       headers: { ...responseHeaders, "cache-control": "no-store" },
     });
   } catch (error) {
+    if (
+      error instanceof ExecutionAuditDuplicateIntentError
+      || error instanceof ExecutionAuditWriteOutcomeUnknownError
+    ) {
+      // A prior immutable intent exists, or the write outcome itself is
+      // uncertain. The final pre-submit boundary may have been crossed. Never
+      // call Jupiter again; only recovery may determine whether the exact
+      // signature landed.
+      submissionState = "unknown";
+      auditSignature = error.signature;
+    } else if (auditSignature && !auditObservationScheduled) {
+      // Once the intent exists, a venue timeout or downstream error cannot be
+      // represented as definitely unsent. This audit write is best effort and
+      // must never replace the real execution response.
+      const signature = auditSignature;
+      scheduleExecutionAuditObservation({
+        signature,
+        submissionState: "unknown",
+        settlementState: "pending",
+        errorCode: null,
+      });
+    }
     const security = apiSecurityError(error);
     const status = security?.status ?? (error instanceof ExecutionValidationError ? error.status : 500);
     const message = error instanceof Error ? error.message : "The signed order could not be submitted.";
     return NextResponse.json(
-      { error: message, submissionState },
+      { error: message, submissionState, ...(auditSignature ? { signature: auditSignature } : {}) },
       { status, headers: { ...responseHeaders, ...(security?.headers ?? {}), "cache-control": "no-store" } },
     );
   }

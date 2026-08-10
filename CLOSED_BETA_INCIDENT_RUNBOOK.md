@@ -1,6 +1,6 @@
 # Hedgents closed-beta incident runbook
 
-This runbook covers beta-access revocation, emergency execution pause, and settlement recovery. It is deliberately scoped to controls that exist today. Hedgents does **not** yet have a durable server-side execution audit ledger; see “Evidence boundary” below.
+This runbook covers beta-access revocation, emergency execution pause, and settlement recovery. It is deliberately scoped to controls that exist today, including the minimal private execution-audit ledger described below.
 
 ## Known-safe control order
 
@@ -70,14 +70,50 @@ Local development may retain `HEDGENTS_INVITE_CODE_HASH` as a deterministic boot
 
 ## Evidence boundary
 
-Current durable truth consists of the user’s authenticated recovery receipt and Solana transaction state. The private invite index records access issuance metadata, redemption counts, revocation time, and grant version. Deployment logs may provide supporting request context but are not a complete execution audit ledger.
+Current settlement truth consists of the user’s authenticated recovery receipt and Solana transaction state. The private invite index records access issuance metadata, redemption counts, revocation time, and grant version. Deployment logs may provide supporting request context but are not treated as complete execution evidence.
 
-Durable server-side execution audit events are **pending implementation**. Until that work is complete:
+Before Jupiter is called, Hedgents durably writes one immutable private intent keyed by an HMAC of the authenticated Solana signature. It contains HMACed signature/request/session identifiers, product/direction/settlement identifiers, grant ID, transaction/guard commitments, block-height expiry, and timestamp. It deliberately excludes raw signatures, wallet addresses, exact amounts, signed transactions, location/IP/user agent, raw request IDs, recovery credentials, and invite hashes. A duplicate intent—or an uncertain intent-write result—means submission state is unknown and the venue must not be called again.
 
-- do not claim that every order attempt has a durable server record;
-- never block or rewrite an already-submitted result merely because a later audit write is unavailable;
+Bounded post-response and recovery observations record coherent submission/settlement states. They are best effort: a later audit-write failure never blocks or rewrites an already-known execution or chain result. The intent proves that the final pre-submit boundary was crossed; it does not by itself prove that Solana accepted the transaction. Therefore:
+
+- never infer settlement from the intent or a Jupiter response alone;
 - preserve local receipts and chain signatures during every incident;
-- record operator actions and timestamps in the incident notes outside the application.
+- use finalized multi-RPC verification for the actual outcome;
+- retain the old audit integrity key offline before rotating it, or prior record HMACs cannot be verified;
+- record operator actions and timestamps in incident notes outside the application.
+
+## Rehearsal
+
+Rehearse before inviting testers, and again after any change to the execution switches.
+
+Machine-checked invariants (no deployment or credentials needed):
+
+```bash
+npx tsx --test lib/emergency-pause-rehearsal.test.ts
+```
+
+That suite proves, against the real modules, that a paused deployment rejects comparison, order
+assembly, and submission with `503`; that every execution route is `force-dynamic`, so a pause is
+never served from cache; that the recovery route imports no execution switch and no beta cookie,
+so settlement recovery survives both a pause and a revocation; and that the execution switch, the
+product allowlist, and the rail funding flag are three independent controls.
+
+Operator drill against the deployment, in this order:
+
+1. Record the current `HEDGENTS_EXECUTION_ENABLED` value and the live deployment SHA.
+2. Ask the tester to export their execution receipt **first**, before anything is revoked.
+3. Set `HEDGENTS_EXECUTION_ENABLED=false` and redeploy. Confirm in Admin that the execution-switch
+   readiness check flips to blocked and that the rail-funding check still reads paused.
+4. From the terminal, confirm a new quote or order attempt fails with the operator-pause message.
+5. Re-verify the exported receipt through the recovery flow and confirm it still returns a
+   finalized `Success`, `Failed`, or `Pending` verdict while execution is paused.
+6. Revoke one disposable invite grant and confirm order/submission is rejected on the next request
+   while the same receipt still recovers.
+7. Restore the recorded switch value, redeploy, and note the start and end timestamps outside the
+   application.
+
+A rehearsal is only complete when step 5 has been performed with a real receipt. A pause that has
+never been exercised alongside a recovery is an assumption, not a control.
 
 ## Resume checklist
 

@@ -7,6 +7,7 @@ import {
   readAccessSession,
   type AccessSessionClaims,
 } from "@/lib/access-auth";
+import { CCTP_ATTESTATION_ORIGIN } from "@/lib/rail-cctp";
 import { isInviteGrantActive } from "@/lib/invite-store";
 
 const publicPaths = new Set(["/access", "/admin/login"]);
@@ -55,6 +56,9 @@ function continueWithPageSecurity(request: NextRequest, claims?: AccessSessionCl
     "https://eth.merkle.io",
     "https://mainnet.base.org",
     "https://bsc-dataseed1.binance.org",
+    // Circle's attestation service. Required even while HEDGENTS_RAIL_FUNDING_ENABLED is false:
+    // verifying a source burn that was already broadcast is deliberately not gated by the flag.
+    CCTP_ATTESTATION_ORIGIN,
     ...configuredConnectOrigins(),
   ])].join(" ");
   const policy = [
