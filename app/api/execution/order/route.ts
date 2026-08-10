@@ -20,7 +20,7 @@ import {
   parseEligibilityEvidence,
 } from "@/lib/eligibility";
 import { getJupiterOrder, simulateSolanaTransaction } from "@/lib/jupiter-server";
-import { bindSolanaTransaction } from "@/lib/solana-transaction-binding";
+import { transactionGuardCommitment } from "@/lib/solana-transaction-guard";
 import {
   assertProductExecutionAllowed,
   assertUsdBaseUnitAmountWithinBetaCap,
@@ -125,6 +125,7 @@ export async function POST(request: Request) {
       outputMint,
       amount: inputAmount,
       taker,
+      excludeRouters: "jupiterz",
     });
     const raw = await getJupiterOrder(params);
     const transaction = stringField(raw, "transaction");
@@ -178,8 +179,13 @@ export async function POST(request: Request) {
       );
     }
 
-    const simulation = await simulateSolanaTransaction(transaction);
-    const transactionBinding = bindSolanaTransaction(transaction, taker);
+    const simulation = await simulateSolanaTransaction(transaction, {
+      taker,
+      inputMint,
+      outputMint,
+      inputAmount,
+      minimumOutputAmount,
+    });
     const platformFee = recordField(raw, "platformFee");
     const quoteExpiresAt = expiresAt(raw.expireAt);
     const authorizationExpiresAt = Math.min(
@@ -205,7 +211,8 @@ export async function POST(request: Request) {
       minimumOutputAmount,
       quotedOutputAmount: outputAmount,
       betaMaximumUsd: executionControls.maxUsd,
-      transactionMessageDigest: transactionBinding.messageDigest,
+      transactionMessageDigest: simulation.transactionMessageDigest,
+      transactionGuard: transactionGuardCommitment(simulation),
       lastValidBlockHeight,
       eligibilityCountryCode: eligibility.countryCode,
       eligibilityPolicyId: eligibility.policyId,

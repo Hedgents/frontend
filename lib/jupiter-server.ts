@@ -15,6 +15,14 @@ import {
 import { bindSolanaTransaction } from "@/lib/solana-transaction-binding";
 import { readBoundedUpstreamJson } from "@/lib/safe-upstream-response";
 import { expiredSettlementDecision } from "@/lib/execution-records";
+import {
+  assertProgramFingerprintAllowed,
+  configuredMaximumSolDebitLamports,
+  guardSolanaTransaction,
+  type SolanaSimulationValue,
+  type TransactionGuardExpectation,
+  type TransactionGuardReport,
+} from "@/lib/solana-transaction-guard";
 
 const JUPITER_SWAP_V2 = "https://api.jup.ag/swap/v2";
 
@@ -108,27 +116,22 @@ export async function executeJupiterOrder(body: {
   }
 }
 
-interface SimulationPayload {
-  error?: { message?: string };
-  result?: {
-    value?: {
-      err?: unknown;
-      logs?: string[] | null;
-      unitsConsumed?: number | null;
-    };
-  };
-}
-
-export async function simulateSolanaTransaction(transaction: string) {
+export async function simulateSolanaTransaction(
+  transaction: string,
+  expectation: Omit<TransactionGuardExpectation, "maximumSolDebitLamports">,
+  options: { sigVerify?: boolean } = {},
+): Promise<TransactionGuardReport> {
   try {
-    const resultEnvelope = await solanaRpcRequest<NonNullable<SimulationPayload["result"]>>(
+    const resultEnvelope = await solanaRpcRequest<{ value?: SolanaSimulationValue }>(
       "simulateTransaction",
       [
         transaction,
         {
           encoding: "base64",
-          commitment: "processed",
-          sigVerify: false,
+          commitment: "confirmed",
+          sigVerify: options.sigVerify === true,
+          replaceRecentBlockhash: false,
+          innerInstructions: true,
         },
       ],
       { timeoutMs: 12_000, id: "hedgents-m2-simulation" },
@@ -145,7 +148,12 @@ export async function simulateSolanaTransaction(transaction: string) {
         400,
       );
     }
-    return { unitsConsumed: result.unitsConsumed ?? null };
+    const report = guardSolanaTransaction(transaction, result, {
+      ...expectation,
+      maximumSolDebitLamports: configuredMaximumSolDebitLamports(),
+    });
+    assertProgramFingerprintAllowed(report);
+    return report;
   } catch (error) {
     if (error instanceof ExecutionValidationError) throw error;
     throw new ExecutionValidationError(

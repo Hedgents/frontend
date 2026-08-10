@@ -12,7 +12,11 @@ import {
   validateRequestId,
   validateSignedTransaction,
 } from "@/lib/execution-validation";
-import { executeJupiterOrder, verifySolanaSettlement } from "@/lib/jupiter-server";
+import {
+  executeJupiterOrder,
+  simulateSolanaTransaction,
+  verifySolanaSettlement,
+} from "@/lib/jupiter-server";
 import { validateExecutionAuthorization } from "@/lib/execution-authorization";
 import { getSolanaExecutionProduct, getSolanaSettlementAsset } from "@/lib/product-registry";
 import { bindSolanaTransaction } from "@/lib/solana-transaction-binding";
@@ -25,6 +29,7 @@ import {
   assertExecutionWithinBetaCap,
   requireExecutionSubmissionEnabled,
 } from "@/lib/execution-controls";
+import { assertTransactionGuardCompatible } from "@/lib/solana-transaction-guard";
 
 export const dynamic = "force-dynamic";
 
@@ -79,6 +84,21 @@ export async function POST(request: Request) {
     ) {
       throw new ExecutionValidationError(eligibility.reason, 403);
     }
+    if (!claims.transactionGuard) {
+      throw new ExecutionValidationError("The executable quote has no authenticated transaction safety report.");
+    }
+    const observedGuard = await simulateSolanaTransaction(
+      signedTransaction,
+      {
+        taker: claims.taker,
+        inputMint: claims.inputMint,
+        outputMint: claims.outputMint,
+        inputAmount: claims.inputAmount,
+        minimumOutputAmount: claims.minimumOutputAmount,
+      },
+      { sigVerify: true },
+    );
+    assertTransactionGuardCompatible(claims.transactionGuard, observedGuard);
     submissionState = "unknown";
     const raw = await executeJupiterOrder({
       signedTransaction,

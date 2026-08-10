@@ -50,6 +50,26 @@ test("settlement recovery remains independent of the new-trade guard", () => {
   assert.match(source, /verifySolanaSettlement/, "settlement verification");
 });
 
+test("terminal Rail gate blocks new funding without blocking pending delivery recovery", () => {
+  const page = routeSource("../app/page.tsx");
+  const terminal = routeSource("../components/MetalTerminal.tsx");
+  const panel = routeSource("../components/CctpFundingPanel.tsx");
+  const hook = routeSource("../hooks/use-cctp-funding.ts");
+
+  assert.match(page, /terminalFeatures=\{getPublicTerminalFeatures\(\)\}/);
+  assert.match(terminal, /terminalFeatures\.railFundingEnabled && executionControl\.enabled/);
+  assert.match(panel, /allowNewFunding && hydrated && state\.phase === "idle"/);
+  assert.doesNotMatch(panel, /Continue in background/);
+
+  const quoteGuard = hook.indexOf("const quoteFunding");
+  const executeGuard = hook.indexOf("const executeFunding");
+  const recoveryPoll = hook.indexOf("getFundingStatus(");
+  assert.ok(quoteGuard >= 0 && executeGuard > quoteGuard && recoveryPoll > executeGuard);
+  assert.match(hook.slice(quoteGuard, executeGuard), /if \(!input\.allowNewFunding\)/);
+  assert.match(hook.slice(executeGuard, recoveryPoll), /if \(!input\.allowNewFunding\)/);
+  assert.doesNotMatch(hook.slice(recoveryPoll), /if \(!input\.allowNewFunding\)/);
+});
+
 test("wallet QA approval stops before persistence or submission", () => {
   const source = routeSource("../components/MetalTerminal.tsx");
   const qaGuard = source.indexOf("if (executionControl.rejectionOnly)");
@@ -71,6 +91,37 @@ test("post-Jupiter outcomes stay recoverable until independent settlement eviden
   const binding = verifier.indexOf("const settledBinding = bindSolanaTransaction");
   const onchainFailure = verifier.indexOf("if (result.meta.err)", binding);
   assert.ok(binding >= 0 && onchainFailure > binding, "transaction bytes must be bound before trusting meta.err");
+});
+
+test("orders exclude RFQ signatures and authenticate a fail-closed debit report", () => {
+  const route = routeSource("../app/api/execution/order/route.ts");
+  const orderRequest = route.indexOf("const raw = await getJupiterOrder(params)");
+  const simulation = route.indexOf("const simulation = await simulateSolanaTransaction");
+  const authorization = route.indexOf("const authorization = createExecutionAuthorization");
+  assert.match(route, /excludeRouters: "jupiterz"/);
+  assert.ok(orderRequest >= 0 && simulation > orderRequest, "the exact Jupiter message must be simulated");
+  assert.ok(authorization > simulation, "authorization must follow debit simulation");
+  assert.match(route, /transactionGuard: transactionGuardCommitment\(simulation\)/);
+
+  const simulator = routeSource("./jupiter-server.ts");
+  assert.match(simulator, /commitment: "confirmed"/);
+  assert.match(simulator, /innerInstructions: true/);
+  assert.match(simulator, /replaceRecentBlockhash: false/);
+  assert.match(simulator, /assertProgramFingerprintAllowed\(report\)/);
+});
+
+test("submission re-simulates the signed message before any Jupiter execution call", () => {
+  const route = routeSource("../app/api/execution/execute/route.ts");
+  const signedBinding = route.indexOf("const submittedBinding = bindSolanaTransaction");
+  const simulation = route.indexOf("const observedGuard = await simulateSolanaTransaction");
+  const compatibility = route.indexOf("assertTransactionGuardCompatible(", simulation);
+  const submissionState = route.indexOf('submissionState = "unknown"', simulation);
+  const venueCall = route.indexOf("const raw = await executeJupiterOrder", simulation);
+  assert.ok(simulation > signedBinding, "signed message binding must precede signature-verified simulation");
+  assert.match(route.slice(simulation, submissionState), /\{ sigVerify: true \}/);
+  assert.ok(compatibility > simulation, "the signed simulation must match the authenticated report");
+  assert.ok(submissionState > compatibility, "a guard failure must remain definitely not submitted");
+  assert.ok(venueCall > submissionState, "Jupiter must never be called before all guard checks pass");
 });
 
 test("unverified results are never presented as wallet receipts", () => {

@@ -9,6 +9,10 @@ import {
   getSolanaExecutionProduct,
   getSolanaSettlementAsset,
 } from "@/lib/product-registry";
+import {
+  TRANSACTION_GUARD_SCHEMA,
+  type TransactionGuardCommitment,
+} from "@/lib/solana-transaction-guard";
 
 export interface ExecutionAuthorizationClaims {
   requestId: string;
@@ -25,6 +29,8 @@ export interface ExecutionAuthorizationClaims {
   /** Cap in force when the order was assembled; optional only for legacy recovery receipts. */
   betaMaximumUsd?: number;
   transactionMessageDigest: string;
+  /** Required for new executions; optional only so historical recovery receipts remain readable. */
+  transactionGuard?: TransactionGuardCommitment;
   lastValidBlockHeight: number | null;
   eligibilityCountryCode: string;
   eligibilityPolicyId: EligibilityPolicyId;
@@ -97,6 +103,15 @@ function validateClaims(claims: ExecutionAuthorizationClaims, requestId?: string
   if (!/^[a-f0-9]{64}$/.test(claims.transactionMessageDigest)) {
     throw new ExecutionValidationError("The executable quote transaction commitment is invalid.");
   }
+  if (claims.transactionGuard !== undefined && (
+    claims.transactionGuard.schema !== TRANSACTION_GUARD_SCHEMA ||
+    !/^[a-f0-9]{64}$/.test(claims.transactionGuard.reportDigest) ||
+    !/^[a-f0-9]{64}$/.test(claims.transactionGuard.programFingerprint) ||
+    !/^(0|[1-9]\d*)$/.test(claims.transactionGuard.takerSolDebitLamports) ||
+    !/^(0|[1-9]\d*)$/.test(claims.transactionGuard.networkFeeLamports)
+  )) {
+    throw new ExecutionValidationError("The executable quote transaction safety report is invalid.");
+  }
   if (
     claims.lastValidBlockHeight !== null
     && (!Number.isSafeInteger(claims.lastValidBlockHeight) || claims.lastValidBlockHeight <= 0)
@@ -119,7 +134,8 @@ export function validateExecutionAuthorization(value: unknown, requestId: string
       !/^\d+$/.test(validated.quotedOutputAmount) ||
       BigInt(validated.quotedOutputAmount) <= 0n ||
       !Number.isSafeInteger(validated.betaMaximumUsd) ||
-      validated.betaMaximumUsd! <= 0
+      validated.betaMaximumUsd! <= 0 ||
+      !validated.transactionGuard
     ) {
       throw new ExecutionValidationError(
         "The executable quote predates the current beta controls. Build a fresh route.",

@@ -4,12 +4,19 @@ import {
   solanaSettlementAssets,
 } from "../lib/product-registry";
 import { classifyRouteAvailability } from "../lib/route-availability";
+import {
+  configuredMaximumSolDebitLamports,
+  guardSolanaTransaction,
+  type SolanaSimulationValue,
+  type TransactionGuardExpectation,
+} from "../lib/solana-transaction-guard";
 
 const JUPITER_ORDER_URL = "https://api.jup.ag/swap/v2/order";
 const DEFAULT_SOLANA_RPC = "https://api.mainnet-beta.solana.com";
 
 const apiKey = process.env.JUPITER_API_KEY?.trim();
 if (!apiKey) throw new Error("JUPITER_API_KEY is required.");
+const maximumSolDebitLamports = configuredMaximumSolDebitLamports();
 
 const configuredBuyTaker = process.env.HEDGENTS_SIMULATION_WALLET?.trim() || null;
 if (configuredBuyTaker && (configuredBuyTaker.length < 32 || configuredBuyTaker.length > 44 || !/^[1-9A-HJ-NP-Za-km-z]+$/.test(configuredBuyTaker))) {
@@ -27,17 +34,6 @@ const rpcUrls = [...new Set([
 const requestedAmount = process.argv[2] ? Number(process.argv[2]) : null;
 if (requestedAmount !== null && (!Number.isFinite(requestedAmount) || requestedAmount <= 0)) {
   throw new Error("Pass a positive optional USDC simulation amount.");
-}
-
-interface SimulationPayload {
-  error?: { message?: string };
-  result?: {
-    value?: {
-      err?: unknown;
-      logs?: string[] | null;
-      unitsConsumed?: number | null;
-    };
-  };
 }
 
 interface LargestTokenAccount {
@@ -101,10 +97,19 @@ async function jupiterOrder(params: URLSearchParams) {
   throw new Error(lastError);
 }
 
-async function simulateTransaction(transaction: string) {
-  const payload = await rpcRequest<SimulationPayload["result"]>("simulateTransaction", [
+async function simulateTransaction(
+  transaction: string,
+  expectation: Omit<TransactionGuardExpectation, "maximumSolDebitLamports">,
+) {
+  const payload = await rpcRequest<{ value?: SolanaSimulationValue }>("simulateTransaction", [
     transaction,
-    { encoding: "base64", commitment: "processed", sigVerify: false },
+    {
+      encoding: "base64",
+      commitment: "confirmed",
+      sigVerify: false,
+      replaceRecentBlockhash: false,
+      innerInstructions: true,
+    },
   ]);
   const result = payload?.value;
   if (!result) throw new Error("Solana RPC returned no simulation result.");
@@ -112,7 +117,10 @@ async function simulateTransaction(transaction: string) {
     const usefulLog = result.logs?.slice().reverse().find((line) => line.includes("Error") || line.includes("failed"));
     throw new Error(usefulLog ?? `Simulation failed: ${JSON.stringify(result.err)}`);
   }
-  return result.unitsConsumed ?? null;
+  return guardSolanaTransaction(transaction, result, {
+    ...expectation,
+    maximumSolDebitLamports,
+  });
 }
 
 async function findPublicHolder(mint: string, minimumAmount: bigint) {
@@ -147,9 +155,20 @@ function validateOrder(
     throw new Error("Jupiter returned an unexpected asset or amount.");
   }
   const outputAmount = typeof payload.outAmount === "string" ? payload.outAmount : null;
+  const minimumOutputAmount = typeof payload.otherAmountThreshold === "string"
+    ? payload.otherAmountThreshold
+    : outputAmount;
   const transaction = typeof payload.transaction === "string" ? payload.transaction : null;
   const priceImpactPct = normalizeJupiterPriceImpact(payload);
-  if (!outputAmount || !/^\d+$/.test(outputAmount) || BigInt(outputAmount) <= 0n) {
+  if (
+    !outputAmount
+    || !minimumOutputAmount
+    || !/^\d+$/.test(outputAmount)
+    || !/^\d+$/.test(minimumOutputAmount)
+    || BigInt(outputAmount) <= 0n
+    || BigInt(minimumOutputAmount) <= 0n
+    || BigInt(minimumOutputAmount) > BigInt(outputAmount)
+  ) {
     throw new Error("Jupiter returned no executable output.");
   }
   if (!transaction || transaction.length < 100) throw new Error("Jupiter returned no signable transaction.");
@@ -157,7 +176,7 @@ function validateOrder(
   if (priceImpactPct > expected.maximumPriceImpactPct) {
     throw new Error(`${priceImpactPct.toFixed(2)}% price impact exceeds the adapter guardrail.`);
   }
-  return { outputAmount, transaction, priceImpactPct };
+  return { outputAmount, minimumOutputAmount, transaction, priceImpactPct };
 }
 
 type MatrixResult = Record<string, unknown> & { status: "passed" | "failed" };
@@ -184,6 +203,7 @@ for (const product of Object.values(solanaExecutionProducts)) {
       outputMint: product.mint,
       amount: inputAmount,
       taker: buyTaker,
+      excludeRouters: "jupiterz",
     }));
     const validated = validateOrder(payload, {
       inputMint: product.execution.inputMint,
@@ -193,7 +213,13 @@ for (const product of Object.values(solanaExecutionProducts)) {
     });
     buyOutputAmount = validated.outputAmount;
     phase = "simulation";
-    const unitsConsumed = await simulateTransaction(validated.transaction);
+    const guard = await simulateTransaction(validated.transaction, {
+      taker: buyTaker,
+      inputMint: product.execution.inputMint,
+      outputMint: product.mint,
+      inputAmount,
+      minimumOutputAmount: validated.minimumOutputAmount,
+    });
     results.push({
       direction: "buy",
       productId: product.productId,
@@ -204,7 +230,10 @@ for (const product of Object.values(solanaExecutionProducts)) {
       outputAmount: validated.outputAmount,
       priceImpactPct: validated.priceImpactPct,
       router: typeof payload.router === "string" ? payload.router : null,
-      unitsConsumed,
+      unitsConsumed: guard.unitsConsumed,
+      programFingerprint: guard.programFingerprint,
+      takerSolDebitLamports: guard.takerSolDebitLamports,
+      networkFeeLamports: guard.networkFeeLamports,
       latencyMs: Date.now() - buyStartedAt,
     });
   } catch (error) {
@@ -248,6 +277,7 @@ for (const product of Object.values(solanaExecutionProducts)) {
         outputMint: settlement.mint,
         amount: inputAmount,
         taker: sellTaker,
+        excludeRouters: "jupiterz",
       }));
       const validated = validateOrder(payload, {
         inputMint: product.mint,
@@ -256,7 +286,13 @@ for (const product of Object.values(solanaExecutionProducts)) {
         maximumPriceImpactPct: product.execution.maximumPriceImpactPct,
       });
       phase = "simulation";
-      const unitsConsumed = await simulateTransaction(validated.transaction);
+      const guard = await simulateTransaction(validated.transaction, {
+        taker: sellTaker,
+        inputMint: product.mint,
+        outputMint: settlement.mint,
+        inputAmount,
+        minimumOutputAmount: validated.minimumOutputAmount,
+      });
       results.push({
         direction: "sell",
         productId: product.productId,
@@ -267,7 +303,10 @@ for (const product of Object.values(solanaExecutionProducts)) {
         outputAmount: validated.outputAmount,
         priceImpactPct: validated.priceImpactPct,
         router: typeof payload.router === "string" ? payload.router : null,
-        unitsConsumed,
+        unitsConsumed: guard.unitsConsumed,
+        programFingerprint: guard.programFingerprint,
+        takerSolDebitLamports: guard.takerSolDebitLamports,
+        networkFeeLamports: guard.networkFeeLamports,
         holder: `${sellTaker.slice(0, 5)}…${sellTaker.slice(-4)}`,
         latencyMs: Date.now() - sellStartedAt,
       });
@@ -292,6 +331,11 @@ for (const product of Object.values(solanaExecutionProducts)) {
 const failed = results.filter((result) => result.status === "failed");
 const buyResults = results.filter((result) => result.direction === "buy");
 const sellResults = results.filter((result) => result.direction === "sell");
+const programFingerprints = [...new Set(
+  results
+    .map((result) => result.programFingerprint)
+    .filter((value): value is string => typeof value === "string"),
+)].sort();
 console.log(JSON.stringify({
   checkedAt: new Date().toISOString(),
   mode: "read-only simulation; public state only; no signature and no submission",
@@ -302,6 +346,7 @@ console.log(JSON.stringify({
   sellPassed: sellResults.filter((result) => result.status === "passed").length,
   failedCount: failed.length,
   allPassed: failed.length === 0,
+  reviewedProgramFingerprintCandidates: programFingerprints,
   results,
 }, null, 2));
 
