@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3200 900" role="img" aria-labelledby="title desc">
+  <title id="title">Hedgents Metal Execution Network logo for light surfaces</title>
+  <desc id="desc">Hedgents wordmark paired with the mercury element Hg and routed metal node.</desc>
+  <defs>
+    <linearGradient id="graphite" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#080E11"/>
+      <stop offset="0.45" stop-color="#3A4143"/>
+      <stop offset="0.72" stop-color="#0D1316"/>
+      <stop offset="1" stop-color="#505758"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#DDBB59"/>
+      <stop offset="0.55" stop-color="#A97922"/>
+      <stop offset="1" stop-color="#C59631"/>
+    </linearGradient>
+  </defs>
+  <g transform="translate(54 22) scale(.84)">
+    <g fill="none" stroke="url(#graphite)" stroke-width="28" stroke-linecap="square" stroke-linejoin="miter">
+      <path d="M344 180H184V844H344"/>
+      <path d="M680 180H840V844H680"/>
+    </g>
+    <text x="250" y="322" fill="url(#gold)" font-family="Avenir Next, Helvetica Neue, Arial, sans-serif" font-size="82" font-weight="700" letter-spacing="-2">80</text>
+    <path d="M248 410V690M398 410V690M248 550H398" fill="none" stroke="url(#graphite)" stroke-width="47" stroke-linecap="square"/>
+    <path d="M656 560A100 105 0 1 1 456 560A100 105 0 1 1 656 560V686C656 744 621 778 568 791C539 798 521 814 514 833" fill="none" stroke="url(#graphite)" stroke-width="47" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="514" cy="856" r="43" fill="none" stroke="url(#gold)" stroke-width="27"/>
+  </g>
+  <text x="1000" y="470" fill="url(#graphite)" font-family="Avenir Next, Helvetica Neue, Arial, sans-serif" font-size="300" font-weight="500" letter-spacing="42" textLength="2040" lengthAdjust="spacingAndGlyphs">HEDGENTS</text>
+  <text x="1018" y="642" fill="url(#graphite)" opacity=".9" font-family="Avenir Next, Helvetica Neue, Arial, sans-serif" font-size="92" font-weight="600" letter-spacing="28" textLength="2000" lengthAdjust="spacingAndGlyphs">METAL EXECUTION NETWORK</text>
+</svg>

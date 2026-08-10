@@ -1,0 +1,2479 @@
+{
+  "schemaVersion": "1.0.0",
+  "source": {
+    "id": "usgs-mcs-2026-v1.3",
+    "title": "Mineral Commodity Summaries 2026 Data Release - Commodity Salient U.S. and World Statistics",
+    "doi": "https://doi.org/10.5066/P1WKQ63T",
+    "publication": "https://doi.org/10.3133/mcs2026",
+    "scienceBaseItemId": "69837e43b66b01367d7ec7c7",
+    "sourceCsvMd5": "36185ff3742087e1dd90c52fe634fe12",
+    "sourceCsvSha256": "582a0aa231aea53d8a97dc8d1cd3dfa5f885cf3760353e3d029d7f0ae4fbaaf5",
+    "observedAt": "2025-12-31T23:59:59.000Z",
+    "publishedAt": "2026-05-27T15:15:49.000Z"
+  },
+  "recordCount": 50,
+  "metricCount": 111,
+  "records": [
+    {
+      "metalId": "aluminium",
+      "chapter": "ALUMINUM",
+      "commodity": "Aluminum",
+      "commercialForm": "primary smelter metal",
+      "reportingMode": "direct",
+      "metrics": [
+        {
+          "metricId": "supply-growth-yoy-pct",
+          "value": 1.6484,
+          "unit": "percent",
+          "coverageRatio": 0.85,
+          "derivation": "(USGS 2025 world production - USGS 2024 world production) / USGS 2024 world production × 100",
+          "inputs": {
+            "production2024": 72800,
+            "production2025": 74000,
+            "unit": "thousand metric tons"
+          }
+        },
+        {
+          "metricId": "top-three-supply-share-pct",
+          "value": 71.7568,
+          "unit": "percent",
+          "coverageRatio": 0.9,
+          "derivation": "Sum of the three largest explicitly reported 2025 country production values / USGS 2025 world production × 100",
+          "inputs": {
+            "worldProduction2025": 74000,
+            "unit": "thousand metric tons",
+            "topProducers": [
+              {
+                "country": "China",
+                "value": 45000
+              },
+              {
+                "country": "India",
+                "value": 4200
+              },
+              {
+                "country": "Russia",
+                "value": 3900
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "metalId": "antimony",
+      "chapter": "ANTIMONY",
+      "commodity": "Antimony",
+      "commercialForm": "antimony content",
+      "reportingMode": "direct",
+      "metrics": [
+        {
+          "metricId": "supply-growth-yoy-pct",
+          "value": -7.563,
+          "unit": "percent",
+          "coverageRatio": 0.85,
+          "derivation": "(USGS 2025 world production - USGS 2024 world production) / USGS 2024 world production × 100",
+          "inputs": {
+            "production2024": 119000,
+            "production2025": 110000,
+            "unit": "metric tons"
+          }
+        },
+        {
+          "metricId": "top-three-supply-share-pct",
+          "value": 85.4545,
+          "unit": "percent",
+          "coverageRatio": 0.9,
+          "derivation": "Sum of the three largest explicitly reported 2025 country production values / USGS 2025 world production × 100",
+          "inputs": {
+            "worldProduction2025": 110000,
+            "unit": "metric tons",
+            "topProducers": [
+              {
+                "country": "China",
+                "value": 40000
+              },
+              {
+                "country": "Russia",
+                "value": 32000
+              },
+              {
+                "country": "Tajikistan",
+                "value": 22000
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "metalId": "arsenic",
+      "chapter": "ARSENIC",
+      "commodity": "Arsenic",
+      "commercialForm": "arsenic trioxide, gross weight",
+      "reportingMode": "direct",
+      "metrics": [
+        {
+          "metricId": "supply-growth-yoy-pct",
+          "value": -2.4,
+          "unit": "percent",
+          "coverageRatio": 0.85,
+          "derivation": "(USGS 2025 world production - USGS 2024 world production) / USGS 2024 world production × 100",
+          "inputs": {
+            "production2024": 62500,
+            "production2025": 61000,
+            "unit": "metric tons"
+          }
+        },
+        {
+          "metricId": "top-three-supply-share-pct",
+          "value": 96.7213,
+          "unit": "percent",
+          "coverageRatio": 0.9,
+          "derivation": "Sum of the three largest explicitly reported 2025 country production values / USGS 2025 world production × 100",
+          "inputs": {
+            "worldProduction2025": 61000,
+            "unit": "metric tons",
+            "topProducers": [
+              {
+                "country": "Peru",
+                "value": 30000
+              },
+              {
+                "country": "China",
+                "value": 24000
+              },
+              {
+                "country": "Morocco",
+                "value": 5000
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "metalId": "beryllium",
+      "chapter": "BERYLLIUM",
+      "commodity": "Beryllium",
+      "commercialForm": "beryllium content",
+      "reportingMode": "direct",
+      "metrics": [
+        {
+          "metricId": "supply-growth-yoy-pct",
+          "value": -0.6928,
+          "unit": "percent",
+          "coverageRatio": 0.85,
+          "derivation": "(USGS 2025 world production - USGS 2024 world production) / USGS 2024 world production × 100",
+          "inputs": {
+            "production2024": 433,
+            "production2025": 430,
+            "unit": "metric tons"
+          }
+        },
+        {
+          "metricId": "top-three-supply-share-pct",
+          "value": 90,
+          "unit": "percent",
+          "coverageRatio": 0.9,
+          "derivation": "Sum of the three largest explicitly reported 2025 country production values / USGS 2025 world production × 100",
+          "inputs": {
+            "worldProduction2025": 430,
+            "unit": "metric tons",
+            "topProducers": [
+              {
+                "country": "United States",
+                "value": 230
+              },
+              {
+                "country": "Brazil",
+                "value": 80
+              },
+              {
+                "country": "China",
+                "value": 77
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "metalId": "bismuth",
+      "chapter": "BISMUTH",
+      "commodity": "Bismuth",
+      "commercialForm": "refined bismuth",
+      "reportingMode": "direct",
+      "metrics": [
+        {
+          "metricId": "supply-growth-yoy-pct",
+          "value": -1.8405,
+          "unit": "percent",
+          "coverageRatio": 0.85,
+          "derivation": "(USGS 2025 world production - USGS 2024 world production) / USGS 2024 world production × 100",
+          "inputs": {
+            "production2024": 16300,
+            "production2025": 16000,
+            "unit": "metric tons"
+          }
+        },
+        {
+          "metricId": "top-three-supply-share-pct",
+          "value": 96.875,
+          "unit": "percent",
+          "coverageRatio": 0.9,
+          "derivation": "Sum of the three largest explicitly reported 2025 country production values / USGS 2025 world production × 100",
+          "inputs": {
+            "worldProduction2025": 16000,
+            "unit": "metric tons",
+            "topProducers": [
+              {
+                "country": "China",
+                "value": 14000
+              },
+              {
+                "country": "Korea, Republic of",
+                "value": 1000
+              },
+              {
+                "country": "Japan",
+                "value": 500
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "metalId": "cadmium",
+      "chapter": "CADMIUM",
+      "commodity": "Cadmium",
+      "commercialForm": "refined cadmium",
+      "reportingMode": "direct",
+      "metrics": [
+        {
+          "metricId": "supply-growth-yoy-pct",
+          "value": 0.8772,
+          "unit": "percent",
+          "coverageRatio": 0.85,
+          "derivation": "(USGS 2025 world production - USGS 2024 world production) / USGS 2024 world production × 100",
+          "inputs": {
+            "production2024": 22800,
+            "production2025": 23000,
+            "unit": "metric tons"
+          }
+        },
+        {
+          "metricId": "top-three-supply-share-pct",
+          "value": 65.6522,
+          "unit": "percent",
+          "coverageRatio": 0.9,
+          "derivation": "Sum of the three largest explicitly reported 2025 country production values / USGS 2025 world production × 100",
+          "inputs": {
+            "worldProduction2025": 23000,
+            "unit": "metric tons",
+            "topProducers": [
+              {
+                "country": "China",
+                "value": 9500
+              },
+              {
+                "country": "Korea, Republic of",
+                "value": 4300
+              },
+              {
+                "country": "Canada",
+                "value": 1300
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "metalId": "cerium",
+      "chapter": "RARE EARTHS",
+      "commodity": "Rare Earths",
+      "commercialForm": "rare-earth-oxide equivalent, group total",
+      "reportingMode": "group",
+      "notes": "USGS reports the lanthanides as a rare-earth group. Group observations are repeated across member cells only as explicitly labeled group context.",
+      "metrics": [
+        {
+          "metricId": "supply-growth-yoy-pct",
+          "value": 2.6316,
+          "unit": "percent",
+          "coverageRatio": 0.55,
+          "derivation": "(USGS 2025 world production - USGS 2024 world production) / USGS 2024 world production × 100",
+          "inputs": {
+            "production2024": 380000,
+            "production2025": 390000,
+            "unit": "metric tons"
+          }
+        },
+        {
+          "metricId": "top-three-supply-share-pct",
+          "value": 89.7436,
+          "unit": "percent",
+          "coverageRatio": 0.5,
+          "derivation": "Sum of the three largest explicitly reported 2025 country production values / USGS 2025 world production × 100",
+          "inputs": {
+            "worldProduction2025": 390000,
+            "unit": "metric tons",
+            "topProducers": [
+              {
+                "country": "China",
+                "value": 270000
+              },
+              {
+                "country": "United States",
+                "value": 51000
+              },
+              {
+                "country": "Australia",
+                "value": 29000
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "metalId": "chromium",
+      "chapter": "CHROMIUM",
+      "commodity": "Chromium",
+      "commercialForm": "chromite ore",
+      "reportingMode": "direct",
+      "notes": "USGS reserve totals are reported as lower bounds and are not converted into point reserve-life estimates.",
+      "metrics": [
+        {
+          "metricId": "supply-growth-yoy-pct",
+          "value": 2.8226,
+          "unit": "percent",
+          "coverageRatio": 0.85,
+          "derivation": "(USGS 2025 world production - USGS 2024 world production) / USGS 2024 world production × 100",
+          "inputs": {
+            "production2024": 49600,
+            "production2025": 51000,
+            "unit": "thousand metric tons"
+          }
+        },
+        {
+          "metricId": "top-three-supply-share-pct",
+          "value": 76.4706,
+          "unit": "percent",
+          "coverageRatio": 0.9,
+          "derivation": "Sum of the three largest explicitly reported 2025 country production values / USGS 2025 world production × 100",
+          "inputs": {
+            "worldProduction2025": 51000,
+            "unit": "thousand metric tons",
+            "topProducers": [
+              {
+                "country": "South Africa",
+                "value": 23000
+              },
+              {
+                "country": "Turkey",
+                "value": 9000
+              },
+              {
+                "country": "Kazakhstan",
+                "value": 7000
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "metalId": "cobalt",
+      "chapter": "COBALT",
+      "commodity": "Cobalt",
+      "commercialForm": "cobalt content",
+      "reportingMode": "direct",
+      "metrics": [
+        {
+          "metricId": "supply-growth-yoy-pct",
+          "value": 2.649,
+          "unit": "percent",
+          "coverageRatio": 0.85,
+          "derivation": "(USGS 2025 world production - USGS 2024 world production) / USGS 2024 world production × 100",
+          "inputs": {
+            "production2024": 302000,
+            "production2025": 310000,
+            "unit": "metric tons"
+          }
+        },
+        {
+          "metricId": "top-three-supply-share-pct",
+          "value": 90.871,
+          "unit": "percent",
+          "coverageRatio": 0.9,
+          "derivation": "Sum of the three largest explicitly reported 2025 country production values / USGS 2025 world production × 100",
+          "inputs": {
+            "worldProduction2025": 310000,
+            "unit": "metric tons",
+            "topProducers": [
+              {
+                "country": "Congo (Kinshasa)",
+                "value": 230000
+              },
+              {
+                "country": "Indonesia",
+                "value": 44000
+              },
+              {
+                "country": "Russia",
+                "value": 7700
+              }
+            ]
+          }
+        },
+        {
+          "metricId": "reserve-life-years",
+          "value": 38.7097,
+          "unit": "years",
+          "coverageRatio": 0.9,
+          "derivation": "USGS 2025 world reserves / USGS 2025 world production after unit normalization",
+          "inputs": {
+            "reserves2025": 12000000,
+            "reserveUnit": "metric tons",
+            "production2025": 310000,
+            "productionUnit": "metric tons"
+          }
+        }
+      ]
+    },
+    {
+      "metalId": "copper",
+      "chapter": "COPPER",
+      "commodity": "Copper",
+      "commercialForm": "mine copper content",
+      "reportingMode": "direct",
+      "metrics": [
+        {
+          "metricId": "supply-growth-yoy-pct",
+          "value": 0,
+          "unit": "percent",
+          "coverageRatio": 0.85,
+          "derivation": "(USGS 2025 world production - USGS 2024 world production) / USGS 2024 world production × 100",
+          "inputs": {
+            "production2024": 23000,
+            "production2025": 23000,
+            "unit": "thousand metric tons"
+          }
+        },
+        {
+          "metricId": "top-three-supply-share-pct",
+          "value": 48.6957,
+          "unit": "percent",
+          "coverageRatio": 0.9,
+          "derivation": "Sum of the three largest explicitly reported 2025 country production values / USGS 2025 world production × 100",
+          "inputs": {
+            "worldProduction2025": 23000,
+            "unit": "thousand metric tons",
+            "topProducers": [
+              {
+                "country": "Chile",
+                "value": 5300
+              },
+              {
+                "country": "Congo (Kinshasa)",
+                "value": 3200
+              },
+              {
+                "country": "Peru",
+                "value": 2700
+              }
+            ]
+          }
+        },
+        {
+          "metricId": "reserve-life-years",
+          "value": 42.6087,
+          "unit": "years",
+          "coverageRatio": 0.9,
+          "derivation": "USGS 2025 world reserves / USGS 2025 world production after unit normalization",
+          "inputs": {
+            "reserves2025": 980000,
+            "reserveUnit": "thousand metric tons",
+            "production2025": 23000,
+            "productionUnit": "thousand metric tons"
+          }
+        }
+      ]
+    },
+    {
+      "metalId": "dysprosium",
+      "chapter": "RARE EARTHS",
+      "commodity": "Rare Earths",
+      "commercialForm": "rare-earth-oxide equivalent, group total",
+      "reportingMode": "group",
+      "notes": "USGS reports the lanthanides as a rare-earth group. Group observations are repeated across member cells only as explicitly labeled group context.",
+      "metrics": [
+        {
+          "metricId": "supply-growth-yoy-pct",
+          "value": 2.6316,
+          "unit": "percent",
+          "coverageRatio": 0.55,
+          "derivation": "(USGS 2025 world production - USGS 2024 world production) / USGS 2024 world production × 100",
+          "inputs": {
+            "production2024": 380000,
+            "production2025": 390000,
+            "unit": "metric tons"
+          }
+        },
+        {
+          "metricId": "top-three-supply-share-pct",
+          "value": 89.7436,
+          "unit": "percent",
+          "coverageRatio": 0.5,
+          "derivation": "Sum of the three largest explicitly reported 2025 country production values / USGS 2025 world production × 100",
+          "inputs": {
+            "worldProduction2025": 390000,
+            "unit": "metric tons",
+            "topProducers": [
+              {
+                "country": "China",
+                "value": 270000
+              },
+              {
+                "country": "United States",
+                "value": 51000
+              },
+              {
+                "country": "Australia",
+                "value": 29000
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "metalId": "erbium",
+      "chapter": "RARE EARTHS",
+      "commodity": "Rare Earths",
+      "commercialForm": "rare-earth-oxide equivalent, group total",
+      "reportingMode": "group",
+      "notes": "USGS reports the lanthanides as a rare-earth group. Group observations are repeated across member cells only as explicitly labeled group context.",
+      "metrics": [
+        {
+          "metricId": "supply-growth-yoy-pct",
+          "value": 2.6316,
+          "unit": "percent",
+          "coverageRatio": 0.55,
+          "derivation": "(USGS 2025 world production - USGS 2024 world production) / USGS 2024 world production × 100",
+          "inputs": {
+            "production2024": 380000,
+            "production2025": 390000,
+            "unit": "metric tons"
+          }
+        },
+        {
+          "metricId": "top-three-supply-share-pct",
+          "value": 89.7436,
+          "unit": "percent",
+          "coverageRatio": 0.5,
+          "derivation": "Sum of the three largest explicitly reported 2025 country production values / USGS 2025 world production × 100",
+          "inputs": {
+            "worldProduction2025": 390000,
+            "unit": "metric tons",
+            "topProducers": [
+              {
+                "country": "China",
+                "value": 270000
+              },
+              {
+                "country": "United States",
+                "value": 51000
+              },
+              {
+                "country": "Australia",
+                "value": 29000
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "metalId": "europium",
+      "chapter": "RARE EARTHS",
+      "commodity": "Rare Earths",
+      "commercialForm": "rare-earth-oxide equivalent, group total",
+      "reportingMode": "group",
+      "notes": "USGS reports the lanthanides as a rare-earth group. Group observations are repeated across member cells only as explicitly labeled group context.",
+      "metrics": [
+        {
+          "metricId": "supply-growth-yoy-pct",
+          "value": 2.6316,
+          "unit": "percent",
+          "coverageRatio": 0.55,
+          "derivation": "(USGS 2025 world production - USGS 2024 world production) / USGS 2024 world production × 100",
+          "inputs": {
+            "production2024": 380000,
+            "production2025": 390000,
+            "unit": "metric tons"
+          }
+        },
+        {
+          "metricId": "top-three-supply-share-pct",
+          "value": 89.7436,
+          "unit": "percent",
+          "coverageRatio": 0.5,
+          "derivation": "Sum of the three largest explicitly reported 2025 country production values / USGS 2025 world production × 100",
+          "inputs": {
+            "worldProduction2025": 390000,
+            "unit": "metric tons",
+            "topProducers": [
+              {
+                "country": "China",
+                "value": 270000
+              },
+              {
+                "country": "United States",
+                "value": 51000
+              },
+              {
+                "country": "Australia",
+                "value": 29000
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "metalId": "gadolinium",
+      "chapter": "RARE EARTHS",
+      "commodity": "Rare Earths",
+      "commercialForm": "rare-earth-oxide equivalent, group total",
+      "reportingMode": "group",
+      "notes": "USGS reports the lanthanides as a rare-earth group. Group observations are repeated across member cells only as explicitly labeled group context.",
+      "metrics": [
+        {
+          "metricId": "supply-growth-yoy-pct",
+          "value": 2.6316,
+          "unit": "percent",
+          "coverageRatio": 0.55,
+          "derivation": "(USGS 2025 world production - USGS 2024 world production) / USGS 2024 world production × 100",
+          "inputs": {
+            "production2024": 380000,
+            "production2025": 390000,
+            "unit": "metric tons"
+          }
+        },
+        {
+          "metricId": "top-three-supply-share-pct",
+          "value": 89.7436,
+          "unit": "percent",
+          "coverageRatio": 0.5,
+          "derivation": "Sum of the three largest explicitly reported 2025 country production values / USGS 2025 world production × 100",
+          "inputs": {
+            "worldProduction2025": 390000,
+            "unit": "metric tons",
+            "topProducers": [
+              {
+                "country": "China",
+                "value": 270000
+              },
+              {
+                "country": "United States",
+                "value": 51000
+              },
+              {
+                "country": "Australia",
+                "value": 29000
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "metalId": "gallium",
+      "chapter": "GALLIUM",
+      "commodity": "Gallium",
+      "commercialForm": "low-purity primary gallium",
+      "reportingMode": "direct",
+      "metrics": [
+        {
+          "metricId": "supply-growth-yoy-pct",
+          "value": 6.1321,
+          "unit": "percent",
+          "coverageRatio": 0.85,
+          "derivation": "(USGS 2025 world production - USGS 2024 world production) / USGS 2024 world production × 100",
+          "inputs": {
+            "production2024": 848000,
+            "production2025": 900000,
+            "unit": "kilograms"
+          }
+        },
+        {
+          "metricId": "top-three-supply-share-pct",
+          "value": 100,
+          "unit": "percent",
+          "coverageRatio": 0.9,
+          "derivation": "Sum of the three largest explicitly reported 2025 country production values / USGS 2025 world production × 100",
+          "inputs": {
+            "worldProduction2025": 900000,
+            "unit": "kilograms",
+            "topProducers": [
+              {
+                "country": "China",
+                "value": 900000
+              },
+              {
+                "country": "Russia",
+                "value": 6000
+              },
+              {
+                "country": "Japan",
+                "value": 3000
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "metalId": "gold",
+      "chapter": "GOLD",
+      "commodity": "Gold",
+      "commercialForm": "mine gold content",
+      "reportingMode": "direct",
+      "metrics": [
+        {
+          "metricId": "supply-growth-yoy-pct",
+          "value": 0.6098,
+          "unit": "percent",
+          "coverageRatio": 0.85,
+          "derivation": "(USGS 2025 world production - USGS 2024 world production) / USGS 2024 world production × 100",
+          "inputs": {
+            "production2024": 3280,
+            "production2025": 3300,
+            "unit": "metric tons"
+          }
+        },
+        {
+          "metricId": "top-three-supply-share-pct",
+          "value": 29.3939,
+          "unit": "percent",
+          "coverageRatio": 0.9,
+          "derivation": "Sum of the three largest explicitly reported 2025 country production values / USGS 2025 world production × 100",
+          "inputs": {
+            "worldProduction2025": 3300,
+            "unit": "metric tons",
+            "topProducers": [
+              {
+                "country": "China",
+                "value": 380
+              },
+              {
+                "country": "Russia",
+                "value": 310
+              },
+              {
+                "country": "Australia",
+                "value": 280
+              }
+            ]
+          }
+        },
+        {
+          "metricId": "reserve-life-years",
+          "value": 20,
+          "unit": "years",
+          "coverageRatio": 0.9,
+          "derivation": "USGS 2025 world reserves / USGS 2025 world production after unit normalization",
+          "inputs": {
+            "reserves2025": 66000,
+            "reserveUnit": "metric tons",
+            "production2025": 3300,
+            "productionUnit": "metric tons"
+          }
+        }
+      ]
+    },
+    {
+      "metalId": "holmium",
+      "chapter": "RARE EARTHS",
+      "commodity": "Rare Earths",
+      "commercialForm": "rare-earth-oxide equivalent, group total",
+      "reportingMode": "group",
+      "notes": "USGS reports the lanthanides as a rare-earth group. Group observations are repeated across member cells only as explicitly labeled group context.",
+      "metrics": [
+        {
+          "metricId": "supply-growth-yoy-pct",
+          "value": 2.6316,
+          "unit": "percent",
+          "coverageRatio": 0.55,
+          "derivation": "(USGS 2025 world production - USGS 2024 world production) / USGS 2024 world production × 100",
+          "inputs": {
+            "production2024": 380000,
+            "production2025": 390000,
+            "unit": "metric tons"
+          }
+        },
+        {
+          "metricId": "top-three-supply-share-pct",
+          "value": 89.7436,
+          "unit": "percent",
+          "coverageRatio": 0.5,
+          "derivation": "Sum of the three largest explicitly reported 2025 country production values / USGS 2025 world production × 100",
+          "inputs": {
+            "worldProduction2025": 390000,
+            "unit": "metric tons",
+            "topProducers": [
+              {
+                "country": "China",
+                "value": 270000
+              },
+              {
+                "country": "United States",
+                "value": 51000
+              },
+              {
+                "country": "Australia",
+                "value": 29000
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "metalId": "indium",
+      "chapter": "INDIUM",
+      "commodity": "Indium",
+      "commercialForm": "refined indium",
+      "reportingMode": "direct",
+      "metrics": [
+        {
+          "metricId": "supply-growth-yoy-pct",
+          "value": 0.9174,
+          "unit": "percent",
+          "coverageRatio": 0.85,
+          "derivation": "(USGS 2025 world production - USGS 2024 world production) / USGS 2024 world production × 100",
+          "inputs": {
+            "production2024": 1090,
+            "production2025": 1100,
+            "unit": "metric tons"
+          }
+        },
+        {
+          "metricId": "top-three-supply-share-pct",
+          "value": 91.3636,
+          "unit": "percent",
+          "coverageRatio": 0.9,
+          "derivation": "Sum of the three largest explicitly reported 2025 country production values / USGS 2025 world production × 100",
+          "inputs": {
+            "worldProduction2025": 1100,
+            "unit": "metric tons",
+            "topProducers": [
+              {
+                "country": "China",
+                "value": 760
+              },
+              {
+                "country": "Korea, Republic of",
+                "value": 180
+              },
+              {
+                "country": "Japan",
+                "value": 65
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "metalId": "iron",
+      "chapter": "IRON ORE",
+      "commodity": "Iron Ore",
+      "commercialForm": "contained iron in ore",
+      "reportingMode": "direct",
+      "metrics": [
+        {
+          "metricId": "supply-growth-yoy-pct",
+          "value": 0,
+          "unit": "percent",
+          "coverageRatio": 0.85,
+          "derivation": "(USGS 2025 world production - USGS 2024 world production) / USGS 2024 world production × 100",
+          "inputs": {
+            "production2024": 1600000,
+            "production2025": 1600000,
+            "unit": "thousand metric tons"
+          }
+        },
+        {
+          "metricId": "top-three-supply-share-pct",
+          "value": 65.625,
+          "unit": "percent",
+          "coverageRatio": 0.9,
+          "derivation": "Sum of the three largest explicitly reported 2025 country production values / USGS 2025 world production × 100",
+          "inputs": {
+            "worldProduction2025": 1600000,
+            "unit": "thousand metric tons",
+            "topProducers": [
+              {
+                "country": "Australia",
+                "value": 600000
+              },
+              {
+                "country": "Brazil",
+                "value": 260000
+              },
+              {
+                "country": "India",
+                "value": 190000
+              }
+            ]
+          }
+        },
+        {
+          "metricId": "reserve-life-years",
+          "value": 54.375,
+          "unit": "years",
+          "coverageRatio": 0.9,
+          "derivation": "USGS 2025 world reserves / USGS 2025 world production after unit normalization",
+          "inputs": {
+            "reserves2025": 87000,
+            "reserveUnit": "million metric tons",
+            "production2025": 1600000,
+            "productionUnit": "thousand metric tons"
+          }
+        }
+      ]
+    },
+    {
+      "metalId": "lanthanum",
+      "chapter": "RARE EARTHS",
+      "commodity": "Rare Earths",
+      "commercialForm": "rare-earth-oxide equivalent, group total",
+      "reportingMode": "group",
+      "notes": "USGS reports the lanthanides as a rare-earth group. Group observations are repeated across member cells only as explicitly labeled group context.",
+      "metrics": [
+        {
+          "metricId": "supply-growth-yoy-pct",
+          "value": 2.6316,
+          "unit": "percent",
+          "coverageRatio": 0.55,
+          "derivation": "(USGS 2025 world production - USGS 2024 world production) / USGS 2024 world production × 100",
+          "inputs": {
+            "production2024": 380000,
+            "production2025": 390000,
+            "unit": "metric tons"
+          }
+        },
+        {
+          "metricId": "top-three-supply-share-pct",
+          "value": 89.7436,
+          "unit": "percent",
+          "coverageRatio": 0.5,
+          "derivation": "Sum of the three largest explicitly reported 2025 country production values / USGS 2025 world production × 100",
+          "inputs": {
+            "worldProduction2025": 390000,
+            "unit": "metric tons",
+            "topProducers": [
+              {
+                "country": "China",
+                "value": 270000
+              },
+              {
+                "country": "United States",
+                "value": 51000
+              },
+              {
+                "country": "Australia",
+                "value": 29000
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "metalId": "lead",
+      "chapter": "LEAD",
+      "commodity": "Lead",
+      "commercialForm": "mine lead content",
+      "reportingMode": "direct",
+      "metrics": [
+        {
+          "metricId": "supply-growth-yoy-pct",
+          "value": -2.1739,
+          "unit": "percent",
+          "coverageRatio": 0.85,
+          "derivation": "(USGS 2025 world production - USGS 2024 world production) / USGS 2024 world production × 100",
+          "inputs": {
+            "production2024": 4600,
+            "production2025": 4500,
+            "unit": "thousand metric tons"
+          }
+        },
+        {
+          "metricId": "top-three-supply-share-pct",
+          "value": 59.3333,
+          "unit": "percent",
+          "coverageRatio": 0.9,
+          "derivation": "Sum of the three largest explicitly reported 2025 country production values / USGS 2025 world production × 100",
+          "inputs": {
+            "worldProduction2025": 4500,
+            "unit": "thousand metric tons",
+            "topProducers": [
+              {
+                "country": "China",
+                "value": 1900
+              },
+              {
+                "country": "Australia",
+                "value": 480
+              },
+              {
+                "country": "Peru",
+                "value": 290
+              }
+            ]
+          }
+        },
+        {
+          "metricId": "reserve-life-years",
+          "value": 21.1111,
+          "unit": "years",
+          "coverageRatio": 0.9,
+          "derivation": "USGS 2025 world reserves / USGS 2025 world production after unit normalization",
+          "inputs": {
+            "reserves2025": 95000,
+            "reserveUnit": "thousand metric tons",
+            "production2025": 4500,
+            "productionUnit": "thousand metric tons"
+          }
+        }
+      ]
+    },
+    {
+      "metalId": "lithium",
+      "chapter": "LITHIUM",
+      "commodity": "Lithium",
+      "commercialForm": "lithium content",
+      "reportingMode": "direct",
+      "metrics": [
+        {
+          "metricId": "supply-growth-yoy-pct",
+          "value": 30.6306,
+          "unit": "percent",
+          "coverageRatio": 0.85,
+          "derivation": "(USGS 2025 world production - USGS 2024 world production) / USGS 2024 world production × 100",
+          "inputs": {
+            "production2024": 222000,
+            "production2025": 290000,
+            "unit": "metric tons"
+          }
+        },
+        {
+          "metricId": "top-three-supply-share-pct",
+          "value": 72.4138,
+          "unit": "percent",
+          "coverageRatio": 0.9,
+          "derivation": "Sum of the three largest explicitly reported 2025 country production values / USGS 2025 world production × 100",
+          "inputs": {
+            "worldProduction2025": 290000,
+            "unit": "metric tons",
+            "topProducers": [
+              {
+                "country": "Australia",
+                "value": 92000
+              },
+              {
+                "country": "China",
+                "value": 62000
+              },
+              {
+                "country": "Chile",
+                "value": 56000
+              }
+            ]
+          }
+        },
+        {
+          "metricId": "reserve-life-years",
+          "value": 127.5862,
+          "unit": "years",
+          "coverageRatio": 0.9,
+          "derivation": "USGS 2025 world reserves / USGS 2025 world production after unit normalization",
+          "inputs": {
+            "reserves2025": 37000000,
+            "reserveUnit": "metric tons",
+            "production2025": 290000,
+            "productionUnit": "metric tons"
+          }
+        }
+      ]
+    },
+    {
+      "metalId": "lutetium",
+      "chapter": "RARE EARTHS",
+      "commodity": "Rare Earths",
+      "commercialForm": "rare-earth-oxide equivalent, group total",
+      "reportingMode": "group",
+      "notes": "USGS reports the lanthanides as a rare-earth group. Group observations are repeated across member cells only as explicitly labeled group context.",
+      "metrics": [
+        {
+          "metricId": "supply-growth-yoy-pct",
+          "value": 2.6316,
+          "unit": "percent",
+          "coverageRatio": 0.55,
+          "derivation": "(USGS 2025 world production - USGS 2024 world production) / USGS 2024 world production × 100",
+          "inputs": {
+            "production2024": 380000,
+            "production2025": 390000,
+            "unit": "metric tons"
+          }
+        },
+        {
+          "metricId": "top-three-supply-share-pct",
+          "value": 89.7436,
+          "unit": "percent",
+          "coverageRatio": 0.5,
+          "derivation": "Sum of the three largest explicitly reported 2025 country production values / USGS 2025 world production × 100",
+          "inputs": {
+            "worldProduction2025": 390000,
+            "unit": "metric tons",
+            "topProducers": [
+              {
+                "country": "China",
+                "value": 270000
+              },
+              {
+                "country": "United States",
+                "value": 51000
+              },
+              {
+                "country": "Australia",
+                "value": 29000
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "metalId": "magnesium",
+      "chapter": "MAGNESIUM METAL",
+      "commodity": "Magnesium Metal",
+      "commercialForm": "primary magnesium metal",
+      "reportingMode": "direct",
+      "metrics": [
+        {
+          "metricId": "supply-growth-yoy-pct",
+          "value": 1.8519,
+          "unit": "percent",
+          "coverageRatio": 0.85,
+          "derivation": "(USGS 2025 world production - USGS 2024 world production) / USGS 2024 world production × 100",
+          "inputs": {
+            "production2024": 1080,
+            "production2025": 1100,
+            "unit": "thousand metric tons"
+          }
+        },
+        {
+          "metricId": "top-three-supply-share-pct",
+          "value": 93.6364,
+          "unit": "percent",
+          "coverageRatio": 0.9,
+          "derivation": "Sum of the three largest explicitly reported 2025 country production values / USGS 2025 world production × 100",
+          "inputs": {
+            "worldProduction2025": 1100,
+            "unit": "thousand metric tons",
+            "topProducers": [
+              {
+                "country": "China",
+                "value": 950
+              },
+              {
+                "country": "Russia",
+                "value": 60
+              },
+              {
+                "country": "Brazil",
+                "value": 20
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "metalId": "manganese",
+      "chapter": "MANGANESE",
+      "commodity": "Manganese",
+      "commercialForm": "manganese content",
+      "reportingMode": "direct",
+      "metrics": [
+        {
+          "metricId": "supply-growth-yoy-pct",
+          "value": 6.9519,
+          "unit": "percent",
+          "coverageRatio": 0.85,
+          "derivation": "(USGS 2025 world production - USGS 2024 world production) / USGS 2024 world production × 100",
+          "inputs": {
+            "production2024": 18700,
+            "production2025": 20000,
+            "unit": "thousand metric tons"
+          }
+        },
+        {
+          "metricId": "top-three-supply-share-pct",
+          "value": 73,
+          "unit": "percent",
+          "coverageRatio": 0.9,
+          "derivation": "Sum of the three largest explicitly reported 2025 country production values / USGS 2025 world production × 100",
+          "inputs": {
+            "worldProduction2025": 20000,
+            "unit": "thousand metric tons",
+            "topProducers": [
+              {
+                "country": "South Africa",
+                "value": 7600
+              },
+              {
+                "country": "Gabon",
+                "value": 5000
+              },
+              {
+                "country": "Ghana",
+                "value": 2000
+              }
+            ]
+          }
+        },
+        {
+          "metricId": "reserve-life-years",
+          "value": 85,
+          "unit": "years",
+          "coverageRatio": 0.9,
+          "derivation": "USGS 2025 world reserves / USGS 2025 world production after unit normalization",
+          "inputs": {
+            "reserves2025": 1700000,
+            "reserveUnit": "thousand metric tons",
+            "production2025": 20000,
+            "productionUnit": "thousand metric tons"
+          }
+        }
+      ]
+    },
+    {
+      "metalId": "mercury",
+      "chapter": "MERCURY",
+      "commodity": "Mercury",
+      "commercialForm": "mine mercury content",
+      "reportingMode": "direct",
+      "metrics": [
+        {
+          "metricId": "supply-growth-yoy-pct",
+          "value": -0.9434,
+          "unit": "percent",
+          "coverageRatio": 0.85,
+          "derivation": "(USGS 2025 world production - USGS 2024 world production) / USGS 2024 world production × 100",
+          "inputs": {
+            "production2024": 212,
+            "production2025": 210,
+            "unit": "metric tons"
+          }
+        },
+        {
+          "metricId": "top-three-supply-share-pct",
+          "value": 99.5238,
+          "unit": "percent",
+          "coverageRatio": 0.9,
+          "derivation": "Sum of the three largest explicitly reported 2025 country production values / USGS 2025 world production × 100",
+          "inputs": {
+            "worldProduction2025": 210,
+            "unit": "metric tons",
+            "topProducers": [
+              {
+                "country": "China",
+                "value": 200
+              },
+              {
+                "country": "Kyrgyzstan",
+                "value": 5
+              },
+              {
+                "country": "Tajikistan",
+                "value": 4
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "metalId": "molybdenum",
+      "chapter": "MOLYBDENUM",
+      "commodity": "Molybdenum",
+      "commercialForm": "molybdenum content",
+      "reportingMode": "direct",
+      "metrics": [
+        {
+          "metricId": "supply-growth-yoy-pct",
+          "value": 1.5625,
+          "unit": "percent",
+          "coverageRatio": 0.85,
+          "derivation": "(USGS 2025 world production - USGS 2024 world production) / USGS 2024 world production × 100",
+          "inputs": {
+            "production2024": 256000,
+            "production2025": 260000,
+            "unit": "metric tons"
+          }
+        },
+        {
+          "metricId": "top-three-supply-share-pct",
+          "value": 68.8462,
+          "unit": "percent",
+          "coverageRatio": 0.9,
+          "derivation": "Sum of the three largest explicitly reported 2025 country production values / USGS 2025 world production × 100",
+          "inputs": {
+            "worldProduction2025": 260000,
+            "unit": "metric tons",
+            "topProducers": [
+              {
+                "country": "China",
+                "value": 97000
+              },
+              {
+                "country": "Chile",
+                "value": 42000
+              },
+              {
+                "country": "United States",
+                "value": 40000
+              }
+            ]
+          }
+        },
+        {
+          "metricId": "reserve-life-years",
+          "value": 65.3846,
+          "unit": "years",
+          "coverageRatio": 0.9,
+          "derivation": "USGS 2025 world reserves / USGS 2025 world production after unit normalization",
+          "inputs": {
+            "reserves2025": 17000,
+            "reserveUnit": "thousand metric tons",
+            "production2025": 260000,
+            "productionUnit": "metric tons"
+          }
+        }
+      ]
+    },
+    {
+      "metalId": "neodymium",
+      "chapter": "RARE EARTHS",
+      "commodity": "Rare Earths",
+      "commercialForm": "rare-earth-oxide equivalent, group total",
+      "reportingMode": "group",
+      "notes": "USGS reports the lanthanides as a rare-earth group. Group observations are repeated across member cells only as explicitly labeled group context.",
+      "metrics": [
+        {
+          "metricId": "supply-growth-yoy-pct",
+          "value": 2.6316,
+          "unit": "percent",
+          "coverageRatio": 0.55,
+          "derivation": "(USGS 2025 world production - USGS 2024 world production) / USGS 2024 world production × 100",
+          "inputs": {
+            "production2024": 380000,
+            "production2025": 390000,
+            "unit": "metric tons"
+          }
+        },
+        {
+          "metricId": "top-three-supply-share-pct",
+          "value": 89.7436,
+          "unit": "percent",
+          "coverageRatio": 0.5,
+          "derivation": "Sum of the three largest explicitly reported 2025 country production values / USGS 2025 world production × 100",
+          "inputs": {
+            "worldProduction2025": 390000,
+            "unit": "metric tons",
+            "topProducers": [
+              {
+                "country": "China",
+                "value": 270000
+              },
+              {
+                "country": "United States",
+                "value": 51000
+              },
+              {
+                "country": "Australia",
+                "value": 29000
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "metalId": "nickel",
+      "chapter": "NICKEL",
+      "commodity": "Nickel",
+      "commercialForm": "mine nickel content",
+      "reportingMode": "direct",
+      "metrics": [
+        {
+          "metricId": "supply-growth-yoy-pct",
+          "value": 5.1213,
+          "unit": "percent",
+          "coverageRatio": 0.85,
+          "derivation": "(USGS 2025 world production - USGS 2024 world production) / USGS 2024 world production × 100",
+          "inputs": {
+            "production2024": 3710000,
+            "production2025": 3900000,
+            "unit": "metric tons"
+          }
+        },
+        {
+          "metricId": "top-three-supply-share-pct",
+          "value": 78.7179,
+          "unit": "percent",
+          "coverageRatio": 0.9,
+          "derivation": "Sum of the three largest explicitly reported 2025 country production values / USGS 2025 world production × 100",
+          "inputs": {
+            "worldProduction2025": 3900000,
+            "unit": "metric tons",
+            "topProducers": [
+              {
+                "country": "Indonesia",
+                "value": 2600000
+              },
+              {
+                "country": "Philippines",
+                "value": 270000
+              },
+              {
+                "country": "Russia",
+                "value": 200000
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "metalId": "niobium",
+      "chapter": "NIOBIUM (COLUMBIUM)",
+      "commodity": "Niobium (Columbium)",
+      "commercialForm": "niobium content",
+      "reportingMode": "direct",
+      "metrics": [
+        {
+          "metricId": "supply-growth-yoy-pct",
+          "value": 0,
+          "unit": "percent",
+          "coverageRatio": 0.85,
+          "derivation": "(USGS 2025 world production - USGS 2024 world production) / USGS 2024 world production × 100",
+          "inputs": {
+            "production2024": 112000,
+            "production2025": 112000,
+            "unit": "metric tons"
+          }
+        },
+        {
+          "metricId": "top-three-supply-share-pct",
+          "value": 99.0804,
+          "unit": "percent",
+          "coverageRatio": 0.9,
+          "derivation": "Sum of the three largest explicitly reported 2025 country production values / USGS 2025 world production × 100",
+          "inputs": {
+            "worldProduction2025": 112000,
+            "unit": "metric tons",
+            "topProducers": [
+              {
+                "country": "Brazil",
+                "value": 104000
+              },
+              {
+                "country": "Canada",
+                "value": 6000
+              },
+              {
+                "country": "Congo (Kinshasa)",
+                "value": 970
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "metalId": "palladium",
+      "chapter": "PLATINUM-GROUP METALS",
+      "commodity": "Palladium",
+      "commercialForm": "mine palladium content",
+      "reportingMode": "direct",
+      "metrics": [
+        {
+          "metricId": "supply-growth-yoy-pct",
+          "value": -12.4424,
+          "unit": "percent",
+          "coverageRatio": 0.85,
+          "derivation": "(USGS 2025 world production - USGS 2024 world production) / USGS 2024 world production × 100",
+          "inputs": {
+            "production2024": 217000,
+            "production2025": 190000,
+            "unit": "kilograms"
+          }
+        },
+        {
+          "metricId": "top-three-supply-share-pct",
+          "value": 89.4737,
+          "unit": "percent",
+          "coverageRatio": 0.9,
+          "derivation": "Sum of the three largest explicitly reported 2025 country production values / USGS 2025 world production × 100",
+          "inputs": {
+            "worldProduction2025": 190000,
+            "unit": "kilograms",
+            "topProducers": [
+              {
+                "country": "Russia",
+                "value": 84000
+              },
+              {
+                "country": "South Africa",
+                "value": 70000
+              },
+              {
+                "country": "Canada",
+                "value": 16000
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "metalId": "platinum",
+      "chapter": "PLATINUM-GROUP METALS",
+      "commodity": "Platinum",
+      "commercialForm": "mine platinum content",
+      "reportingMode": "direct",
+      "metrics": [
+        {
+          "metricId": "supply-growth-yoy-pct",
+          "value": -5.0279,
+          "unit": "percent",
+          "coverageRatio": 0.85,
+          "derivation": "(USGS 2025 world production - USGS 2024 world production) / USGS 2024 world production × 100",
+          "inputs": {
+            "production2024": 179000,
+            "production2025": 170000,
+            "unit": "kilograms"
+          }
+        },
+        {
+          "metricId": "top-three-supply-share-pct",
+          "value": 92.9412,
+          "unit": "percent",
+          "coverageRatio": 0.9,
+          "derivation": "Sum of the three largest explicitly reported 2025 country production values / USGS 2025 world production × 100",
+          "inputs": {
+            "worldProduction2025": 170000,
+            "unit": "kilograms",
+            "topProducers": [
+              {
+                "country": "South Africa",
+                "value": 120000
+              },
+              {
+                "country": "Russia",
+                "value": 20000
+              },
+              {
+                "country": "Zimbabwe",
+                "value": 18000
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "metalId": "praseodymium",
+      "chapter": "RARE EARTHS",
+      "commodity": "Rare Earths",
+      "commercialForm": "rare-earth-oxide equivalent, group total",
+      "reportingMode": "group",
+      "notes": "USGS reports the lanthanides as a rare-earth group. Group observations are repeated across member cells only as explicitly labeled group context.",
+      "metrics": [
+        {
+          "metricId": "supply-growth-yoy-pct",
+          "value": 2.6316,
+          "unit": "percent",
+          "coverageRatio": 0.55,
+          "derivation": "(USGS 2025 world production - USGS 2024 world production) / USGS 2024 world production × 100",
+          "inputs": {
+            "production2024": 380000,
+            "production2025": 390000,
+            "unit": "metric tons"
+          }
+        },
+        {
+          "metricId": "top-three-supply-share-pct",
+          "value": 89.7436,
+          "unit": "percent",
+          "coverageRatio": 0.5,
+          "derivation": "Sum of the three largest explicitly reported 2025 country production values / USGS 2025 world production × 100",
+          "inputs": {
+            "worldProduction2025": 390000,
+            "unit": "metric tons",
+            "topProducers": [
+              {
+                "country": "China",
+                "value": 270000
+              },
+              {
+                "country": "United States",
+                "value": 51000
+              },
+              {
+                "country": "Australia",
+                "value": 29000
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "metalId": "rhenium",
+      "chapter": "RHENIUM",
+      "commodity": "Rhenium",
+      "commercialForm": "mine rhenium content",
+      "reportingMode": "direct",
+      "metrics": [
+        {
+          "metricId": "supply-growth-yoy-pct",
+          "value": 1.5038,
+          "unit": "percent",
+          "coverageRatio": 0.85,
+          "derivation": "(USGS 2025 world production - USGS 2024 world production) / USGS 2024 world production × 100",
+          "inputs": {
+            "production2024": 79800,
+            "production2025": 81000,
+            "unit": "kilograms"
+          }
+        },
+        {
+          "metricId": "top-three-supply-share-pct",
+          "value": 74.0741,
+          "unit": "percent",
+          "coverageRatio": 0.9,
+          "derivation": "Sum of the three largest explicitly reported 2025 country production values / USGS 2025 world production × 100",
+          "inputs": {
+            "worldProduction2025": 81000,
+            "unit": "kilograms",
+            "topProducers": [
+              {
+                "country": "Chile",
+                "value": 30000
+              },
+              {
+                "country": "China",
+                "value": 20000
+              },
+              {
+                "country": "Poland",
+                "value": 10000
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "metalId": "samarium",
+      "chapter": "RARE EARTHS",
+      "commodity": "Rare Earths",
+      "commercialForm": "rare-earth-oxide equivalent, group total",
+      "reportingMode": "group",
+      "notes": "USGS reports the lanthanides as a rare-earth group. Group observations are repeated across member cells only as explicitly labeled group context.",
+      "metrics": [
+        {
+          "metricId": "supply-growth-yoy-pct",
+          "value": 2.6316,
+          "unit": "percent",
+          "coverageRatio": 0.55,
+          "derivation": "(USGS 2025 world production - USGS 2024 world production) / USGS 2024 world production × 100",
+          "inputs": {
+            "production2024": 380000,
+            "production2025": 390000,
+            "unit": "metric tons"
+          }
+        },
+        {
+          "metricId": "top-three-supply-share-pct",
+          "value": 89.7436,
+          "unit": "percent",
+          "coverageRatio": 0.5,
+          "derivation": "Sum of the three largest explicitly reported 2025 country production values / USGS 2025 world production × 100",
+          "inputs": {
+            "worldProduction2025": 390000,
+            "unit": "metric tons",
+            "topProducers": [
+              {
+                "country": "China",
+                "value": 270000
+              },
+              {
+                "country": "United States",
+                "value": 51000
+              },
+              {
+                "country": "Australia",
+                "value": 29000
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "metalId": "selenium",
+      "chapter": "SELENIUM",
+      "commodity": "Selenium",
+      "commercialForm": "refinery selenium",
+      "reportingMode": "direct",
+      "metrics": [
+        {
+          "metricId": "supply-growth-yoy-pct",
+          "value": 3.5422,
+          "unit": "percent",
+          "coverageRatio": 0.85,
+          "derivation": "(USGS 2025 world production - USGS 2024 world production) / USGS 2024 world production × 100",
+          "inputs": {
+            "production2024": 3670,
+            "production2025": 3800,
+            "unit": "metric tons"
+          }
+        },
+        {
+          "metricId": "top-three-supply-share-pct",
+          "value": 77.8947,
+          "unit": "percent",
+          "coverageRatio": 0.9,
+          "derivation": "Sum of the three largest explicitly reported 2025 country production values / USGS 2025 world production × 100",
+          "inputs": {
+            "worldProduction2025": 3800,
+            "unit": "metric tons",
+            "topProducers": [
+              {
+                "country": "China",
+                "value": 2000
+              },
+              {
+                "country": "Japan",
+                "value": 640
+              },
+              {
+                "country": "Russia",
+                "value": 320
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "metalId": "silicon",
+      "chapter": "SILICON",
+      "commodity": "Silicon",
+      "commercialForm": "silicon metal",
+      "reportingMode": "direct",
+      "metrics": [
+        {
+          "metricId": "supply-growth-yoy-pct",
+          "value": -16.3636,
+          "unit": "percent",
+          "coverageRatio": 0.85,
+          "derivation": "(USGS 2025 world production - USGS 2024 world production) / USGS 2024 world production × 100",
+          "inputs": {
+            "production2024": 5500,
+            "production2025": 4600,
+            "unit": "thousand metric tons"
+          }
+        },
+        {
+          "metricId": "top-three-supply-share-pct",
+          "value": 93.6957,
+          "unit": "percent",
+          "coverageRatio": 0.9,
+          "derivation": "Sum of the three largest explicitly reported 2025 country production values / USGS 2025 world production × 100",
+          "inputs": {
+            "worldProduction2025": 4600,
+            "unit": "thousand metric tons",
+            "topProducers": [
+              {
+                "country": "China",
+                "value": 4000
+              },
+              {
+                "country": "Brazil",
+                "value": 180
+              },
+              {
+                "country": "Norway",
+                "value": 130
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "metalId": "silver",
+      "chapter": "SILVER",
+      "commodity": "Silver",
+      "commercialForm": "mine silver content",
+      "reportingMode": "direct",
+      "metrics": [
+        {
+          "metricId": "supply-growth-yoy-pct",
+          "value": 2.7668,
+          "unit": "percent",
+          "coverageRatio": 0.85,
+          "derivation": "(USGS 2025 world production - USGS 2024 world production) / USGS 2024 world production × 100",
+          "inputs": {
+            "production2024": 25300,
+            "production2025": 26000,
+            "unit": "metric tons"
+          }
+        },
+        {
+          "metricId": "top-three-supply-share-pct",
+          "value": 51.1538,
+          "unit": "percent",
+          "coverageRatio": 0.9,
+          "derivation": "Sum of the three largest explicitly reported 2025 country production values / USGS 2025 world production × 100",
+          "inputs": {
+            "worldProduction2025": 26000,
+            "unit": "metric tons",
+            "topProducers": [
+              {
+                "country": "Mexico",
+                "value": 6300
+              },
+              {
+                "country": "Peru",
+                "value": 3600
+              },
+              {
+                "country": "China",
+                "value": 3400
+              }
+            ]
+          }
+        },
+        {
+          "metricId": "reserve-life-years",
+          "value": 23.4615,
+          "unit": "years",
+          "coverageRatio": 0.9,
+          "derivation": "USGS 2025 world reserves / USGS 2025 world production after unit normalization",
+          "inputs": {
+            "reserves2025": 610000,
+            "reserveUnit": "metric tons",
+            "production2025": 26000,
+            "productionUnit": "metric tons"
+          }
+        }
+      ]
+    },
+    {
+      "metalId": "strontium",
+      "chapter": "STRONTIUM",
+      "commodity": "Strontium",
+      "commercialForm": "celestite mineral concentrate",
+      "reportingMode": "direct",
+      "metrics": [
+        {
+          "metricId": "supply-growth-yoy-pct",
+          "value": 12.5,
+          "unit": "percent",
+          "coverageRatio": 0.85,
+          "derivation": "(USGS 2025 world production - USGS 2024 world production) / USGS 2024 world production × 100",
+          "inputs": {
+            "production2024": 400000,
+            "production2025": 450000,
+            "unit": "metric tons"
+          }
+        },
+        {
+          "metricId": "top-three-supply-share-pct",
+          "value": 95.5556,
+          "unit": "percent",
+          "coverageRatio": 0.9,
+          "derivation": "Sum of the three largest explicitly reported 2025 country production values / USGS 2025 world production × 100",
+          "inputs": {
+            "worldProduction2025": 450000,
+            "unit": "metric tons",
+            "topProducers": [
+              {
+                "country": "Iran",
+                "value": 250000
+              },
+              {
+                "country": "Spain",
+                "value": 100000
+              },
+              {
+                "country": "China",
+                "value": 80000
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "metalId": "tantalum",
+      "chapter": "TANTALUM",
+      "commodity": "Tantalum",
+      "commercialForm": "tantalum content",
+      "reportingMode": "direct",
+      "metrics": [
+        {
+          "metricId": "supply-growth-yoy-pct",
+          "value": 0,
+          "unit": "percent",
+          "coverageRatio": 0.85,
+          "derivation": "(USGS 2025 world production - USGS 2024 world production) / USGS 2024 world production × 100",
+          "inputs": {
+            "production2024": 2500,
+            "production2025": 2500,
+            "unit": "metric tons"
+          }
+        },
+        {
+          "metricId": "top-three-supply-share-pct",
+          "value": 83.6,
+          "unit": "percent",
+          "coverageRatio": 0.9,
+          "derivation": "Sum of the three largest explicitly reported 2025 country production values / USGS 2025 world production × 100",
+          "inputs": {
+            "worldProduction2025": 2500,
+            "unit": "metric tons",
+            "topProducers": [
+              {
+                "country": "Congo (Kinshasa)",
+                "value": 1300
+              },
+              {
+                "country": "Rwanda",
+                "value": 400
+              },
+              {
+                "country": "Nigeria",
+                "value": 390
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "metalId": "tellurium",
+      "chapter": "TELLURIUM",
+      "commodity": "Tellurium",
+      "commercialForm": "refinery tellurium",
+      "reportingMode": "direct",
+      "metrics": [
+        {
+          "metricId": "supply-growth-yoy-pct",
+          "value": 1.9368,
+          "unit": "percent",
+          "coverageRatio": 0.85,
+          "derivation": "(USGS 2025 world production - USGS 2024 world production) / USGS 2024 world production × 100",
+          "inputs": {
+            "production2024": 981,
+            "production2025": 1000,
+            "unit": "metric tons"
+          }
+        },
+        {
+          "metricId": "top-three-supply-share-pct",
+          "value": 92.8,
+          "unit": "percent",
+          "coverageRatio": 0.9,
+          "derivation": "Sum of the three largest explicitly reported 2025 country production values / USGS 2025 world production × 100",
+          "inputs": {
+            "worldProduction2025": 1000,
+            "unit": "metric tons",
+            "topProducers": [
+              {
+                "country": "China",
+                "value": 800
+              },
+              {
+                "country": "Russia",
+                "value": 67
+              },
+              {
+                "country": "Japan",
+                "value": 61
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "metalId": "terbium",
+      "chapter": "RARE EARTHS",
+      "commodity": "Rare Earths",
+      "commercialForm": "rare-earth-oxide equivalent, group total",
+      "reportingMode": "group",
+      "notes": "USGS reports the lanthanides as a rare-earth group. Group observations are repeated across member cells only as explicitly labeled group context.",
+      "metrics": [
+        {
+          "metricId": "supply-growth-yoy-pct",
+          "value": 2.6316,
+          "unit": "percent",
+          "coverageRatio": 0.55,
+          "derivation": "(USGS 2025 world production - USGS 2024 world production) / USGS 2024 world production × 100",
+          "inputs": {
+            "production2024": 380000,
+            "production2025": 390000,
+            "unit": "metric tons"
+          }
+        },
+        {
+          "metricId": "top-three-supply-share-pct",
+          "value": 89.7436,
+          "unit": "percent",
+          "coverageRatio": 0.5,
+          "derivation": "Sum of the three largest explicitly reported 2025 country production values / USGS 2025 world production × 100",
+          "inputs": {
+            "worldProduction2025": 390000,
+            "unit": "metric tons",
+            "topProducers": [
+              {
+                "country": "China",
+                "value": 270000
+              },
+              {
+                "country": "United States",
+                "value": 51000
+              },
+              {
+                "country": "Australia",
+                "value": 29000
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "metalId": "thulium",
+      "chapter": "RARE EARTHS",
+      "commodity": "Rare Earths",
+      "commercialForm": "rare-earth-oxide equivalent, group total",
+      "reportingMode": "group",
+      "notes": "USGS reports the lanthanides as a rare-earth group. Group observations are repeated across member cells only as explicitly labeled group context.",
+      "metrics": [
+        {
+          "metricId": "supply-growth-yoy-pct",
+          "value": 2.6316,
+          "unit": "percent",
+          "coverageRatio": 0.55,
+          "derivation": "(USGS 2025 world production - USGS 2024 world production) / USGS 2024 world production × 100",
+          "inputs": {
+            "production2024": 380000,
+            "production2025": 390000,
+            "unit": "metric tons"
+          }
+        },
+        {
+          "metricId": "top-three-supply-share-pct",
+          "value": 89.7436,
+          "unit": "percent",
+          "coverageRatio": 0.5,
+          "derivation": "Sum of the three largest explicitly reported 2025 country production values / USGS 2025 world production × 100",
+          "inputs": {
+            "worldProduction2025": 390000,
+            "unit": "metric tons",
+            "topProducers": [
+              {
+                "country": "China",
+                "value": 270000
+              },
+              {
+                "country": "United States",
+                "value": 51000
+              },
+              {
+                "country": "Australia",
+                "value": 29000
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "metalId": "tin",
+      "chapter": "TIN",
+      "commodity": "Tin",
+      "commercialForm": "mine tin content",
+      "reportingMode": "direct",
+      "metrics": [
+        {
+          "metricId": "supply-growth-yoy-pct",
+          "value": -1.3605,
+          "unit": "percent",
+          "coverageRatio": 0.85,
+          "derivation": "(USGS 2025 world production - USGS 2024 world production) / USGS 2024 world production × 100",
+          "inputs": {
+            "production2024": 294000,
+            "production2025": 290000,
+            "unit": "metric tons"
+          }
+        },
+        {
+          "metricId": "top-three-supply-share-pct",
+          "value": 56.8966,
+          "unit": "percent",
+          "coverageRatio": 0.9,
+          "derivation": "Sum of the three largest explicitly reported 2025 country production values / USGS 2025 world production × 100",
+          "inputs": {
+            "worldProduction2025": 290000,
+            "unit": "metric tons",
+            "topProducers": [
+              {
+                "country": "China",
+                "value": 71000
+              },
+              {
+                "country": "Indonesia",
+                "value": 61000
+              },
+              {
+                "country": "Peru",
+                "value": 33000
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "metalId": "titanium",
+      "chapter": "TITANIUM MINERAL CONCENTRATES",
+      "commodity": "Titanium Mineral Concentrates",
+      "commercialForm": "ilmenite mineral concentrate",
+      "reportingMode": "direct",
+      "notes": "The baseline uses ilmenite only so country values and world totals remain comparable; rutile is retained in the source artifact but not added to this metric.",
+      "metrics": [
+        {
+          "metricId": "supply-growth-yoy-pct",
+          "value": 2.063,
+          "unit": "percent",
+          "coverageRatio": 0.85,
+          "derivation": "(USGS 2025 world production - USGS 2024 world production) / USGS 2024 world production × 100",
+          "inputs": {
+            "production2024": 9210,
+            "production2025": 9400,
+            "unit": "thousand metric tons"
+          }
+        },
+        {
+          "metricId": "top-three-supply-share-pct",
+          "value": 68.0851,
+          "unit": "percent",
+          "coverageRatio": 0.9,
+          "derivation": "Sum of the three largest explicitly reported 2025 country production values / USGS 2025 world production × 100",
+          "inputs": {
+            "worldProduction2025": 9400,
+            "unit": "thousand metric tons",
+            "topProducers": [
+              {
+                "country": "China",
+                "value": 3200
+              },
+              {
+                "country": "Mozambique",
+                "value": 1900
+              },
+              {
+                "country": "South Africa",
+                "value": 1300
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "metalId": "tungsten",
+      "chapter": "TUNGSTEN",
+      "commodity": "Tungsten",
+      "commercialForm": "tungsten content",
+      "reportingMode": "direct",
+      "metrics": [
+        {
+          "metricId": "supply-growth-yoy-pct",
+          "value": 3.6585,
+          "unit": "percent",
+          "coverageRatio": 0.85,
+          "derivation": "(USGS 2025 world production - USGS 2024 world production) / USGS 2024 world production × 100",
+          "inputs": {
+            "production2024": 82000,
+            "production2025": 85000,
+            "unit": "metric tons"
+          }
+        },
+        {
+          "metricId": "top-three-supply-share-pct",
+          "value": 85.1765,
+          "unit": "percent",
+          "coverageRatio": 0.9,
+          "derivation": "Sum of the three largest explicitly reported 2025 country production values / USGS 2025 world production × 100",
+          "inputs": {
+            "worldProduction2025": 85000,
+            "unit": "metric tons",
+            "topProducers": [
+              {
+                "country": "China",
+                "value": 67000
+              },
+              {
+                "country": "Vietnam",
+                "value": 3000
+              },
+              {
+                "country": "Kazakhstan",
+                "value": 2400
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "metalId": "vanadium",
+      "chapter": "VANADIUM",
+      "commodity": "Vanadium",
+      "commercialForm": "vanadium content",
+      "reportingMode": "direct",
+      "notes": "The USGS table header reports reserves in thousand metric tons; the CSV row unit omits that table-level qualifier, so the importer applies the published header explicitly.",
+      "metrics": [
+        {
+          "metricId": "supply-growth-yoy-pct",
+          "value": -6.7797,
+          "unit": "percent",
+          "coverageRatio": 0.85,
+          "derivation": "(USGS 2025 world production - USGS 2024 world production) / USGS 2024 world production × 100",
+          "inputs": {
+            "production2024": 118000,
+            "production2025": 110000,
+            "unit": "metric tons"
+          }
+        },
+        {
+          "metricId": "top-three-supply-share-pct",
+          "value": 98.4545,
+          "unit": "percent",
+          "coverageRatio": 0.9,
+          "derivation": "Sum of the three largest explicitly reported 2025 country production values / USGS 2025 world production × 100",
+          "inputs": {
+            "worldProduction2025": 110000,
+            "unit": "metric tons",
+            "topProducers": [
+              {
+                "country": "China",
+                "value": 82000
+              },
+              {
+                "country": "Russia",
+                "value": 21000
+              },
+              {
+                "country": "Brazil",
+                "value": 5300
+              }
+            ]
+          }
+        },
+        {
+          "metricId": "reserve-life-years",
+          "value": 190.9091,
+          "unit": "years",
+          "coverageRatio": 0.9,
+          "derivation": "USGS 2025 world reserves / USGS 2025 world production after unit normalization",
+          "inputs": {
+            "reserves2025": 21000,
+            "reserveUnit": "thousand metric tons",
+            "production2025": 110000,
+            "productionUnit": "metric tons"
+          }
+        }
+      ]
+    },
+    {
+      "metalId": "ytterbium",
+      "chapter": "RARE EARTHS",
+      "commodity": "Rare Earths",
+      "commercialForm": "rare-earth-oxide equivalent, group total",
+      "reportingMode": "group",
+      "notes": "USGS reports the lanthanides as a rare-earth group. Group observations are repeated across member cells only as explicitly labeled group context.",
+      "metrics": [
+        {
+          "metricId": "supply-growth-yoy-pct",
+          "value": 2.6316,
+          "unit": "percent",
+          "coverageRatio": 0.55,
+          "derivation": "(USGS 2025 world production - USGS 2024 world production) / USGS 2024 world production × 100",
+          "inputs": {
+            "production2024": 380000,
+            "production2025": 390000,
+            "unit": "metric tons"
+          }
+        },
+        {
+          "metricId": "top-three-supply-share-pct",
+          "value": 89.7436,
+          "unit": "percent",
+          "coverageRatio": 0.5,
+          "derivation": "Sum of the three largest explicitly reported 2025 country production values / USGS 2025 world production × 100",
+          "inputs": {
+            "worldProduction2025": 390000,
+            "unit": "metric tons",
+            "topProducers": [
+              {
+                "country": "China",
+                "value": 270000
+              },
+              {
+                "country": "United States",
+                "value": 51000
+              },
+              {
+                "country": "Australia",
+                "value": 29000
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "metalId": "zinc",
+      "chapter": "ZINC",
+      "commodity": "Zinc",
+      "commercialForm": "mine zinc content",
+      "reportingMode": "direct",
+      "metrics": [
+        {
+          "metricId": "supply-growth-yoy-pct",
+          "value": 9.2437,
+          "unit": "percent",
+          "coverageRatio": 0.85,
+          "derivation": "(USGS 2025 world production - USGS 2024 world production) / USGS 2024 world production × 100",
+          "inputs": {
+            "production2024": 11900,
+            "production2025": 13000,
+            "unit": "thousand metric tons"
+          }
+        },
+        {
+          "metricId": "top-three-supply-share-pct",
+          "value": 51.5385,
+          "unit": "percent",
+          "coverageRatio": 0.9,
+          "derivation": "Sum of the three largest explicitly reported 2025 country production values / USGS 2025 world production × 100",
+          "inputs": {
+            "worldProduction2025": 13000,
+            "unit": "thousand metric tons",
+            "topProducers": [
+              {
+                "country": "China",
+                "value": 4100
+              },
+              {
+                "country": "Peru",
+                "value": 1500
+              },
+              {
+                "country": "Australia",
+                "value": 1100
+              }
+            ]
+          }
+        },
+        {
+          "metricId": "reserve-life-years",
+          "value": 18.4615,
+          "unit": "years",
+          "coverageRatio": 0.9,
+          "derivation": "USGS 2025 world reserves / USGS 2025 world production after unit normalization",
+          "inputs": {
+            "reserves2025": 240000,
+            "reserveUnit": "thousand metric tons",
+            "production2025": 13000,
+            "productionUnit": "thousand metric tons"
+          }
+        }
+      ]
+    },
+    {
+      "metalId": "zirconium",
+      "chapter": "ZIRCONIUM AND HAFNIUM",
+      "commodity": "Zirconium",
+      "commercialForm": "zirconium mineral concentrates",
+      "reportingMode": "direct",
+      "notes": "Reserve and production forms differ, so the importer refuses to derive reserve life unless units and forms are explicitly compatible.",
+      "metrics": [
+        {
+          "metricId": "supply-growth-yoy-pct",
+          "value": -7.6923,
+          "unit": "percent",
+          "coverageRatio": 0.85,
+          "derivation": "(USGS 2025 world production - USGS 2024 world production) / USGS 2024 world production × 100",
+          "inputs": {
+            "production2024": 1300,
+            "production2025": 1200,
+            "unit": "thousand metric tons"
+          }
+        },
+        {
+          "metricId": "top-three-supply-share-pct",
+          "value": 69.1667,
+          "unit": "percent",
+          "coverageRatio": 0.9,
+          "derivation": "Sum of the three largest explicitly reported 2025 country production values / USGS 2025 world production × 100",
+          "inputs": {
+            "worldProduction2025": 1200,
+            "unit": "thousand metric tons",
+            "topProducers": [
+              {
+                "country": "Australia",
+                "value": 400
+              },
+              {
+                "country": "South Africa",
+                "value": 270
+              },
+              {
+                "country": "Mozambique",
+                "value": 160
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

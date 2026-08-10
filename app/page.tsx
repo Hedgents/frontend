@@ -1,50 +1,70 @@
-import { MeshFeed } from "@/components/MeshFeed";
-import { NumbersPanel } from "@/components/NumbersPanel";
-import { AprHistoryChart } from "@/components/AprHistoryChart";
-import { StrategyCardsRow } from "@/components/StrategyCardsRow";
-import { BenchmarkComparisonBar } from "@/components/BenchmarkComparisonBar";
-import { OnchainActivityRail } from "@/components/OnchainActivityRail";
-import { RecentShipsCard } from "@/components/RecentShipsCard";
-import { OrchestratorCard } from "@/components/OrchestratorCard";
-import { LifetimeBanner } from "@/components/LifetimeBanner";
+import { MetalTerminal, type TerminalView } from "@/components/MetalTerminal";
+import type { ScarcityMarket } from "@/components/ScarcityExchange";
+import { loadScarcityMarketCatalog } from "@/lib/scarcity-market-store";
+import { METAL_MARKET_NAMESPACE_BY_ID } from "@/lib/scarcity";
+import { getPublicExecutionControls } from "@/lib/execution-controls";
+import { compileCurveMarket } from "@/lib/scarcity-curves";
 
-function SectionLabel({ children }: { children: React.ReactNode }) {
+const terminalViews = new Set<TerminalView>(["markets", "scarcity", "portfolio", "orders"]);
+
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Promise<{ view?: string | string[] }>;
+}) {
+  const [catalog, resolvedSearchParams] = await Promise.all([
+    loadScarcityMarketCatalog(),
+    searchParams,
+  ]);
+  const scarcityMarkets: ScarcityMarket[] = catalog.map((market) => {
+    const curve = compileCurveMarket(market);
+    return {
+      slug: market.question.slug,
+      marketId: market.marketId,
+      questionHash: market.questionHash,
+      rulesHash: market.rulesHash,
+      canonicalQuestion: market.canonicalQuestion,
+      canonicalRules: market.canonicalRules,
+      title: market.question.title,
+      question: market.question.question,
+      metal: market.question.metal,
+      marketKind: market.question.kind === "event" ? "event" : "data",
+      category: market.question.kind === "event"
+        ? METAL_MARKET_NAMESPACE_BY_ID[market.question.metal.id]?.primaryCategory ?? "science"
+        : "price-data",
+      resolutionTarget: market.question.kind === "event"
+        ? { kind: "event", ...market.question.event }
+        : { kind: "data", ...market.question.observation },
+      sources: market.question.sources,
+      schedule: market.rules.schedule,
+      lifecycle: market.lifecycle,
+      publication: market.publication,
+      warning: market.warning,
+      curve: curve ? {
+        slug: curve.slug,
+        marketId: curve.marketId,
+        metricHash: curve.metricHash,
+        rulesHash: curve.rulesHash,
+        canonicalMetric: curve.canonicalMetric,
+        canonicalRules: curve.canonicalRules,
+        title: curve.metric.title,
+        metric: curve.metric.metric,
+        displayRange: curve.metric.displayRange,
+        bucketCount: curve.rules.engine.bucketCount,
+        targetJackpotBps: curve.rules.engine.targetJackpotBps,
+        jackpotLeverageCap: curve.rules.engine.jackpotLeverageCap,
+      } : null,
+    };
+  });
+  const requestedView = resolvedSearchParams.view;
+  const view = typeof requestedView === "string" && terminalViews.has(requestedView as TerminalView)
+    ? (requestedView as TerminalView)
+    : "markets";
   return (
-    <div className="flex items-center gap-3 pt-2">
-      <span className="text-[10px] uppercase tracking-[0.2em] font-medium opacity-50">
-        {children}
-      </span>
-      <div className="flex-1 h-px bg-gradient-to-r from-current/10 to-transparent opacity-30" />
-    </div>
-  );
-}
-
-export default function Page() {
-  return (
-    <main className="min-h-screen p-6 max-w-7xl mx-auto space-y-5 w-full">
-      <LifetimeBanner />
-
-      <SectionLabel>Treasury</SectionLabel>
-      <NumbersPanel />
-
-      <SectionLabel>Strategies</SectionLabel>
-      <StrategyCardsRow />
-      <BenchmarkComparisonBar />
-
-      <SectionLabel>Allocator</SectionLabel>
-      <OrchestratorCard />
-
-      <SectionLabel>Activity</SectionLabel>
-      <RecentShipsCard />
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <div className="lg:col-span-2">
-          <MeshFeed />
-        </div>
-        <div>
-          <OnchainActivityRail />
-        </div>
-      </div>
-      <AprHistoryChart />
-    </main>
+    <MetalTerminal
+      scarcityMarkets={scarcityMarkets}
+      initialView={view}
+      executionControl={getPublicExecutionControls()}
+    />
   );
 }

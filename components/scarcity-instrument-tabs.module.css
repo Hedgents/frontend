@@ -1,0 +1,77 @@
+.tabs {
+  align-self: stretch;
+  display: flex;
+  min-width: 0;
+  min-height: 62px;
+  border-right: 1px solid var(--line-strong);
+}
+
+.tabs button {
+  display: grid;
+  align-content: center;
+  gap: 5px;
+  min-width: 178px;
+  padding: 0 18px;
+  border: 0;
+  border-right: 1px solid var(--line);
+  color: var(--faint);
+  text-align: left;
+  background: transparent;
+  cursor: pointer;
+  transition: color 160ms ease, background-color 160ms ease;
+}
+
+.tabs button:first-child {
+  border-left: 1px solid var(--line);
+}
+
+.tabs button:hover {
+  color: var(--paper);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.tabs button:focus-visible {
+  outline: 2px solid var(--metal-tone);
+  outline-offset: -2px;
+}
+
+.tabs button span {
+  font: 700 10px/1 var(--font-mono), monospace;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.tabs button small {
+  color: var(--faint);
+  font-size: 9px;
+  line-height: 1;
+}
+
+.tabs .active {
+  color: var(--paper);
+  background: color-mix(in srgb, var(--metal-tone) 7%, transparent);
+  box-shadow: inset 0 -2px var(--metal-tone);
+}
+
+@media (max-width: 860px) {
+  .tabs {
+    min-height: 57px;
+  }
+
+  .tabs button {
+    flex: 1;
+    min-width: 0;
+    min-height: 57px;
+    padding-inline: 14px;
+  }
+}
+
+@media (max-width: 520px) {
+  .tabs button {
+    padding-inline: 11px;
+  }
+
+  .tabs button span {
+    font-size: 9px;
+  }
+}

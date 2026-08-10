@@ -1,37 +1,74 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { Bodoni_Moda, IBM_Plex_Mono, IBM_Plex_Sans } from "next/font/google";
+import { Providers } from "./providers";
+import { connection } from "next/server";
 import "./globals.css";
-import { Navbar } from "@/components/Navbar";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const plexSans = IBM_Plex_Sans({
+  variable: "--font-plex",
   subsets: ["latin"],
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const plexMono = IBM_Plex_Mono({
+  variable: "--font-mono",
+  weight: ["400", "500", "600", "700"],
   subsets: ["latin"],
+  display: "swap",
+});
+
+const bodoni = Bodoni_Moda({
+  variable: "--font-display",
+  subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "Hedgents Dashboard",
-  description: "Local operator dashboard for the Hedgents fleet.",
+  metadataBase: new URL("https://terminal.hedgents.com"),
+  title: "Hedgents Metal Terminal",
+  description:
+    "Discover, compare, route, and trade eligible metal products across supported chains.",
+  icons: {
+    icon: [{ url: "/brand/hedgents-source-app-icon.png", type: "image/png" }],
+  },
+  openGraph: {
+    title: "Hedgents Metal Terminal",
+    description:
+      "Discover, compare, and trade verified tokenized metal products on Solana.",
+    images: [
+      {
+        url: "/brand/hedgents-source-app-icon.png",
+        width: 330,
+        height: 330,
+        alt: "Hedgents Hg mark",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary",
+    title: "Hedgents Metal Terminal",
+    description: "One execution interface for tokenized metal markets.",
+    images: ["/brand/hedgents-source-app-icon.png"],
+  },
 };
 
-export default function RootLayout({
+export const viewport: Viewport = {
+  colorScheme: "dark",
+  themeColor: "#0f110f",
+};
+
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  await connection();
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${plexSans.variable} ${plexMono.variable} ${bodoni.variable}`}
     >
-      <body className="min-h-full flex flex-col">
-        <Navbar />
-        {children}
-      </body>
+      <body><Providers>{children}</Providers></body>
     </html>
   );
 }

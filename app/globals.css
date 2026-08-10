@@ -120,11 +120,27 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
+    box-sizing: border-box;
   }
   body {
     @apply bg-background text-foreground;
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.5;
   }
   html {
-    @apply font-sans;
+    min-width: 320px;
+    background: #0f110f;
+    font-family: var(--font-plex), sans-serif;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    scroll-padding-top: 84px;
+  }
+
+  :focus-visible {
+    outline: 2px solid #e7dfca;
+    outline-offset: 3px;
   }
 }

@@ -1,62 +1,53 @@
-# Hedgents frontend
+# Hedgents metal terminal
 
-Local operator dashboard for the [Hedgents fleet](https://github.com/Hedgents/fleet). Surfaces inter-agent mesh communication as a human-readable feed alongside live AUM, P&L, and per-strategy position state.
+Hedgents is a self-custodial Solana terminal for discovering, comparing, buying, and selling tokenized metal products. Purchases start with native Solana USDC; sales can settle into canonical Solana USDC, USDT, or USDG. Registered products become executable only when the exact-size Jupiter gate returns a valid route inside that product's price-impact limit; settlement goes directly to the connected wallet.
 
-## Overview
+Cross-chain stablecoin funding is intentionally outside this repository. A separate Rail SDK may fund the Solana wallet, but Hedgents owns wallet connection, product intelligence, execution safety, and settlement verification.
 
-The Hedgents fleet runs as 5 autonomous Rust daemons on the operator's hardware. This frontend is a local-only Next.js app that:
+## Current scope
 
-- Tails each daemon's structured tracing log via the dashboard backend (`fleet-dashboard-server`)
-- Decodes signed CBOR envelopes (`Assign`, `Approve`, `Report`, `Escalate`, `MarketSignal`, `Beacon`) into one-line human sentences
-- Renders a scrolling mesh feed showing the agent-to-agent conversation in real time
-- Polls on-chain position state (Kamino, Jupiter Perps) for live AUM
-- Surfaces fleet health, allocation breakdown, and 24h P&L
+- 15 registered Solana execution adapters across gold, silver, uranium, platinum, copper, and palladium; live liquidity is checked separately and may leave an adapter unavailable
+- Live Pyth metal or underlying-security references where an institutional feed exists
+- Exact-size Jupiter health checks across every registered product for the selected metal
+- Like-for-like route ranking without treating physical metal, ETF shares, futures funds, and miners funds as interchangeable
+- Wallet Standard signing and managed Jupiter execution
+- Pre-signature Solana simulation and short-lived authenticated order claims
+- Server-enforced country/issuer evidence with fail-closed tokenized-security allowlists
+- Independent, multi-RPC post-trade settlement verification
+- Recoverable signed-pending state and portable authenticated JSON receipts
+- FIFO cost basis and realized/unrealized P&L for verified Hedgents fills, with explicit coverage limits
+- Per-endpoint request limits, mutation-origin validation, bounded JSON bodies, and security headers
+- Optional privacy-preserving beta diagnostics, off by default
+- A production fail-closed execution switch and exact server-side closed-beta transaction cap; receipt recovery remains available during a pause
 
-Designed for institutional treasury operators watching their own fleet execute strategy on real money.
-
-## What you'll see
-
-- **Numbers panel**: total AUM, 24h P&L, allocation pie, 5 daemon health pills
-- **Mesh feed**: live envelope stream — "researcher saw SOL move +2.3% over 1h", "orchestrator asked onyc to lever to 40% LTV", "riskwatcher noticed onyc LTV drift, distance 487bps", etc.
-- **Behavior timeline**: 24h activity heatmap + grouped events
-
-## Status
-
-In active development for the 2026-05 demo. See [the sprint plan](https://github.com/Hedgents/fleet/blob/main/docs/superpowers/plans/2026-05-06-demo-sprint.md) for architecture + day-by-day milestones.
-
-## Architecture
-
-```
-[Hedgents fleet daemons] → [JSONL logs + tracing JSON]
-                              ↓
-                 [fleet-dashboard-server (axum)]
-                       ↓                ↓
-                  [SQLite store]  [chain reads]
-                              ↓
-                 [REST + WebSocket on 127.0.0.1:7700]
-                              ↓
-                  [this Next.js frontend, localhost:3000]
-```
-
-No hosted infrastructure. No auth. No wallet adapter. The operator's Solana keypair lives in their local `secrets-dir` per daemon convention; this frontend only displays — it doesn't custody.
-
-## Build
+## Local development
 
 ```bash
 npm install
-npm run dev
-# opens http://localhost:3000
+cp .env.example .env.local
+npm run dev -- --port 3001
 ```
 
-Requires the [fleet dashboard server](https://github.com/Hedgents/fleet) running at `127.0.0.1:7700`. Override via `NEXT_PUBLIC_API_BASE` if running elsewhere.
+Open `http://127.0.0.1:3001` to avoid colliding with unrelated services that may bind the IPv6 localhost address.
 
-## Stack
+## Verification
 
-- Next.js 16 + React 19
-- Tailwind CSS v4 + shadcn/ui
-- recharts (24h activity chart)
-- Native WebSocket for the live mesh feed (auto-reconnect every 2s)
+```bash
+npm test
+npm run test:e2e
+npm run build
+npm run probe:metals -- 100
+npm run simulate:metals -- 100
+```
 
-## License
+The probe and simulation commands require the environment described in [.env.example](./.env.example). The 60-route simulation matrix uses a public funded wallet for buys and public token-holder state for sells; it never signs or submits a transaction.
 
-TBD — institutional preview.
+See [BETA_READINESS.md](./BETA_READINESS.md) for the closed-beta gates and operator checklist.
+See [BETA_WALLET_MATRIX.md](./BETA_WALLET_MATRIX.md) for extension checks and the explicitly paid canary gate.
+
+## Key boundaries
+
+- No custody: the user approves transactions in their own wallet.
+- No new bridge: cross-chain funding belongs to the separate Rail SDK.
+- No false best price: products are ranked only inside an equivalent exposure group.
+- No automatic hedge: Hyperliquid is displayed as a separate future approval path, not bundled into a spot purchase.

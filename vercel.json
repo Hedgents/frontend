@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/scarcity-detector",
+      "schedule": "17 4 * * *"
+    }
+  ]
+}

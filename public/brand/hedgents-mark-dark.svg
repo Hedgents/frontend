@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-labelledby="title desc">
+  <title id="title">Hedgents Hg mark on dark</title>
+  <desc id="desc">Mercury element symbol Hg, atomic number 80, framed as a routed metal node.</desc>
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="42%" r="72%">
+      <stop offset="0" stop-color="#192126"/>
+      <stop offset="0.62" stop-color="#10161A"/>
+      <stop offset="1" stop-color="#080D10"/>
+    </radialGradient>
+    <linearGradient id="steel" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F8F8F4"/>
+      <stop offset="0.46" stop-color="#BFC4C6"/>
+      <stop offset="0.72" stop-color="#F4F4F0"/>
+      <stop offset="1" stop-color="#AEB4B6"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F0CE6B"/>
+      <stop offset="0.55" stop-color="#C99B37"/>
+      <stop offset="1" stop-color="#E1B94E"/>
+    </linearGradient>
+  </defs>
+  <rect x="24" y="24" width="976" height="976" rx="164" fill="url(#bg)"/>
+  <g fill="none" stroke="url(#steel)" stroke-width="28" stroke-linecap="square" stroke-linejoin="miter">
+    <path d="M344 180H184V844H344"/>
+    <path d="M680 180H840V844H680"/>
+  </g>
+  <text x="250" y="322" fill="url(#gold)" font-family="Avenir Next, Helvetica Neue, Arial, sans-serif" font-size="82" font-weight="700" letter-spacing="-2">80</text>
+  <path d="M248 410V690M398 410V690M248 550H398" fill="none" stroke="url(#steel)" stroke-width="47" stroke-linecap="square"/>
+  <path d="M656 560A100 105 0 1 1 456 560A100 105 0 1 1 656 560V686C656 744 621 778 568 791C539 798 521 814 514 833" fill="none" stroke="url(#steel)" stroke-width="47" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="514" cy="856" r="43" fill="url(#bg)" stroke="url(#gold)" stroke-width="27"/>
+</svg>
