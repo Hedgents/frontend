@@ -1,5 +1,6 @@
 export type RouteAvailabilityReason =
   | "available"
+  | "operator-disabled"
   | "configuration-required"
   | "market-closed"
   | "settlement-restricted"
@@ -9,6 +10,9 @@ export type RouteAvailabilityReason =
 
 export function classifyRouteAvailability(error: unknown): RouteAvailabilityReason {
   const message = (error instanceof Error ? error.message : String(error ?? "")).toLowerCase();
+  if (message.includes("not enabled for closed-beta execution")) {
+    return "operator-disabled";
+  }
   if (message.includes("not configured") || message.includes("api key")) {
     return "configuration-required";
   }
@@ -40,6 +44,7 @@ export function classifyRouteAvailability(error: unknown): RouteAvailabilityReas
 export function routeAvailabilityLabel(reason: RouteAvailabilityReason) {
   switch (reason) {
     case "available": return "Live route";
+    case "operator-disabled": return "Not enabled in beta";
     case "configuration-required": return "Execution not configured";
     case "market-closed": return "Market maker offline";
     case "settlement-restricted": return "USDC-only exit";

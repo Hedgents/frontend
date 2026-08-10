@@ -8,6 +8,10 @@ test("classifies actionable route failures for the terminal", () => {
   assert.equal(classifyRouteAvailability("Only USDC is available for swapping with Ondo"), "settlement-restricted");
   assert.equal(classifyRouteAvailability("No route found"), "insufficient-liquidity");
   assert.equal(classifyRouteAvailability("Transfer is restricted"), "transfer-restricted");
+  assert.equal(
+    classifyRouteAvailability("gold-oro is not enabled for closed-beta execution."),
+    "operator-disabled",
+  );
+  assert.equal(routeAvailabilityLabel("operator-disabled"), "Not enabled in beta");
   assert.equal(routeAvailabilityLabel("provider-unavailable"), "Venue unavailable");
 });
-

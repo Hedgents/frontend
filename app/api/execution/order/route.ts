@@ -22,6 +22,7 @@ import {
 import { getJupiterOrder, simulateSolanaTransaction } from "@/lib/jupiter-server";
 import { bindSolanaTransaction } from "@/lib/solana-transaction-binding";
 import {
+  assertProductExecutionAllowed,
   assertUsdBaseUnitAmountWithinBetaCap,
   effectiveBuyMaximumUsd,
   requireNewExecutionEnabled,
@@ -90,6 +91,7 @@ export async function POST(request: Request) {
         "This product is mapped for discovery but does not have an activated execution adapter.",
       );
     }
+    assertProductExecutionAllowed(product.productId, executionControls);
     const eligibility = evaluateProductEligibility(
       product,
       parseEligibilityEvidence(body.eligibility),

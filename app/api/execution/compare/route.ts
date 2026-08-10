@@ -14,9 +14,11 @@ import {
 } from "@/lib/execution-validation";
 import { getJupiterOrder } from "@/lib/jupiter-server";
 import {
+  assertProductExecutionAllowed,
   assertUsdBaseUnitAmountWithinBetaCap,
   effectiveBuyMaximumUsd,
   requireNewExecutionEnabled,
+  type ExecutionControls,
 } from "@/lib/execution-controls";
 import { classifyRouteAvailability } from "@/lib/route-availability";
 import {
@@ -82,7 +84,7 @@ async function compareProduct(
   settlementAsset: SolanaSettlementAsset,
   side: TradeSide,
   amount: unknown,
-  betaMaximumUsd: number,
+  executionControls: ExecutionControls,
 ): Promise<ProductRouteComparison> {
   let inputAmount = "0";
   const isBuy = side === "buy";
@@ -91,12 +93,13 @@ async function compareProduct(
   const inputDecimals = isBuy ? settlementAsset.decimals : product.decimals;
   const outputDecimals = isBuy ? product.decimals : settlementAsset.decimals;
   try {
+    assertProductExecutionAllowed(product.productId, executionControls);
     inputAmount = isBuy
       ? parseDecimalToBaseUnits(
           amount,
           settlementAsset.decimals,
           product.execution.minimumUsd,
-          effectiveBuyMaximumUsd(product.execution.maximumUsd, betaMaximumUsd),
+          effectiveBuyMaximumUsd(product.execution.maximumUsd, executionControls.maxUsd),
         )
       : parseTokenAmountToBaseUnits(amount, product.decimals, product.symbol);
     const raw = await getJupiterOrder(new URLSearchParams({
@@ -123,9 +126,7 @@ async function compareProduct(
     }
     if (!isBuy) {
       assertUsdBaseUnitAmountWithinBetaCap(outputAmount, settlementAsset.decimals, {
-        enabled: true,
-        maxUsd: betaMaximumUsd,
-        rejectionOnly: false,
+        maxUsd: executionControls.maxUsd,
       });
     }
     const priceImpactPct = normalizeJupiterPriceImpact(raw);
@@ -202,7 +203,7 @@ export async function POST(request: Request) {
     const routes = await Promise.all(
       (products as SolanaExecutionProduct[]).flatMap((product) =>
         (settlementAssets as SolanaSettlementAsset[]).map((asset) =>
-          compareProduct(product, asset, side, amount, executionControls.maxUsd),
+          compareProduct(product, asset, side, amount, executionControls),
         ),
       ),
     );

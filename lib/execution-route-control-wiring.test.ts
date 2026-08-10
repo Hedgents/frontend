@@ -21,6 +21,28 @@ test("every new-trade route wires the emergency execution guard", () => {
   );
 });
 
+test("every new-trade route checks the product allowlist before venue work", () => {
+  const venueBoundaryByRoute = new Map([
+    ["../app/api/execution/compare/route.ts", "getJupiterOrder("],
+    ["../app/api/execution/order/route.ts", "getJupiterOrder("],
+    ["../app/api/execution/execute/route.ts", "executeJupiterOrder("],
+  ]);
+  for (const [path, venueBoundary] of venueBoundaryByRoute) {
+    const source = routeSource(path);
+    const allowlistGuard = source.indexOf("assertProductExecutionAllowed(");
+    const venueWork = source.indexOf(venueBoundary);
+    assert.ok(allowlistGuard >= 0, `${path} product allowlist guard`);
+    assert.ok(venueWork > allowlistGuard, `${path} must fail closed before venue work`);
+  }
+});
+
+test("read-only product registry and quote discovery do not use the execution allowlist", () => {
+  for (const path of ["../app/api/registry/route.ts", "../app/api/quotes/route.ts"]) {
+    const source = routeSource(path);
+    assert.doesNotMatch(source, /assertProductExecutionAllowed|requireNewExecutionEnabled/, path);
+  }
+});
+
 test("settlement recovery remains independent of the new-trade guard", () => {
   const source = routeSource("../app/api/execution/status/route.ts");
   assert.doesNotMatch(source, /requireNewExecutionEnabled/, "recovery route");

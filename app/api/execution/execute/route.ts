@@ -21,6 +21,7 @@ import {
   submissionStateFromSettlement,
 } from "@/lib/execution-records";
 import {
+  assertProductExecutionAllowed,
   assertExecutionWithinBetaCap,
   requireExecutionSubmissionEnabled,
 } from "@/lib/execution-controls";
@@ -47,6 +48,7 @@ export async function POST(request: Request) {
     const signedTransaction = validateSignedTransaction(body.signedTransaction);
     const requestId = validateRequestId(body.requestId);
     const claims = validateExecutionAuthorization(body.authorization, requestId);
+    assertProductExecutionAllowed(claims.productId, executionControls);
     const settlementAsset = getSolanaSettlementAsset(claims.settlementAssetId);
     if (!settlementAsset) {
       throw new ExecutionValidationError("The execution settlement asset is no longer supported.");

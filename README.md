@@ -19,6 +19,7 @@ Cross-chain stablecoin funding is intentionally outside this repository. A separ
 - Per-endpoint request limits, mutation-origin validation, bounded JSON bodies, and security headers
 - Optional privacy-preserving beta diagnostics, off by default
 - A production fail-closed execution switch and exact server-side closed-beta transaction cap; receipt recovery remains available during a pause
+- A production fail-closed product execution allowlist, initially intended for `gold-paxg`; the full registry remains available for read-only discovery
 
 ## Local development
 

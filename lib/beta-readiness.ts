@@ -75,6 +75,17 @@ export async function getBetaReadiness() {
       executionControls.configurationValid && executionControls.maxUsd <= 100,
       `Server-enforced maximum is $${executionControls.maxUsd.toLocaleString()} per trade. Closed beta requires $100 or less.`,
     ),
+    check(
+      "execution-products",
+      "Execution product allowlist",
+      executionControls.productAllowlistConfigured
+        && executionControls.productAllowlistValid
+        && executionControls.allowedProductIds.length > 0,
+      executionControls.productAllowlistIssue
+        ?? (executionControls.productAllowlistConfigured
+          ? `${executionControls.allowedProductIds.length} product(s) enabled server-side: ${executionControls.allowedProductIds.join(", ")}.`
+          : `No explicit production allowlist is configured; non-production currently permits all ${executionControls.allowedProductIds.length} registry product(s).`),
+    ),
     check("storage", "Durable evidence", onlineDetectorStorageConfigured(), "Private durable storage is configured for evidence, reviewed markets, analytics, and detector state."),
     check("origins", "Mutation origins", present("HEDGENTS_ALLOWED_ORIGINS"), "Explicit production browser origins are allowlisted."),
     check("eligibility", "Security eligibility policy", present("HEDGENTS_SECURITY_COUNTRY_ALLOWLIST"), "A legally reviewed country allowlist is required before tokenized-security routes can leave fail-closed mode.", "external"),
