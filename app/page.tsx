@@ -3,6 +3,7 @@ import type { ScarcityMarket } from "@/components/ScarcityExchange";
 import { loadScarcityMarketCatalog } from "@/lib/scarcity-market-store";
 import { METAL_MARKET_NAMESPACE_BY_ID } from "@/lib/scarcity";
 import { getPublicExecutionControls } from "@/lib/execution-controls";
+import { getPublicTerminalFeatures } from "@/lib/terminal-feature-controls";
 import { compileCurveMarket } from "@/lib/scarcity-curves";
 
 const terminalViews = new Set<TerminalView>(["markets", "scarcity", "portfolio", "orders"]);
@@ -65,6 +66,7 @@ export default async function Page({
       scarcityMarkets={scarcityMarkets}
       initialView={view}
       executionControl={getPublicExecutionControls()}
+      terminalFeatures={getPublicTerminalFeatures()}
     />
   );
 }

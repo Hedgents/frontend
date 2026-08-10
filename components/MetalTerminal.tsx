@@ -42,7 +42,7 @@ import {
 } from "@solana/kit";
 import { createTransactionSignerFromWalletAccount } from "@solana/wallet-account-signer";
 import { useClient } from "@solana/react";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   useConnect as useEvmConnect,
   useConnection,
@@ -62,6 +62,7 @@ import {
 } from "@/lib/beta-telemetry";
 import { actionableExecutionError, amountBucket } from "@/lib/execution-errors";
 import type { PublicExecutionControls } from "@/lib/execution-controls";
+import { readPendingCctpFunding } from "@/lib/cctp-funding-storage";
 import { normalizeExecutionReceipt, parseExecutionReceipt } from "@/lib/execution-receipts";
 import { calculatePortfolioAccounting } from "@/lib/portfolio-accounting";
 import { routeAvailabilityLabel } from "@/lib/route-availability";
@@ -89,6 +90,8 @@ import {
 } from "@/lib/product-registry";
 import type { LiveQuote, MetalQuoteResponse } from "@/lib/quote-types";
 import type { CctpSourceId } from "@/lib/rail-cctp";
+import type { PublicTerminalFeatures } from "@/lib/terminal-feature-controls";
+import { defaultAmountForTradeSide } from "@/lib/trade-ticket-state";
 import { SCARCITY_TRACKED_ELEMENT_COUNT } from "@/lib/scarcity/registry";
 import type { ScarcityMarket } from "./ScarcityExchange";
 import {
@@ -328,10 +331,12 @@ export function MetalTerminal({
   scarcityMarkets,
   initialView = "markets",
   executionControl,
+  terminalFeatures,
 }: {
   scarcityMarkets: ScarcityMarket[];
   initialView?: TerminalView;
   executionControl: PublicExecutionControls;
+  terminalFeatures: PublicTerminalFeatures;
 }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -368,6 +373,7 @@ export function MetalTerminal({
   const [walletPanelOpen, setWalletPanelOpen] = useState(false);
   const [fundingPanelOpen, setFundingPanelOpen] = useState(false);
   const [fundingSourceId, setFundingSourceId] = useState<FundingSourceId>("solana");
+  const [pendingFundingSourceId, setPendingFundingSourceId] = useState<CctpSourceId | null>(null);
   const [reviewOpen, setReviewOpen] = useState(false);
   const [executionInputAmount, setExecutionInputAmount] = useState(amount);
   const [executionPhase, setExecutionPhase] = useState<ExecutionPhase>("idle");
@@ -540,8 +546,9 @@ export function MetalTerminal({
     eligibilityAccepted &&
     /^[A-Z]{2}$/.test(eligibilityCountryCode);
   const crossChainFundingSelected = tradeSide === "buy" && fundingSourceId !== "solana";
+  const newRailFundingAllowed = terminalFeatures.railFundingEnabled && executionControl.enabled;
   const canStartSelectedRoute = canReview &&
-    (!crossChainFundingSelected || Boolean(evmConnection.address));
+    (!crossChainFundingSelected || (newRailFundingAllowed && Boolean(evmConnection.address)));
   const connectedWalletCount = Number(Boolean(solanaConnection)) + Number(evmConnection.isConnected);
   const walletSummary = [
     solanaConnection?.account ? `SOL ${shortAddress(solanaConnection.account.address)}` : null,
@@ -590,6 +597,21 @@ export function MetalTerminal({
       });
     });
   };
+
+  const syncPendingFunding = useCallback(() => {
+    setPendingFundingSourceId(
+      readPendingCctpFunding(window.localStorage)?.sourceId ?? null,
+    );
+  }, []);
+
+  const closeFundingPanel = useCallback(() => {
+    setFundingPanelOpen(false);
+    syncPendingFunding();
+  }, [syncPendingFunding]);
+
+  useEffect(() => {
+    syncPendingFunding();
+  }, [syncPendingFunding]);
 
   useEffect(() => {
     try {
@@ -701,12 +723,12 @@ export function MetalTerminal({
     const closeOnEscape = (event: KeyboardEvent) => {
       if (event.key !== "Escape") return;
       setWalletPanelOpen(false);
-      setFundingPanelOpen(false);
+      closeFundingPanel();
       if (executionPhase !== "signing" && executionPhase !== "submitting") setReviewOpen(false);
     };
     window.addEventListener("keydown", closeOnEscape);
     return () => window.removeEventListener("keydown", closeOnEscape);
-  }, [executionPhase, fundingPanelOpen, reviewOpen, walletPanelOpen]);
+  }, [closeFundingPanel, executionPhase, fundingPanelOpen, reviewOpen, walletPanelOpen]);
 
   const chooseMarket = (market: MetalMarket) => {
     setSelectedMetalId(market.id);
@@ -725,9 +747,15 @@ export function MetalTerminal({
   const chooseTradeSide = (side: TradeSide) => {
     if (side === tradeSide) return;
     setTradeSide(side);
-    setAmount(side === "buy" ? "100" : selectedProductBalance?.amount !== "0"
-      ? selectedProductBalance?.amount ?? "0.1"
-      : "0.1");
+    setAmount(defaultAmountForTradeSide(
+      side,
+      executionControl.maxUsd,
+      selectedProductBalance?.amount,
+    ));
+    if (side === "buy") {
+      setSettlementAssetId("usdc");
+      setFundingSourceId("solana");
+    }
     if (side === "sell") {
       setFundingSourceId("solana");
       setHedgeEnabled(false);
@@ -841,16 +869,33 @@ export function MetalTerminal({
       return;
     }
     if (crossChainFundingSelected) {
+      if (pendingFundingSourceId && pendingFundingSourceId !== fundingSourceId) {
+        setFundingSourceId(pendingFundingSourceId);
+        setFundingPanelOpen(true);
+        return;
+      }
+      if (!newRailFundingAllowed) return;
       setFundingPanelOpen(true);
       return;
     }
     void openReview(amount);
   };
 
+  const resumePendingFunding = () => {
+    if (!pendingFundingSourceId) return;
+    setFundingSourceId(pendingFundingSourceId);
+    if (!solanaWalletConnected || !evmConnection.address) {
+      setWalletPanelOpen(true);
+      return;
+    }
+    setFundingPanelOpen(true);
+  };
+
   const continueAfterCctpFunding = (receivedAmountBaseUnits: string) => {
     const receivedAmount = baseUnits(receivedAmountBaseUnits, 6);
     setAmount(receivedAmount);
     setFundingPanelOpen(false);
+    setPendingFundingSourceId(null);
     void openReview(receivedAmount);
   };
 
@@ -1209,9 +1254,11 @@ export function MetalTerminal({
             hedgeNotional={hedgeNotional}
             routeNodes={routeNodes}
             executionControl={executionControl}
+            railFundingEnabled={terminalFeatures.railFundingEnabled}
             canReview={canReview}
             canStartSelectedRoute={canStartSelectedRoute}
             fundingSourceId={fundingSourceId}
+            pendingFundingSourceId={pendingFundingSourceId}
             eligibilityAccepted={eligibilityAccepted}
             eligibilityCountryCode={eligibilityCountryCode}
             quoteData={liveQuotes.data}
@@ -1237,6 +1284,7 @@ export function MetalTerminal({
             onSettlementAssetChange={setSettlementAssetId}
             onHedgeChange={setHedgeEnabled}
             onFundingSourceChange={setFundingSourceId}
+            onResumePendingFunding={resumePendingFunding}
             onEligibilityChange={setEligibilityAccepted}
             onEligibilityCountryChange={updateEligibilityCountryCode}
             onReview={startRoute}
@@ -1289,7 +1337,10 @@ export function MetalTerminal({
       </footer>
 
       {walletPanelOpen ? (
-        <WalletPanel onClose={() => setWalletPanelOpen(false)} />
+        <WalletPanel
+          railFundingEnabled={terminalFeatures.railFundingEnabled}
+          onClose={() => setWalletPanelOpen(false)}
+        />
       ) : null}
 
       {fundingPanelOpen && fundingSourceId !== "solana" && evmConnection.address && solanaConnection?.account ? (
@@ -1300,8 +1351,10 @@ export function MetalTerminal({
           destinationAddress={solanaConnection.account.address}
           productName={selectedProduct.name}
           ticker={selectedProduct.ticker}
+          allowNewFunding={newRailFundingAllowed}
+          canContinueToMetal={executionControl.enabled}
           onFunded={continueAfterCctpFunding}
-          onClose={() => setFundingPanelOpen(false)}
+          onClose={closeFundingPanel}
         />
       ) : null}
 
@@ -1358,9 +1411,11 @@ interface MarketsViewProps {
   hedgeNotional: number;
   routeNodes: string[];
   executionControl: PublicExecutionControls;
+  railFundingEnabled: boolean;
   canReview: boolean;
   canStartSelectedRoute: boolean;
   fundingSourceId: FundingSourceId;
+  pendingFundingSourceId: CctpSourceId | null;
   eligibilityAccepted: boolean;
   eligibilityCountryCode: string;
   quoteData: MetalQuoteResponse | null;
@@ -1386,6 +1441,7 @@ interface MarketsViewProps {
   onSettlementAssetChange: (value: SettlementAssetId) => void;
   onHedgeChange: (value: boolean) => void;
   onFundingSourceChange: (value: FundingSourceId) => void;
+  onResumePendingFunding: () => void;
   onEligibilityChange: (value: boolean) => void;
   onEligibilityCountryChange: (value: string) => void;
   onReview: () => void;
@@ -1410,9 +1466,11 @@ function MarketsView({
   hedgeNotional,
   routeNodes,
   executionControl,
+  railFundingEnabled,
   canReview,
   canStartSelectedRoute,
   fundingSourceId,
+  pendingFundingSourceId,
   eligibilityAccepted,
   eligibilityCountryCode,
   quoteData,
@@ -1438,6 +1496,7 @@ function MarketsView({
   onSettlementAssetChange,
   onHedgeChange,
   onFundingSourceChange,
+  onResumePendingFunding,
   onEligibilityChange,
   onEligibilityCountryChange,
   onReview,
@@ -1794,9 +1853,11 @@ function MarketsView({
           hedgeNotional={hedgeNotional}
           routeNodes={routeNodes}
           executionControl={executionControl}
+          railFundingEnabled={railFundingEnabled}
           canReview={canReview}
           canStartSelectedRoute={canStartSelectedRoute}
           fundingSourceId={fundingSourceId}
+          pendingFundingSourceId={pendingFundingSourceId}
           eligibilityAccepted={eligibilityAccepted}
           eligibilityCountryCode={eligibilityCountryCode}
           quote={selectedProductQuote}
@@ -1816,6 +1877,7 @@ function MarketsView({
           onSettlementAssetChange={onSettlementAssetChange}
           onHedgeChange={onHedgeChange}
           onFundingSourceChange={onFundingSourceChange}
+          onResumePendingFunding={onResumePendingFunding}
           onEligibilityChange={onEligibilityChange}
           onEligibilityCountryChange={onEligibilityCountryChange}
           onReview={onReview}
@@ -1840,9 +1902,11 @@ interface OrderTicketProps {
   hedgeNotional: number;
   routeNodes: string[];
   executionControl: PublicExecutionControls;
+  railFundingEnabled: boolean;
   canReview: boolean;
   canStartSelectedRoute: boolean;
   fundingSourceId: FundingSourceId;
+  pendingFundingSourceId: CctpSourceId | null;
   eligibilityAccepted: boolean;
   eligibilityCountryCode: string;
   quote: LiveQuote | undefined;
@@ -1860,6 +1924,7 @@ interface OrderTicketProps {
   onSettlementAssetChange: (value: SettlementAssetId) => void;
   onHedgeChange: (value: boolean) => void;
   onFundingSourceChange: (value: FundingSourceId) => void;
+  onResumePendingFunding: () => void;
   onEligibilityChange: (value: boolean) => void;
   onEligibilityCountryChange: (value: string) => void;
   onReview: () => void;
@@ -1880,9 +1945,11 @@ function OrderTicket({
   hedgeNotional,
   routeNodes,
   executionControl,
+  railFundingEnabled,
   canReview,
   canStartSelectedRoute,
   fundingSourceId,
+  pendingFundingSourceId,
   eligibilityAccepted,
   eligibilityCountryCode,
   quote,
@@ -1900,6 +1967,7 @@ function OrderTicket({
   onSettlementAssetChange,
   onHedgeChange,
   onFundingSourceChange,
+  onResumePendingFunding,
   onEligibilityChange,
   onEligibilityCountryChange,
   onReview,
@@ -1911,6 +1979,9 @@ function OrderTicket({
   const executionAdapterReady = isSolanaExecutionProduct(product.id);
   const selectedFundingSource =
     fundingSources.find((source) => source.id === fundingSourceId) ?? fundingSources[0];
+  const pendingFundingSource = pendingFundingSourceId
+    ? fundingSources.find((source) => source.id === pendingFundingSourceId) ?? null
+    : null;
   const crossChainFundingSelected = tradeSide === "buy" && fundingSourceId !== "solana";
   const insufficientMetal = tradeSide === "sell" && Number(amount) > Number(selectedProductBalance);
   const shouldConnectWallet =
@@ -1974,7 +2045,7 @@ function OrderTicket({
         <div className={styles.fundingSourcePicker}>
           <span>Pay USDC from</span>
           <div role="group" aria-label="Purchase funding chain">
-            {fundingSources.map((source) => (
+            {fundingSources.filter((source) => source.id === "solana" || railFundingEnabled).map((source) => (
               <button
                 type="button"
                 key={source.id}
@@ -1986,6 +2057,17 @@ function OrderTicket({
                 <small>{source.note}</small>
               </button>
             ))}
+            {pendingFundingSourceId && pendingFundingSource ? (
+              <button
+                type="button"
+                onClick={onResumePendingFunding}
+                aria-label={`Resume pending ${pendingFundingSource.label} CCTP delivery`}
+              >
+                <i style={{ background: pendingFundingSource.tone }} />
+                <strong>Resume {pendingFundingSource.label}</strong>
+                <small>Pending delivery</small>
+              </button>
+            ) : null}
           </div>
         </div>
       ) : (
@@ -2693,7 +2775,13 @@ function OrdersView({
   );
 }
 
-function WalletPanel({ onClose }: { onClose: () => void }) {
+function WalletPanel({
+  railFundingEnabled,
+  onClose,
+}: {
+  railFundingEnabled: boolean;
+  onClose: () => void;
+}) {
   const solanaClient = useClient<AppSolanaClient>();
   const solanaWallets = useWallets(solanaClient);
   const solanaStatus = useWalletStatus(solanaClient);
@@ -2818,14 +2906,16 @@ function WalletPanel({ onClose }: { onClose: () => void }) {
                     disabled={!evmConnection.isConnected || evmSwitchChain.isPending}
                   >
                     <i style={{ background: network.tone }} />
-                    {network.label} · {network.funding}
+                    {network.label} · {!railFundingEnabled && network.id !== "bnb"
+                      ? "Funding paused"
+                      : network.funding}
                   </button>
                 ))}
               </div>
               <p>
-                Hedgents supplies the connected wallet and selected source chain. The external Rail
-                SDK currently enables native USDC funding from Ethereum and Base; BNB remains a
-                wallet connection only and is never represented as a CCTP route.
+                {railFundingEnabled
+                  ? "Hedgents supplies the connected wallet and selected source chain. The external Rail SDK enables native USDC funding from Ethereum and Base; BNB remains wallet-only."
+                  : "EVM wallet connection remains available, but the terminal currently pauses new Rail funding. A previously broadcast CCTP delivery can still be resumed and verified."}
               </p>
               {evmConnect.error ? <small className={styles.walletError}>{evmConnect.error.message}</small> : null}
               {evmSwitchChain.error ? <small className={styles.walletError}>{evmSwitchChain.error.message}</small> : null}

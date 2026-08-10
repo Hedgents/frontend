@@ -1,6 +1,6 @@
 # Hedgents closed-beta readiness
 
-The beta registers 15 Solana metal adapters. It executes native Solana USDC into an adapter, and sells that product into canonical Solana USDC, USDT, or USDG, only when the exact-size Jupiter Swap V2 route passes all output and impact guards. Registration is inventory coverage, not a promise of current liquidity. Cross-chain funding is deliberately outside this repository and is supplied as an external Rail SDK dependency.
+The beta registers 15 Solana metal adapters. It executes native Solana USDC into an adapter, and sells that product into canonical Solana USDC, USDT, or USDG, only when the exact-size Jupiter Swap V2 route passes all output and impact guards. Registration is inventory coverage, not a promise of current liquidity. Cross-chain transport remains an external Rail SDK responsibility; the terminal imports that SDK but starts new Rail funding only behind a separate, default-off feature flag.
 
 ## Product safety gates
 
@@ -16,6 +16,7 @@ The beta registers 15 Solana metal adapters. It executes native Solana USDC into
 - Production also fails closed unless `HEDGENTS_EXECUTION_PRODUCT_ALLOWLIST` contains only registered, comma-separated product IDs. Start with `gold-paxg`; non-allowlisted products remain visible for read-only discovery but never reach Jupiter comparison, order assembly, or submission.
 - `HEDGENTS_BETA_MAX_USD` caps each closed-beta trade (default $100). Buy input and sell stablecoin output are checked with integer base-unit arithmetic and authenticated again at submission.
 - `HEDGENTS_WALLET_REJECTION_MODE=true` is reserved for an unpromoted QA deployment: quotes and wallet prompts work, but submission is rejected before the signed payload is read. It is not a live-execution setting.
+- `HEDGENTS_RAIL_FUNDING_ENABLED=true` separately exposes terminal-initiated Ethereum/Base USDC funding. It defaults off and must remain false for the first Solana-USDC beta. Turning it off blocks new Rail quotes and wallet requests without blocking verification of an already-broadcast CCTP source burn. EVM wallet connection remains a Hedgents terminal feature either way.
 
 ## Free operator checks
 
@@ -60,7 +61,7 @@ The matrix uses no private key, requests no signature, and submits no transactio
 2. Run the quote probe across all registered adapters and record the currently executable subset.
 3. Run `npm run test:e2e` in system Chrome at desktop and mobile widths.
 4. Run the zero-spend 60-route simulation matrix; an explicit public beta wallet is optional.
-5. Configure two independent server RPC providers, set `HEDGENTS_EXECUTION_PRODUCT_ALLOWLIST=gold-paxg`, keep the beta cap at $100 or less, and enable the execution switch only for the wallet test window. Add products only after their own canary and eligibility review. Configure the approved country allowlist before enabling tokenized-security products. Independent order/recovery secrets and production allowed origins are already enforced and configured.
+5. Configure two independent server RPC providers, set `HEDGENTS_EXECUTION_PRODUCT_ALLOWLIST=gold-paxg`, keep `HEDGENTS_RAIL_FUNDING_ENABLED=false`, keep the beta cap at $100 or less, and enable the execution switch only for the wallet test window. Add products only after their own canary and eligibility review. Configure the approved country allowlist before enabling tokenized-security products. Independent order/recovery secrets and production allowed origins are already enforced and configured.
 6. Review every product’s current issuer terms and eligible jurisdictions.
 7. Complete [BETA_WALLET_MATRIX.md](./BETA_WALLET_MATRIX.md).
 8. Perform one deliberately small mainnet canary only when paid verification is approved.
@@ -70,6 +71,8 @@ Emergency pause:
 ```bash
 # Set HEDGENTS_EXECUTION_ENABLED=false in production, then redeploy.
 # Pending receipts continue to verify through /api/execution/status.
+# Set HEDGENTS_RAIL_FUNDING_ENABLED=false to stop new terminal Rail transfers.
+# A source burn already stored in the browser can still resume delivery verification.
 ```
 
 ## Honest infrastructure boundary

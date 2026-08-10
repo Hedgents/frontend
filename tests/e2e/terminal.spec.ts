@@ -41,6 +41,44 @@ test("exposes discovery, two-way order controls, and all settlement assets", asy
   }
 });
 
+test("keeps new Rail funding off while preserving the terminal EVM wallet connector", async ({ page }) => {
+  const funding = page.getByRole("group", { name: "Purchase funding chain" });
+  await expect(funding.getByRole("button", { name: /Solana/i })).toBeVisible();
+  await expect(funding.getByRole("button", { name: /Ethereum/i })).toHaveCount(0);
+  await expect(funding.getByRole("button", { name: /Base/i })).toHaveCount(0);
+
+  await page.getByRole("button", { name: "Connect wallets" }).click();
+  await expect(page.getByRole("heading", { name: "Connect wallets" })).toBeVisible();
+  await expect(page.getByText("EVM source wallet")).toBeVisible();
+  await expect(page.getByText(/terminal currently pauses new Rail funding/i)).toBeVisible();
+});
+
+test("sell to buy resets the cap, settlement, and debounced comparison scope", async ({ page }) => {
+  const comparisonBodies: Array<Record<string, unknown>> = [];
+  page.on("request", (request) => {
+    if (!request.url().endsWith("/api/execution/compare")) return;
+    comparisonBodies.push(request.postDataJSON() as Record<string, unknown>);
+  });
+
+  await page.getByRole("button", { name: /sell metal/i }).click();
+  await page.getByRole("button", { name: /USDT Tether/i }).click();
+  await page.getByLabel("Sell").fill("0.123");
+  await page.waitForTimeout(650);
+  comparisonBodies.length = 0;
+
+  await page.getByRole("button", { name: /buy stable/i }).click();
+  await expect(page.getByLabel("Spend")).toHaveValue("100");
+  await expect.poll(
+    () => comparisonBodies.filter((body) => body.side === "buy").length,
+  ).toBeGreaterThan(0);
+
+  for (const body of comparisonBodies.filter((candidate) => candidate.side === "buy")) {
+    expect(body.amountUsd).toBe("100");
+    expect(body).not.toHaveProperty("amountToken");
+    expect(body.settlementAssetIds).toEqual(["usdc"]);
+  }
+});
+
 test("keeps portfolio and order recovery surfaces reachable without a wallet", async ({ page }) => {
   await page.getByRole("button", { name: "portfolio" }).click();
   await expect(page.getByRole("heading", { name: /Connect the Solana wallet/i })).toBeVisible();
@@ -86,9 +124,9 @@ test("keeps the product passport directly below its comparison", async ({ page }
 });
 
 test("serves the terminal and evidence APIs with hardened browser headers", async ({ page }) => {
-  const documentResponse = await page.goto("/");
-  expect(documentResponse).not.toBeNull();
-  const documentHeaders = documentResponse!.headers();
+  const documentResponse = await page.request.get("/");
+  expect(documentResponse.ok()).toBeTruthy();
+  const documentHeaders = documentResponse.headers();
   const scriptPolicy = documentHeaders["content-security-policy"]
     .split(";")
     .find((directive) => directive.trim().startsWith("script-src"));

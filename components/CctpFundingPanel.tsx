@@ -29,6 +29,8 @@ interface CctpFundingPanelProps {
   destinationAddress: string;
   productName: string;
   ticker: string;
+  allowNewFunding: boolean;
+  canContinueToMetal: boolean;
   onFunded: (receivedAmountBaseUnits: string) => void;
   onClose: () => void;
 }
@@ -40,6 +42,8 @@ export function CctpFundingPanel({
   destinationAddress,
   productName,
   ticker,
+  allowNewFunding,
+  canContinueToMetal,
   onFunded,
   onClose,
 }: CctpFundingPanelProps) {
@@ -49,6 +53,7 @@ export function CctpFundingPanel({
     amountUsd,
     sourceAddress,
     destinationAddress,
+    allowNewFunding,
   });
   const [riskAccepted, setRiskAccepted] = useState(false);
   const quote = state.quote;
@@ -58,8 +63,8 @@ export function CctpFundingPanel({
     : false;
 
   useEffect(() => {
-    if (hydrated && state.phase === "idle") void quoteFunding();
-  }, [hydrated, quoteFunding, state.phase]);
+    if (allowNewFunding && hydrated && state.phase === "idle") void quoteFunding();
+  }, [allowNewFunding, hydrated, quoteFunding, state.phase]);
 
   const retry = () => {
     reset();
@@ -90,7 +95,9 @@ export function CctpFundingPanel({
             <h2>Solana USDC arrived.</h2>
             <p>
               The Rail SDK matched the source burn to Circle&apos;s exact Solana delivery transaction
-              and measured the credit to your wallet. The metal swap is still a separate approval.
+              and measured the credit to your wallet. {canContinueToMetal
+                ? "The metal swap is still a separate approval."
+                : "Metal execution is paused; the delivered USDC remains in your wallet."}
             </p>
             <div>
               <small>Verified purchase balance</small>
@@ -112,9 +119,11 @@ export function CctpFundingPanel({
             <button
               type="button"
               className={styles.reviewButton}
-              onClick={() => onFunded(state.status!.received!.amountBaseUnits)}
+              onClick={canContinueToMetal
+                ? () => onFunded(state.status!.received!.amountBaseUnits)
+                : onClose}
             >
-              Continue to metal quote <ArrowRight size={15} aria-hidden="true" />
+              {canContinueToMetal ? "Continue to metal quote" : "Return to terminal"} <ArrowRight size={15} aria-hidden="true" />
             </button>
           </div>
         ) : state.phase === "quoting" || !hydrated ? (
@@ -163,7 +172,7 @@ export function CctpFundingPanel({
             ) : null}
             {state.phase === "confirming" ? (
               <button type="button" className={styles.secondaryModalButton} onClick={onClose}>
-                Continue in background
+                Close — resume verification later
               </button>
             ) : null}
           </div>
@@ -178,14 +187,21 @@ export function CctpFundingPanel({
                 Inspect exact approval <ExternalLink size={12} aria-hidden="true" />
               </a>
             ) : null}
-            <button type="button" className={styles.reviewButton} onClick={retry}>
-              Build a fresh funding quote <RefreshCw size={14} aria-hidden="true" />
-            </button>
+            {sourceTxUrl ? (
+              <a href={sourceTxUrl} target="_blank" rel="noreferrer">
+                Inspect source burn <ExternalLink size={12} aria-hidden="true" />
+              </a>
+            ) : null}
+            {allowNewFunding && !state.reference ? (
+              <button type="button" className={styles.reviewButton} onClick={retry}>
+                Build a fresh funding quote <RefreshCw size={14} aria-hidden="true" />
+              </button>
+            ) : null}
             <button type="button" className={styles.secondaryModalButton} onClick={onClose}>
               Return to terminal
             </button>
           </div>
-        ) : quote ? (
+        ) : quote && allowNewFunding ? (
           <>
             <div className={styles.modalHeader}>
               <div>
@@ -251,6 +267,16 @@ export function CctpFundingPanel({
               <ArrowRight size={15} aria-hidden="true" />
             </button>
           </>
+        ) : !allowNewFunding ? (
+          <div className={styles.fundingProgress}>
+            <span className={styles.progressPulse}><ShieldCheck size={25} aria-hidden="true" /></span>
+            <p className={styles.overline}>Terminal funding gate</p>
+            <h2>New Rail funding is paused.</h2>
+            <p>No wallet transaction was requested. A previously broadcast source burn remains recoverable from this browser.</p>
+            <button type="button" className={styles.secondaryModalButton} onClick={onClose}>
+              Return to terminal
+            </button>
+          </div>
         ) : null}
       </section>
     </div>

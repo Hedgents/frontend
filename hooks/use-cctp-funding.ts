@@ -16,8 +16,12 @@ import {
   getCctpRailClient,
   quoteCctpFunding,
 } from "@/lib/rail-cctp";
+import {
+  clearPendingCctpFunding,
+  readPendingCctpFunding,
+  savePendingCctpFunding,
+} from "@/lib/cctp-funding-storage";
 
-const STORAGE_KEY = "hedgents:cctp-funding:v1";
 const STATUS_POLL_MS = 7_500;
 
 export type CctpFundingPhase =
@@ -29,14 +33,6 @@ export type CctpFundingPhase =
   | "confirming"
   | "completed"
   | "failed";
-
-interface PersistedCctpFunding {
-  version: 1;
-  sourceId: CctpSourceId;
-  quote: IntentQuote;
-  approvalTxId: string | null;
-  reference: TransactionReference | null;
-}
 
 export interface CctpFundingState {
   phase: CctpFundingPhase;
@@ -69,40 +65,12 @@ function isEvmStep(step: WalletStep) {
   return step.request.namespace === "evm";
 }
 
-function savePending(value: PersistedCctpFunding) {
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(value));
-}
-
-function clearPending() {
-  window.localStorage.removeItem(STORAGE_KEY);
-}
-
-function readPending(): PersistedCctpFunding | null {
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return null;
-    const value = JSON.parse(raw) as Partial<PersistedCctpFunding>;
-    if (
-      value.version !== 1 ||
-      (value.sourceId !== "ethereum" && value.sourceId !== "base") ||
-      !value.quote ||
-      typeof value.quote !== "object"
-    ) {
-      clearPending();
-      return null;
-    }
-    return value as PersistedCctpFunding;
-  } catch {
-    clearPending();
-    return null;
-  }
-}
-
 export function useCctpFunding(input: {
   sourceId: CctpSourceId;
   amountUsd: string;
   sourceAddress: string;
   destinationAddress: string;
+  allowNewFunding: boolean;
 }) {
   const config = useConfig();
   const [state, setState] = useState<CctpFundingState>(initialState);
@@ -110,6 +78,14 @@ export function useCctpFunding(input: {
   const pollInFlight = useRef(false);
 
   const quoteFunding = useCallback(async () => {
+    if (!input.allowNewFunding) {
+      setState((current) => ({
+        ...current,
+        phase: "failed",
+        error: "New cross-chain funding is paused. Existing source burns can still be verified.",
+      }));
+      return;
+    }
     setState({ ...initialState, phase: "quoting" });
     try {
       const quote = await quoteCctpFunding({
@@ -131,9 +107,17 @@ export function useCctpFunding(input: {
         error: errorMessage(error),
       });
     }
-  }, [input.amountUsd, input.destinationAddress, input.sourceAddress, input.sourceId]);
+  }, [input.allowNewFunding, input.amountUsd, input.destinationAddress, input.sourceAddress, input.sourceId]);
 
   const executeFunding = useCallback(async () => {
+    if (!input.allowNewFunding) {
+      setState((current) => ({
+        ...current,
+        phase: "failed",
+        error: "New cross-chain funding is paused. No wallet transaction was requested.",
+      }));
+      return;
+    }
     const quote = state.quote;
     if (!quote) return;
     let fundingBroadcast = state.reference;
@@ -186,7 +170,7 @@ export function useCctpFunding(input: {
 
         if (step.kind === "approval") {
           approvalTxId = hash;
-          savePending({
+          savePendingCctpFunding(window.localStorage, {
             version: 1,
             sourceId: input.sourceId,
             quote,
@@ -201,7 +185,7 @@ export function useCctpFunding(input: {
             submittedAt: new Date().toISOString(),
           };
           fundingBroadcast = fundingReference;
-          savePending({
+          savePendingCctpFunding(window.localStorage, {
             version: 1,
             sourceId: input.sourceId,
             quote,
@@ -218,7 +202,7 @@ export function useCctpFunding(input: {
         });
         if (receipt.status !== "success") {
           if (step.kind === "funding") {
-            clearPending();
+            clearPendingCctpFunding(window.localStorage);
             fundingBroadcast = null;
           }
           throw new Error(`${step.label} reverted on ${source.label}.`);
@@ -247,25 +231,41 @@ export function useCctpFunding(input: {
             error: errorMessage(error),
           });
     }
-  }, [config, input.destinationAddress, input.sourceAddress, input.sourceId, state.quote]);
+  }, [config, input.allowNewFunding, input.destinationAddress, input.sourceAddress, input.sourceId, state.quote]);
 
   const reset = useCallback(() => {
-    clearPending();
+    clearPendingCctpFunding(window.localStorage);
     setState(initialState);
   }, []);
 
   useEffect(() => {
-    const pending = readPending();
+    const pending = readPendingCctpFunding(window.localStorage);
     if (!pending) {
       setHydrated(true);
       return;
     }
     const quote = pending.quote;
-    const matches =
-      pending.sourceId === input.sourceId &&
+    if (pending.sourceId !== input.sourceId) {
+      setState({
+        ...initialState,
+        phase: "failed",
+        error: `A pending ${CCTP_SOURCES[pending.sourceId].label} delivery must be resumed before starting another funding transfer.`,
+      });
+      setHydrated(true);
+      return;
+    }
+    const accountsMatch =
       quote.intent.source.account.address.toLowerCase() === input.sourceAddress.toLowerCase() &&
       quote.intent.destination.account.address === input.destinationAddress;
-    if (!matches) {
+    if (!accountsMatch) {
+      setState({
+        ...initialState,
+        phase: "failed",
+        quote,
+        approvalTxId: pending.approvalTxId,
+        reference: pending.reference,
+        error: "Connect the EVM source and Solana destination wallets used by this pending transfer to resume verification.",
+      });
       setHydrated(true);
       return;
     }
@@ -305,10 +305,10 @@ export function useCctpFunding(input: {
         );
         if (!active) return;
         if (status.state === "completed") {
-          clearPending();
+          clearPendingCctpFunding(window.localStorage);
           setState((current) => ({ ...current, phase: "completed", status, error: null }));
         } else if (status.state === "failed" || status.state === "refunded") {
-          clearPending();
+          clearPendingCctpFunding(window.localStorage);
           setState((current) => ({
             ...current,
             phase: "failed",

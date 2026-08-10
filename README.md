@@ -2,7 +2,7 @@
 
 Hedgents is a self-custodial Solana terminal for discovering, comparing, buying, and selling tokenized metal products. Purchases start with native Solana USDC; sales can settle into canonical Solana USDC, USDT, or USDG. Registered products become executable only when the exact-size Jupiter gate returns a valid route inside that product's price-impact limit; settlement goes directly to the connected wallet.
 
-Cross-chain stablecoin funding is intentionally outside this repository. A separate Rail SDK may fund the Solana wallet, but Hedgents owns wallet connection, product intelligence, execution safety, and settlement verification.
+Cross-chain stablecoin transport is supplied by the external Rail SDK. Hedgents owns wallet connection, product intelligence, execution safety, and settlement verification. The terminal integration is separately opt-in with `HEDGENTS_RAIL_FUNDING_ENABLED=true`; it defaults off while Solana-USDC execution is tested, without hiding the EVM wallet connector or abandoning a pending CCTP delivery.
 
 ## Current scope
 

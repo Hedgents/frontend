@@ -11,6 +11,14 @@ interface RouteComparisonOptions {
   enabled?: boolean;
 }
 
+export function routeComparisonScope(
+  side: TradeSide,
+  productKey: string,
+  settlementKey: string,
+) {
+  return `${side}|${productKey}|${settlementKey}`;
+}
+
 async function fetchRouteComparison(
   productIds: string[],
   amount: string,
@@ -45,25 +53,34 @@ export function useRouteComparison(
     () => settlementKey.split(",").filter(Boolean) as SettlementAssetId[],
     [settlementKey],
   );
-  const [debouncedAmount, setDebouncedAmount] = useState(amount);
   const productKey = productIds.join(",");
   const stableProductIds = useMemo(() => productKey.split(",").filter(Boolean), [productKey]);
+  const scope = routeComparisonScope(side, productKey, settlementKey);
+  const [debouncedInput, setDebouncedInput] = useState({ scope, amount });
 
   useEffect(() => {
-    const timeout = window.setTimeout(() => setDebouncedAmount(amount), 450);
+    if (debouncedInput.scope !== scope) {
+      setDebouncedInput({ scope, amount });
+      return;
+    }
+    const timeout = window.setTimeout(
+      () => setDebouncedInput({ scope, amount }),
+      450,
+    );
     return () => window.clearTimeout(timeout);
-  }, [amount]);
+  }, [amount, debouncedInput.scope, scope]);
 
-  const numericAmount = Number(debouncedAmount);
+  const scopeReady = debouncedInput.scope === scope;
+  const numericAmount = Number(debouncedInput.amount);
   return useQuery({
-    queryKey: ["route-comparison", side, productKey, settlementKey, debouncedAmount],
+    queryKey: ["route-comparison", scope, debouncedInput.scope, debouncedInput.amount],
     queryFn: () => fetchRouteComparison(
       stableProductIds,
-      debouncedAmount,
+      debouncedInput.amount,
       side,
       stableSettlementAssetIds,
     ),
-    enabled: options.enabled !== false && stableProductIds.length > 0 && Number.isFinite(numericAmount) && numericAmount > 0,
+    enabled: options.enabled !== false && scopeReady && stableProductIds.length > 0 && Number.isFinite(numericAmount) && numericAmount > 0,
     staleTime: 8_000,
     refetchInterval: 15_000,
     retry: 1,
