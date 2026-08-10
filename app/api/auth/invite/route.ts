@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import {
   ADMIN_COOKIE,
   BETA_COOKIE,
+  BETA_SESSION_LIFETIME_SECONDS,
   createAccessSession,
   SESSION_COOKIE_OPTIONS,
   validateAccessCode,
@@ -34,9 +35,16 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "That invite code is not valid." }, { status: 401, headers });
     }
     const response = NextResponse.json({ ok: true }, { headers: { ...headers, "cache-control": "no-store" } });
-    response.cookies.set(BETA_COOKIE, createAccessSession("beta", 30 * 86_400), {
+    if (!invite.inviteId || !invite.grantVersion) {
+      throw new Error("Invite grant metadata is missing.");
+    }
+    response.cookies.set(BETA_COOKIE, createAccessSession(
+      "beta",
+      BETA_SESSION_LIFETIME_SECONDS,
+      { id: invite.inviteId, version: invite.grantVersion },
+    ), {
       ...SESSION_COOKIE_OPTIONS,
-      maxAge: 30 * 86_400,
+      maxAge: BETA_SESSION_LIFETIME_SECONDS,
     });
     await recordAnalyticsEvent("invite_access_granted", randomUUID()).catch(() => undefined);
     return response;

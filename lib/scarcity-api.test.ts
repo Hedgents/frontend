@@ -6,14 +6,25 @@ import { GET as listMetals } from "../app/api/scarcity/metals/route";
 import { GET as listCandidates } from "../app/api/scarcity/markets/candidates/route";
 import { GET as listMarkets } from "../app/api/scarcity/markets/route";
 import { GET as listSignals } from "../app/api/scarcity/signals/route";
-import { createAccessSession } from "./access-auth";
+import {
+  ACCESS_ATTESTATION_HEADER,
+  createAccessAttestation,
+  createAccessSession,
+  readAccessSession,
+} from "./access-auth";
 import { resetRateLimitsForTests } from "./api-security";
 import { SCARCITY_METALS, USGS_BASELINE_COVERAGE } from "./scarcity";
 
 function authorizedRequest(path: string) {
   const session = createAccessSession("beta", 60);
+  const claims = readAccessSession(session, "beta");
+  assert.ok(claims);
+  const pathname = new URL(`http://localhost${path}`).pathname;
   return new Request(`http://localhost${path}`, {
-    headers: { cookie: `hedgents_beta=${encodeURIComponent(session)}` },
+    headers: {
+      cookie: `hedgents_beta=${encodeURIComponent(session)}`,
+      [ACCESS_ATTESTATION_HEADER]: createAccessAttestation(claims, "GET", pathname),
+    },
   });
 }
 

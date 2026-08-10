@@ -7,31 +7,18 @@ import {
   validateAccessCode,
 } from "@/lib/access-auth";
 import { ApiSecurityError } from "@/lib/api-security";
+import {
+  MAX_INVITES,
+  emptyInviteIndex,
+  isInviteGrantCurrent,
+  revokeInviteInIndex,
+  summarizeInvite,
+  validateInviteIndex,
+  type InviteIndex,
+  type StoredInvite,
+} from "@/lib/invite-registry";
 
 const INDEX_PATH = "invites/index.json";
-const MAX_INVITES = 250;
-
-interface StoredInvite {
-  id: string;
-  hash: string;
-  createdAt: string;
-  redemptions: number;
-  lastRedeemedAt: string | null;
-  active: boolean;
-}
-
-interface InviteIndex {
-  version: 1;
-  invites: StoredInvite[];
-}
-
-export interface InviteCodeSummary {
-  id: string;
-  createdAt: string;
-  redemptions: number;
-  lastRedeemedAt: string | null;
-  active: boolean;
-}
 
 interface InviteIndexRead {
   index: InviteIndex;
@@ -43,43 +30,14 @@ const globalInviteState = globalThis as typeof globalThis & {
 };
 
 function emptyIndex(): InviteIndex {
-  return { version: 1, invites: [] };
+  return emptyInviteIndex();
 }
 
 function storageConfigured() {
   return Boolean(process.env.BLOB_STORE_ID || process.env.BLOB_READ_WRITE_TOKEN);
 }
 
-function validateIndex(value: unknown): InviteIndex {
-  if (!value || typeof value !== "object" || Array.isArray(value)) throw new Error("Invite index is malformed.");
-  const candidate = value as { version?: unknown; invites?: unknown };
-  if (candidate.version !== 1 || !Array.isArray(candidate.invites) || candidate.invites.length > MAX_INVITES) {
-    throw new Error("Invite index version or size is invalid.");
-  }
-  const ids = new Set<string>();
-  const hashes = new Set<string>();
-  const invites = candidate.invites.map((entry) => {
-    if (!entry || typeof entry !== "object" || Array.isArray(entry)) throw new Error("Invite entry is malformed.");
-    const record = entry as Partial<StoredInvite>;
-    if (
-      typeof record.id !== "string" || !/^[A-F0-9]{12}$/.test(record.id)
-      || typeof record.hash !== "string" || !/^[a-f0-9]{64}$/.test(record.hash)
-      || typeof record.createdAt !== "string" || !Number.isFinite(Date.parse(record.createdAt))
-      || !Number.isSafeInteger(record.redemptions) || Number(record.redemptions) < 0
-      || (record.lastRedeemedAt !== null && (typeof record.lastRedeemedAt !== "string" || !Number.isFinite(Date.parse(record.lastRedeemedAt))))
-      || typeof record.active !== "boolean"
-      || ids.has(record.id) || hashes.has(record.hash)
-    ) {
-      throw new Error("Invite entry failed integrity validation.");
-    }
-    ids.add(record.id);
-    hashes.add(record.hash);
-    return record as StoredInvite;
-  });
-  return { version: 1, invites };
-}
-
-async function readIndex(): Promise<InviteIndexRead> {
+async function readIndex(options: { useCache?: boolean } = {}): Promise<InviteIndexRead> {
   if (!storageConfigured()) {
     if (process.env.NODE_ENV === "production") {
       throw new ApiSecurityError("Private invite storage is not configured.", 503);
@@ -87,10 +45,15 @@ async function readIndex(): Promise<InviteIndexRead> {
     globalInviteState.__hedgentsInviteIndex ??= emptyIndex();
     return { index: structuredClone(globalInviteState.__hedgentsInviteIndex), etag: null };
   }
-  const result = await get(INDEX_PATH, { access: "private", useCache: false });
-  if (!result || result.statusCode !== 200) return { index: emptyIndex(), etag: null };
-  const value = await new Response(result.stream).json().catch(() => null);
-  return { index: validateIndex(value), etag: result.blob.etag };
+  try {
+    const result = await get(INDEX_PATH, { access: "private", useCache: options.useCache ?? false });
+    if (!result || result.statusCode !== 200) return { index: emptyIndex(), etag: null };
+    const value = await new Response(result.stream).json().catch(() => null);
+    return { index: validateInviteIndex(value), etag: result.blob.etag };
+  } catch (error) {
+    if (error instanceof ApiSecurityError) throw error;
+    throw new ApiSecurityError("Private invite storage is temporarily unavailable.", 503);
+  }
 }
 
 async function writeIndex(index: InviteIndex, etag: string | null) {
@@ -101,14 +64,18 @@ async function writeIndex(index: InviteIndex, etag: string | null) {
     globalInviteState.__hedgentsInviteIndex = structuredClone(index);
     return;
   }
-  await put(INDEX_PATH, JSON.stringify(index), {
-    access: "private",
-    contentType: "application/json",
-    cacheControlMaxAge: 60,
-    addRandomSuffix: false,
-    allowOverwrite: Boolean(etag),
-    ...(etag ? { ifMatch: etag } : {}),
-  });
+  try {
+    await put(INDEX_PATH, JSON.stringify(index), {
+      access: "private",
+      contentType: "application/json",
+      cacheControlMaxAge: 60,
+      addRandomSuffix: false,
+      allowOverwrite: Boolean(etag),
+      ...(etag ? { ifMatch: etag } : {}),
+    });
+  } catch {
+    throw new ApiSecurityError("Private invite storage is temporarily unavailable.", 503);
+  }
 }
 
 async function mutateIndex<T>(mutation: (index: InviteIndex) => T): Promise<T> {
@@ -127,20 +94,10 @@ async function mutateIndex<T>(mutation: (index: InviteIndex) => T): Promise<T> {
   throw lastError;
 }
 
-function summary(invite: StoredInvite): InviteCodeSummary {
-  return {
-    id: invite.id,
-    createdAt: invite.createdAt,
-    redemptions: invite.redemptions,
-    lastRedeemedAt: invite.lastRedeemedAt,
-    active: invite.active,
-  };
-}
-
 export async function listInviteCodes() {
   const { index } = await readIndex();
   return index.invites
-    .map(summary)
+    .map(summarizeInvite)
     .sort((left, right) => Date.parse(right.createdAt) - Date.parse(left.createdAt));
 }
 
@@ -159,31 +116,62 @@ export async function createInviteCode() {
       redemptions: 0,
       lastRedeemedAt: null,
       active: true,
+      revokedAt: null,
+      sessionVersion: 1,
     };
     index.invites.unshift(stored);
     return stored;
   });
-  return { code, invite: summary(invite) };
+  return { code, invite: summarizeInvite(invite) };
 }
 
 export async function redeemInviteCode(code: unknown) {
-  if (validateAccessCode(code, "beta")) return { valid: true, inviteId: "legacy" };
+  // Local development keeps a deterministic bootstrap code. Production has no
+  // environment-hash bypass: every beta session must reference a durable,
+  // individually revocable invite grant.
+  if (process.env.NODE_ENV !== "production" && validateAccessCode(code, "beta")) {
+    return { valid: true, inviteId: "dev", grantVersion: 1 };
+  }
   if (typeof code !== "string" || code.length < 8 || code.length > 128) {
-    return { valid: false, inviteId: null };
+    return { valid: false, inviteId: null, grantVersion: null };
   }
   const candidate = hashAccessCode(code.trim());
   for (let attempt = 0; attempt < 3; attempt += 1) {
     try {
       const { index, etag } = await readIndex();
       const invite = index.invites.find((entry) => entry.active && accessCodeHashesMatch(entry.hash, candidate));
-      if (!invite) return { valid: false, inviteId: null };
+      if (!invite) return { valid: false, inviteId: null, grantVersion: null };
       invite.redemptions += 1;
       invite.lastRedeemedAt = new Date().toISOString();
       await writeIndex(index, etag);
-      return { valid: true, inviteId: invite.id };
-    } catch {
-      if (attempt === 2) return { valid: false, inviteId: null };
+      return { valid: true, inviteId: invite.id, grantVersion: invite.sessionVersion };
+    } catch (error) {
+      if (attempt === 2) {
+        if (error instanceof ApiSecurityError) throw error;
+        throw new ApiSecurityError("Private invite storage is temporarily unavailable.", 503);
+      }
     }
   }
-  return { valid: false, inviteId: null };
+  throw new ApiSecurityError("Private invite storage is temporarily unavailable.", 503);
+}
+
+export async function revokeInviteCode(id: string) {
+  if (!/^[A-F0-9]{12}$/.test(id)) throw new ApiSecurityError("Invite identifier is invalid.", 400);
+  const invite = await mutateIndex((index) => {
+    const revoked = revokeInviteInIndex(index, id, new Date().toISOString());
+    if (!revoked) throw new ApiSecurityError("Invite code was not found.", 404);
+    return revoked;
+  });
+  return summarizeInvite(invite);
+}
+
+export async function isInviteGrantActive(
+  id: string,
+  sessionVersion: number,
+  options: { useCache?: boolean } = {},
+) {
+  if (id === "dev") return process.env.NODE_ENV !== "production" && sessionVersion === 1;
+  if (!/^[A-F0-9]{12}$/.test(id) || !Number.isSafeInteger(sessionVersion) || sessionVersion < 1) return false;
+  const { index } = await readIndex(options);
+  return isInviteGrantCurrent(index, id, sessionVersion);
 }

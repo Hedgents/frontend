@@ -2,8 +2,10 @@ import { createHmac, randomUUID } from "node:crypto";
 import type { BrowserContext } from "@playwright/test";
 
 function localSession(role: "beta" | "admin") {
+  const issuedAt = Math.floor(Date.now() / 1000);
   const expiresAt = Math.floor(Date.now() / 1000) + 3_600;
-  const payload = `${role}.${expiresAt}.${randomUUID()}`;
+  const grantId = role === "admin" ? "admin" : "dev";
+  const payload = `v2.${role}.${expiresAt}.${issuedAt}.${randomUUID()}.${grantId}.1`;
   const signature = createHmac(
     "sha256",
     process.env.HEDGENTS_AUTH_SECRET ?? "hedgents-local-auth-secret-do-not-use-in-production",

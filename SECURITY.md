@@ -23,6 +23,7 @@
 - Scarcity config initialization requires the deployed program's upgrade authority, collateral is restricted onchain to six decimals, and frontend decoding verifies owners, account versions, config relationships, resolver snapshots, collateral, fees, and canonical PDAs.
 - Mainnet scarcity manifests fail closed without canonical Solana USDC, declared multisig approvals, and published audit, dispute, incident-response, and manual challenge-window commitments.
 - Durable invite, market, and detector indexes use conditional Blob writes; bounded datasets and analytics scans prevent silent unbounded growth. Dataset publication fails on a concurrent conflicting write.
+- Beta cookies carry a durable invite grant/version and expire within 12 hours. Proxy strips caller-supplied internal proofs and mints a short-lived request-bound attestation that protected handlers independently verify. Real-funds order and submission boundaries recheck the uncached grant; read-only traffic uses the private Blob CDN for at most 60 seconds. Revocation blocks new trades immediately and propagates through read-only access within one minute.
 
 ## Secrets
 

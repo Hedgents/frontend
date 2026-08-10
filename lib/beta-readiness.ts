@@ -56,7 +56,7 @@ export async function getBetaReadiness() {
   const executionControls = getExecutionControls();
   const executionRpcCount = configuredExecutionRpcCount();
   const checks: ReadinessCheck[] = [
-    check("auth-secrets", "Access sessions", present("HEDGENTS_AUTH_SECRET") && present("HEDGENTS_ADMIN_CODE_HASH") && present("HEDGENTS_INVITE_CODE_HASH"), "Invite, admin, and signed access configuration is complete."),
+    check("auth-secrets", "Access sessions", present("HEDGENTS_AUTH_SECRET") && present("HEDGENTS_ADMIN_CODE_HASH"), "Administrator and signed session configuration is complete; beta access uses individually revocable stored grants."),
     check("execution-secrets", "Execution receipts", present("HEDGENTS_ORDER_SIGNING_SECRET") && present("HEDGENTS_RECOVERY_SIGNING_SECRET"), "Order intents and recovery receipts use dedicated signing secrets."),
     check("jupiter", "Metal route quotes", present("JUPITER_API_KEY"), "Jupiter server credential is configured."),
     check(

@@ -50,11 +50,15 @@
 .generatedInvite button { background: #17150f; color: #d7b75e; }
 .inviteError { color: #ef9a8b; border-left: 2px solid #a44f43; padding-left: 12px; font: 12px/1.6 var(--font-mono), monospace; }
 .inviteTable { margin-top: 22px; border: 1px solid #292d29; }
-.inviteTableHead, .inviteRow { display: grid; grid-template-columns: minmax(120px, .7fr) minmax(180px, 1fr) 70px minmax(180px, 1fr); gap: 16px; align-items: center; padding: 11px 13px; }
+.inviteTableHead, .inviteRow { display: grid; grid-template-columns: minmax(120px, .7fr) 80px minmax(160px, 1fr) 64px minmax(160px, 1fr) 92px; gap: 14px; align-items: center; padding: 11px 13px; }
 .inviteTableHead { color: #969b92; background: #0c0e0c; font: 11px var(--font-mono), monospace; text-transform: uppercase; letter-spacing: .12em; }
 .inviteRow { border-top: 1px solid #292d29; color: #afb3ab; font: 10px var(--font-mono), monospace; }
 .inviteRow code { color: #c9b06c; }
 .inviteRow strong { color: #dedbd0; font-weight: 500; }
+.inviteActive, .inviteRevoked { width: fit-content; padding: 6px 8px; border: 1px solid #526039; color: #bdd776; background: #11170e; text-transform: uppercase; }
+.inviteRevoked { border-color: #654039; color: #d38c80; background: #1c100e; }
+.revokeButton { min-height: 38px; border: 1px solid #795047; color: #e09a8d; background: #1c100e; font: 700 10px var(--font-mono), monospace; letter-spacing: .07em; text-transform: uppercase; cursor: pointer; }
+.revokeButton:disabled { border-color: #363936; color: #70746e; background: #111311; cursor: not-allowed; }
 .scarcityPanel { margin-top: 18px; border: 1px solid #3d433b; background: radial-gradient(circle at 8% 8%, rgba(184,211,109,.055), transparent 24%), #101310; padding: 24px; }
 .scarcityHeader { display: flex; justify-content: space-between; align-items: flex-start; gap: 25px; }
 .scarcityHeader h2 { margin: 0; font: 500 29px var(--font-display), serif; }
@@ -258,7 +262,7 @@
 @media (max-width: 1050px) { .readinessChecklist, .publicationReview { grid-template-columns: 1fr 1fr; } .readinessChecklist > div:nth-child(2), .publicationReview > div:nth-child(2) { border-right: 0; } .readinessChecklist > div:nth-child(-n+2), .publicationReview > div:nth-child(-n+2) { border-bottom: 1px solid #30362f; } }
 @media (max-width: 800px) { .grid { grid-template-columns: 1fr; } .heading { grid-template-columns: 1fr; } .headingMeta { text-align: left; } .event { grid-template-columns: 118px 1fr; } .event code { grid-column: 1 / -1; } }
 @media (max-width: 800px) { .scarcityControl { grid-template-columns: 1fr; } .marketCatalog { border-right: 0; border-bottom: 1px solid #292d29; } .marketSelector { display: grid; grid-template-columns: 1fr 1fr; max-height: 360px; overflow-y: auto; } .marketSelector button:nth-child(odd) { border-right: 1px solid #292d29; } .marketPreparation { scroll-margin-top: 116px; } }
-@media (max-width: 720px) { .inviteHeader, .generatedInvite { align-items: stretch; flex-direction: column; } .inviteTable { overflow-x: auto; } .inviteTableHead, .inviteRow { min-width: 650px; } }
+@media (max-width: 720px) { .inviteHeader, .generatedInvite { align-items: stretch; flex-direction: column; } .inviteTable { overflow-x: auto; } .inviteTableHead, .inviteRow { min-width: 900px; } }
 @media (max-width: 720px) { .operatorBar, .protocolInitialization { align-items: stretch; grid-template-columns: 1fr; flex-direction: column; } .operatorWallet { justify-content: space-between; } }
 @media (max-width: 720px) { .dataHeader { align-items: stretch; flex-direction: column; } .storageReady, .storageLocal { width: fit-content; } }
 @media (max-width: 720px) { .detectorHeader { align-items: stretch; flex-direction: column; } .detectorActions { grid-template-columns: 1fr 1fr; } .detectorActions label { grid-column: 1 / -1; } .detectorQueue article { grid-template-columns: 1fr; } .detectorQueue article strong { white-space: normal; } }
