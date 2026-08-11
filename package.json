@@ -14,6 +14,7 @@
     "probe:metals": "tsx scripts/probe-metal-routes.ts",
     "probe:sells": "tsx scripts/probe-metal-sells.ts",
     "simulate:metals": "tsx scripts/simulate-metal-matrix.ts",
+    "sample:envelope": "tsx scripts/sample-guard-envelope.ts",
     "detector:run": "tsx scripts/run-online-detector.ts"
   },
   "dependencies": {

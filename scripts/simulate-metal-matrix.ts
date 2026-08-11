@@ -1,3 +1,4 @@
+import { getAddressEncoder, getProgramDerivedAddress, type Address } from "@solana/kit";
 import { normalizeJupiterPriceImpact } from "../lib/execution-validation";
 import {
   solanaExecutionProducts,
@@ -12,6 +13,8 @@ import {
 } from "../lib/solana-transaction-guard";
 
 const JUPITER_ORDER_URL = "https://api.jup.ag/swap/v2/order";
+const ASSOCIATED_TOKEN_PROGRAM_ID = "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL";
+const addressEncoder = getAddressEncoder();
 const DEFAULT_SOLANA_RPC = "https://api.mainnet-beta.solana.com";
 
 const apiKey = process.env.JUPITER_API_KEY?.trim();
@@ -186,7 +189,19 @@ async function simulateTransaction(
   return { guard: primary, crossChecked: true };
 }
 
-async function findPublicHolder(mint: string, minimumAmount: bigint) {
+async function associatedTokenAddress(owner: string, mint: string, tokenProgramAddress: string) {
+  const [address] = await getProgramDerivedAddress({
+    programAddress: ASSOCIATED_TOKEN_PROGRAM_ID as Address,
+    seeds: [
+      addressEncoder.encode(owner as Address),
+      addressEncoder.encode(tokenProgramAddress as Address),
+      addressEncoder.encode(mint as Address),
+    ],
+  });
+  return address as string;
+}
+
+async function findPublicHolder(mint: string, minimumAmount: bigint, tokenProgramAddress: string) {
   const largest = await rpcRequest<{ value?: LargestTokenAccount[] }>(
     "getTokenLargestAccounts",
     [mint, { commitment: "confirmed" }],
@@ -198,10 +213,13 @@ async function findPublicHolder(mint: string, minimumAmount: bigint) {
       [account.address, { encoding: "jsonParsed", commitment: "confirmed" }],
     );
     const owner = info.value?.data?.parsed?.info?.owner;
-    if (owner && /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(owner)) {
-      const balance = await rpcRequest<{ value?: number }>("getBalance", [owner, { commitment: "confirmed" }]);
-      if ((balance.value ?? 0) >= 5_000_000) return owner;
-    }
+    if (!owner || !/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(owner)) continue;
+    // Jupiter builds the swap against the taker's associated token account, not against whichever
+    // token account happens to be large. A whale that custodies through a non-ATA account reports
+    // "Insufficient funds" and would be recorded as a missing route rather than a bad taker choice.
+    if (await associatedTokenAddress(owner, mint, tokenProgramAddress) !== account.address) continue;
+    const balance = await rpcRequest<{ value?: number }>("getBalance", [owner, { commitment: "confirmed" }]);
+    if ((balance.value ?? 0) >= 5_000_000) return owner;
   }
   throw new Error("No public holder with enough token balance was found for read-only sell simulation.");
 }
@@ -249,6 +267,7 @@ const maximumBuyAmount = Math.max(...Object.values(solanaExecutionProducts).map(
 const buyTaker = configuredBuyTaker ?? await findPublicHolder(
   solanaSettlementAssets.usdc.mint,
   BigInt(Math.ceil(maximumBuyAmount * 10 ** solanaSettlementAssets.usdc.decimals)),
+  solanaSettlementAssets.usdc.tokenProgramAddress,
 );
 
 for (const product of Object.values(solanaExecutionProducts)) {
@@ -323,7 +342,7 @@ for (const product of Object.values(solanaExecutionProducts)) {
     : fallbackSellAmount;
   let sellTaker: string | null = null;
   try {
-    sellTaker = await findPublicHolder(product.mint, sellAmount);
+    sellTaker = await findPublicHolder(product.mint, sellAmount, product.tokenProgramAddress);
   } catch {
     sellTaker = null;
   }
