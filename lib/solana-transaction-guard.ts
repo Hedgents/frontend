@@ -531,16 +531,11 @@ export function configuredMaximumSolDebitLamports() {
 }
 
 export function configuredProgramFingerprintAllowlist() {
+  // Optional. HEDGENTS_SOLANA_PROGRAM_ALLOWLIST is the mandatory production gate; pinning exact
+  // program sets on top of it is an operator choice, and requiring both would reject a returning
+  // tester whose buy no longer creates an associated token account.
   const configured = process.env.HEDGENTS_SOLANA_PROGRAM_FINGERPRINT_ALLOWLIST?.trim();
-  if (!configured) {
-    if (process.env.NODE_ENV === "production") {
-      throw new ExecutionValidationError(
-        "Set HEDGENTS_SOLANA_PROGRAM_FINGERPRINT_ALLOWLIST to reviewed route fingerprints before enabling metal execution.",
-        503,
-      );
-    }
-    return null;
-  }
+  if (!configured) return null;
   const fingerprints = configured.split(",").map((value) => value.trim()).filter(Boolean);
   if (!fingerprints.length || fingerprints.some((value) => !/^[a-f0-9]{64}$/.test(value))) {
     throw new ExecutionValidationError(
@@ -551,9 +546,47 @@ export function configuredProgramFingerprintAllowlist() {
   return new Set(fingerprints);
 }
 
-export function assertProgramFingerprintAllowed(report: Pick<TransactionGuardReport, "programFingerprint">) {
-  const allowlist = configuredProgramFingerprintAllowlist();
-  if (allowlist && !allowlist.has(report.programFingerprint)) {
+export function configuredProgramAllowlist() {
+  const configured = process.env.HEDGENTS_SOLANA_PROGRAM_ALLOWLIST?.trim();
+  if (!configured) {
+    if (process.env.NODE_ENV === "production") {
+      throw new ExecutionValidationError(
+        "Set HEDGENTS_SOLANA_PROGRAM_ALLOWLIST to the reviewed route programs before enabling metal execution.",
+        503,
+      );
+    }
+    return null;
+  }
+  const programs = configured.split(",").map((value) => value.trim()).filter(Boolean);
+  if (!programs.length || programs.some((value) => !/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(value))) {
+    throw new ExecutionValidationError(
+      "HEDGENTS_SOLANA_PROGRAM_ALLOWLIST must contain comma-separated base58 Solana program addresses.",
+      503,
+    );
+  }
+  return new Set(programs);
+}
+
+export function assertProgramFingerprintAllowed(
+  report: Pick<TransactionGuardReport, "programFingerprint" | "programIds">,
+) {
+  // The program allowlist is the primary gate. The fingerprint hashes the whole program set, so a
+  // single product pair legitimately produces a different fingerprint for every venue Jupiter picks
+  // and again for a taker that already holds the product. Reviewing programs is the property that
+  // actually matters, and it survives routing changes that a set hash cannot.
+  const programAllowlist = configuredProgramAllowlist();
+  if (programAllowlist) {
+    const unreviewed = report.programIds.filter((programId) => !programAllowlist.has(programId));
+    if (unreviewed.length) {
+      throw new ExecutionValidationError(
+        `The route invokes ${unreviewed.join(", ")}, which has not passed the operator program review.`,
+        503,
+      );
+    }
+  }
+  // Still enforced when configured, so an operator can additionally pin exact program sets.
+  const fingerprintAllowlist = configuredProgramFingerprintAllowlist();
+  if (fingerprintAllowlist && !fingerprintAllowlist.has(report.programFingerprint)) {
     throw new ExecutionValidationError(
       `The route program fingerprint ${report.programFingerprint} has not passed the operator canary review.`,
       503,

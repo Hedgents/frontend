@@ -10,6 +10,7 @@ import {
   assertProgramFingerprintAllowed,
   assertTransactionGuardCompatible,
   configuredMaximumSolDebitLamports,
+  configuredProgramAllowlist,
   configuredProgramFingerprintAllowlist,
   guardSolanaTransaction,
   type SolanaSimulationValue,
@@ -403,10 +404,67 @@ test("an explicit program-fingerprint allowlist rejects every unreviewed route",
   }
 });
 
+test("the program allowlist rejects an unreviewed program and survives a routing change", () => {
+  const previousPrograms = process.env.HEDGENTS_SOLANA_PROGRAM_ALLOWLIST;
+  const previousFingerprints = process.env.HEDGENTS_SOLANA_PROGRAM_FINGERPRINT_ALLOWLIST;
+  try {
+    delete process.env.HEDGENTS_SOLANA_PROGRAM_FINGERPRINT_ALLOWLIST;
+    const reviewed = scenario({});
+    const reviewedReport = guardSolanaTransaction(
+      reviewed.encoded, reviewed.simulation, reviewed.expectation,
+    );
+    // Jupiter later routes the same pair through a venue the operator has not reviewed.
+    const unreviewedVenue = generatedAddress(21);
+    const rerouted = scenario({ programId: unreviewedVenue });
+    const reroutedReport = guardSolanaTransaction(
+      rerouted.encoded, rerouted.simulation, rerouted.expectation,
+    );
+
+    process.env.HEDGENTS_SOLANA_PROGRAM_ALLOWLIST = reviewedReport.programIds.join(",");
+    assert.doesNotThrow(() => assertProgramFingerprintAllowed(reviewedReport));
+    assert.throws(
+      () => assertProgramFingerprintAllowed(reroutedReport),
+      new RegExp(`invokes ${unreviewedVenue}, which has not passed the operator program review`),
+    );
+
+    // Reviewing the venue is enough. This is the point of the change: a fingerprint pinned to the
+    // first route would still reject this one even though every program in it has been reviewed.
+    const bothFingerprints = `${reviewedReport.programFingerprint},${"0".repeat(64)}`;
+    assert.notEqual(reroutedReport.programFingerprint, reviewedReport.programFingerprint);
+    process.env.HEDGENTS_SOLANA_PROGRAM_ALLOWLIST =
+      [...new Set([...reviewedReport.programIds, ...reroutedReport.programIds])].join(",");
+    assert.doesNotThrow(() => assertProgramFingerprintAllowed(reroutedReport));
+
+    // An operator who additionally pins program sets keeps that stricter behaviour.
+    process.env.HEDGENTS_SOLANA_PROGRAM_FINGERPRINT_ALLOWLIST = bothFingerprints;
+    assert.throws(() => assertProgramFingerprintAllowed(reroutedReport), /operator canary review/);
+    assert.doesNotThrow(() => assertProgramFingerprintAllowed(reviewedReport));
+  } finally {
+    if (previousPrograms === undefined) delete process.env.HEDGENTS_SOLANA_PROGRAM_ALLOWLIST;
+    else process.env.HEDGENTS_SOLANA_PROGRAM_ALLOWLIST = previousPrograms;
+    if (previousFingerprints === undefined) delete process.env.HEDGENTS_SOLANA_PROGRAM_FINGERPRINT_ALLOWLIST;
+    else process.env.HEDGENTS_SOLANA_PROGRAM_FINGERPRINT_ALLOWLIST = previousFingerprints;
+  }
+});
+
+test("a malformed program allowlist fails closed instead of silently allowing everything", () => {
+  const previous = process.env.HEDGENTS_SOLANA_PROGRAM_ALLOWLIST;
+  try {
+    process.env.HEDGENTS_SOLANA_PROGRAM_ALLOWLIST = "not-a-program";
+    assert.throws(() => configuredProgramAllowlist(), /must contain comma-separated base58/);
+    process.env.HEDGENTS_SOLANA_PROGRAM_ALLOWLIST = ",,";
+    assert.throws(() => configuredProgramAllowlist(), /must contain comma-separated base58/);
+  } finally {
+    if (previous === undefined) delete process.env.HEDGENTS_SOLANA_PROGRAM_ALLOWLIST;
+    else process.env.HEDGENTS_SOLANA_PROGRAM_ALLOWLIST = previous;
+  }
+});
+
 test("operator SOL cap and production fingerprint policy fail closed when unconfigured", () => {
   const mutableEnv = process.env as Record<string, string | undefined>;
   const previousCap = process.env.HEDGENTS_MAX_SOL_DEBIT_LAMPORTS;
   const previousFingerprints = process.env.HEDGENTS_SOLANA_PROGRAM_FINGERPRINT_ALLOWLIST;
+  const previousPrograms = process.env.HEDGENTS_SOLANA_PROGRAM_ALLOWLIST;
   const previousNodeEnv = process.env.NODE_ENV;
   try {
     delete process.env.HEDGENTS_MAX_SOL_DEBIT_LAMPORTS;
@@ -415,16 +473,23 @@ test("operator SOL cap and production fingerprint policy fail closed when unconf
     assert.equal(configuredMaximumSolDebitLamports(), "10000000");
 
     mutableEnv.NODE_ENV = "production";
-    delete process.env.HEDGENTS_SOLANA_PROGRAM_FINGERPRINT_ALLOWLIST;
+    delete process.env.HEDGENTS_SOLANA_PROGRAM_ALLOWLIST;
     assert.throws(
-      () => configuredProgramFingerprintAllowlist(),
-      /Set HEDGENTS_SOLANA_PROGRAM_FINGERPRINT_ALLOWLIST/,
+      () => configuredProgramAllowlist(),
+      /Set HEDGENTS_SOLANA_PROGRAM_ALLOWLIST/,
     );
+    // The fingerprint pin is an operator extra on top of the program review, so an unset value is
+    // no longer a production failure by itself. Leaving it required would reject a returning
+    // tester whose buy no longer creates an associated token account.
+    delete process.env.HEDGENTS_SOLANA_PROGRAM_FINGERPRINT_ALLOWLIST;
+    assert.equal(configuredProgramFingerprintAllowlist(), null);
   } finally {
     if (previousCap === undefined) delete process.env.HEDGENTS_MAX_SOL_DEBIT_LAMPORTS;
     else process.env.HEDGENTS_MAX_SOL_DEBIT_LAMPORTS = previousCap;
     if (previousFingerprints === undefined) delete process.env.HEDGENTS_SOLANA_PROGRAM_FINGERPRINT_ALLOWLIST;
     else process.env.HEDGENTS_SOLANA_PROGRAM_FINGERPRINT_ALLOWLIST = previousFingerprints;
+    if (previousPrograms === undefined) delete process.env.HEDGENTS_SOLANA_PROGRAM_ALLOWLIST;
+    else process.env.HEDGENTS_SOLANA_PROGRAM_ALLOWLIST = previousPrograms;
     if (previousNodeEnv === undefined) delete mutableEnv.NODE_ENV;
     else mutableEnv.NODE_ENV = previousNodeEnv;
   }

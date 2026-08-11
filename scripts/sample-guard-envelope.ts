@@ -1,12 +1,13 @@
 /**
  * Zero-spend sampler for the two production guard settings that cannot be chosen from a single
- * matrix run: HEDGENTS_SOLANA_PROGRAM_FINGERPRINT_ALLOWLIST and HEDGENTS_MAX_SOL_DEBIT_LAMPORTS.
+ * matrix run: HEDGENTS_SOLANA_PROGRAM_ALLOWLIST and HEDGENTS_MAX_SOL_DEBIT_LAMPORTS.
  *
- * Both fail closed. A fingerprint list pinned from one sample rejects every later trade that
- * Jupiter happens to route through a different AMM, and a debit cap pinned to one observation
- * rejects the next transaction that opens one more account. This script repeats the real order and
- * simulation path across several trade sizes so the operator sets both from a distribution rather
- * than from a single lucky route.
+ * Both fail closed. A program list built from one sample misses every venue Jupiter did not happen
+ * to pick that minute, and a debit cap pinned to one observation rejects the next transaction that
+ * opens one more account. This script repeats the real order and simulation path across several
+ * trade sizes so the operator sets both from a distribution rather than from a single lucky route.
+ * It also reports each distinct program-set fingerprint, which is what the optional
+ * HEDGENTS_SOLANA_PROGRAM_FINGERPRINT_ALLOWLIST pin would have to enumerate.
  *
  * No key is used, nothing is signed, and nothing is submitted.
  *

@@ -7,6 +7,7 @@ import { getExecutionControls } from "@/lib/execution-controls";
 import { getPublicTerminalFeatures } from "@/lib/terminal-feature-controls";
 import {
   configuredMaximumSolDebitLamports,
+  configuredProgramAllowlist,
   configuredProgramFingerprintAllowlist,
 } from "@/lib/solana-transaction-guard";
 import { executionAuditConfigurationStatus } from "@/lib/execution-audit-store";
@@ -71,16 +72,18 @@ export async function getBetaReadiness() {
   } catch (error) {
     walletDebitDetail = error instanceof Error ? error.message : walletDebitDetail;
   }
-  let fingerprintConfigured = false;
-  let fingerprintDetail = "No reviewed route-program fingerprint is configured.";
+  let programsConfigured = false;
+  let programsDetail = "No reviewed Solana route program is configured.";
   try {
-    const fingerprints = configuredProgramFingerprintAllowlist();
-    fingerprintConfigured = Boolean(fingerprints?.size);
-    if (fingerprints?.size) {
-      fingerprintDetail = `${fingerprints.size} reviewed Solana route-program fingerprint(s) are allowlisted.`;
+    const programs = configuredProgramAllowlist();
+    programsConfigured = Boolean(programs?.size);
+    if (programs?.size) {
+      const fingerprints = configuredProgramFingerprintAllowlist();
+      programsDetail = `${programs.size} reviewed Solana route program(s) are allowlisted`
+        + (fingerprints?.size ? `, pinned to ${fingerprints.size} reviewed program set(s).` : ".");
     }
   } catch (error) {
-    fingerprintDetail = error instanceof Error ? error.message : fingerprintDetail;
+    programsDetail = error instanceof Error ? error.message : programsDetail;
   }
   const auditConfiguration = executionAuditConfigurationStatus({ production: true });
   const checks: ReadinessCheck[] = [
@@ -115,7 +118,7 @@ export async function getBetaReadiness() {
           : `No explicit production allowlist is configured; non-production currently permits all ${executionControls.allowedProductIds.length} registry product(s).`),
     ),
     check("execution-wallet-debit", "Wallet SOL-debit cap", walletDebitConfigured, walletDebitDetail),
-    check("execution-programs", "Route-program review", fingerprintConfigured, fingerprintDetail),
+    check("execution-programs", "Route-program review", programsConfigured, programsDetail),
     check("execution-audit", "Execution audit ledger", auditConfiguration.ready, auditConfiguration.detail),
     check(
       "rail-funding",
