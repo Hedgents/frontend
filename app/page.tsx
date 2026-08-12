@@ -19,6 +19,8 @@ export default async function Page({
     loadScarcityMarketCatalog(),
     searchParams,
   ]);
+  const deployment = await loadScarcityDeployment().catch(() => null);
+  const deployedCurveSlugs = new Set(Object.keys(deployment?.curveMarkets ?? {}));
   const scarcityMarkets: ScarcityMarket[] = catalog.map((market) => {
     const curve = compileCurveMarket(market);
     return {
@@ -56,6 +58,7 @@ export default async function Page({
         bucketCount: curve.rules.engine.bucketCount,
         targetJackpotBps: curve.rules.engine.targetJackpotBps,
         jackpotLeverageCap: curve.rules.engine.jackpotLeverageCap,
+        deployed: deployedCurveSlugs.has(curve.slug),
       } : null,
     };
   });
@@ -63,8 +66,6 @@ export default async function Page({
   // Lithium rounds are not catalog records, so mapping the catalog alone left the one market that
   // is actually deployed out of the list entirely while listing ninety-nine specifications that are
   // not. Append them, then sort deployed markets to the front so the live one leads.
-  const deployment = await loadScarcityDeployment().catch(() => null);
-  const deployedCurveSlugs = new Set(Object.keys(deployment?.curveMarkets ?? {}));
   for (const round of Object.values(LITHIUM_ROUNDS)) {
     const compiled = compileLithiumRound(round);
     scarcityMarkets.push({
@@ -106,6 +107,7 @@ export default async function Page({
         bucketCount: compiled.rules.engine.bucketCount,
         targetJackpotBps: compiled.rules.engine.targetJackpotBps,
         jackpotLeverageCap: compiled.rules.engine.jackpotLeverageCap,
+        deployed: deployedCurveSlugs.has(compiled.slug),
       },
     });
   }

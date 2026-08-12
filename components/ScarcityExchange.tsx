@@ -118,6 +118,8 @@ export type ScarcityMarket = {
     bucketCount: number;
     targetJackpotBps: number;
     jackpotLeverageCap: number;
+    /** True only when a round for this curve exists on chain. Specifications are not tradeable. */
+    deployed: boolean;
   };
 };
 
@@ -447,8 +449,8 @@ export function ScarcityExchange({ markets, defaultDataset, initialView = "marke
 
   const openInstrument = useCallback((nextInstrument: ScarcityInstrument) => {
     const nextMarket = nextInstrument === "curve" && !active.curve
-      ? markets.find((market) => market.metal.id === active.metal.id && market.curve)
-        ?? markets.find((market) => market.curve)
+      ? markets.find((market) => market.metal.id === active.metal.id && market.curve?.deployed)
+        ?? markets.find((market) => market.curve?.deployed)
         ?? active
       : active;
     navigateScarcity("markets", nextMarket.slug, "push", nextInstrument);

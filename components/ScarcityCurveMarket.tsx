@@ -119,9 +119,12 @@ export function ScarcityCurveMarket({
   onOpenVerify: () => void;
   onConnect: () => void;
 }) {
-  const curveMarkets = useMemo(() => markets.filter((market) => market.curve), [markets]);
-  const curve = active.curve ?? curveMarkets[0]?.curve ?? null;
-  const curveMarket = active.curve ? active : curveMarkets[0] ?? active;
+  const curveMarkets = useMemo(() => markets.filter((market) => market.curve?.deployed), [markets]);
+  // A specification can still be the active market when the user arrives from the events view, so
+  // fall through to a deployed round rather than rendering a document as if it were tradeable.
+  const activeCurve = active.curve?.deployed ? active.curve : null;
+  const curve = activeCurve ?? curveMarkets[0]?.curve ?? null;
+  const curveMarket = activeCurve ? active : curveMarkets[0] ?? active;
   const [query, setQuery] = useState("");
   const [forecast, setForecast] = useState(curve?.displayRange.midpoint ?? 50);
   const [stake, setStake] = useState("25");
@@ -148,9 +151,14 @@ export function ScarcityCurveMarket({
   if (!curve) {
     return <section className={styles.unavailable}>
       <LockKeyhole size={24} />
-      <span>Curve specification unavailable</span>
-      <h2>This market resolves to a named event, not a number.</h2>
-      <p>Curve forecasts only open when a reviewed metric has explicit units, range, normalization, and evidence rules.</p>
+      <span>No open forecast round</span>
+      <h2>Curve rounds open one metal at a time.</h2>
+      <p>
+        A metal gets a round once its index has a committed calculation a third party can recompute
+        from a public source, and once that number has been measured to move enough over the round
+        to be worth forecasting. Lithium is first. The rest are specifications until they clear
+        the same bar.
+      </p>
       <button type="button" onClick={onOpenEvents}>Open event markets <ArrowRight size={14} /></button>
     </section>;
   }
