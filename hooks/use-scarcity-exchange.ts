@@ -534,3 +534,76 @@ export function useScarcitySignals(dataset?: string) {
     retry: 1,
   });
 }
+
+export interface TesterXpProfile {
+  rulesVersion: string;
+  granteeId: string;
+  byCluster: { devnet: number; "mainnet-beta": number };
+  total: number;
+  roundsCompleted: number;
+  rounds: Array<{
+    roundSlug: string;
+    cluster: "devnet" | "mainnet-beta";
+    participation: number;
+    accuracy: number;
+    settlementClaim: number;
+    total: number;
+    effectiveBucket: number | null;
+    note: string | null;
+  }>;
+  breadth: { firstRound: number; returningRounds: number; total: number };
+  awards: { count: number; total: number };
+  wallets: Array<{ wallet: string; linkedAt: string }>;
+  disclosure: string;
+}
+
+async function fetchXpProfile() {
+  const response = await fetch("/api/xp/profile", { cache: "no-store" });
+  const payload = (await response.json()) as TesterXpProfile & { error?: string };
+  if (!response.ok) throw new Error(payload.error ?? "XP is unavailable.");
+  return payload;
+}
+
+export function useTesterXp(enabled = true) {
+  return useQuery({
+    queryKey: ["tester-xp"],
+    queryFn: fetchXpProfile,
+    enabled,
+    staleTime: 15_000,
+    retry: 1,
+  });
+}
+
+export interface WalletLinkChallengePayload {
+  granteeId: string;
+  wallet: string;
+  nonce: string;
+  issuedAt: string;
+  expiresAt: string;
+  proof: string;
+  message: string;
+}
+
+export async function requestWalletLinkChallenge(wallet: string) {
+  const response = await fetch(`/api/xp/link?wallet=${encodeURIComponent(wallet)}`, { cache: "no-store" });
+  const payload = (await response.json()) as WalletLinkChallengePayload & { error?: string };
+  if (!response.ok) throw new Error(payload.error ?? "Could not start the wallet link.");
+  return payload;
+}
+
+export async function submitWalletLink(input: {
+  wallet: string;
+  nonce: string;
+  expiresAt: string;
+  proof: string;
+  signature: string;
+}) {
+  const response = await fetch("/api/xp/link", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(input),
+  });
+  const payload = (await response.json()) as { error?: string };
+  if (!response.ok) throw new Error(payload.error ?? "The wallet link could not be completed.");
+  return payload;
+}

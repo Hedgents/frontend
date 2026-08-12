@@ -66,6 +66,8 @@ export interface XpRound {
 
 export interface XpAward {
   id: string;
+  /** Awards belong to the grant, like everything else here. */
+  granteeId: string;
   kind: "verified-report";
   cluster: XpCluster;
   points: number;

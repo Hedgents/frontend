@@ -111,7 +111,7 @@ test("devnet and mainnet totals stay separable", () => {
   const profile = buildXpProfile({
     granteeId: "invite-1",
     rounds: [round(), round({ roundSlug: "r2", cluster: "mainnet-beta" })],
-    awards: [{ id: "a1", kind: "verified-report", cluster: "devnet", points: XP_AWARDS.verifiedReport, awardedAt: "2026-08-12T00:00:00.000Z", reason: "reproduced a settlement defect" }],
+    awards: [{ id: "a1", granteeId: "invite-1", kind: "verified-report", cluster: "devnet", points: XP_AWARDS.verifiedReport, awardedAt: "2026-08-12T00:00:00.000Z", reason: "reproduced a settlement defect" }],
   });
   assert.ok(profile.byCluster.devnet > 0);
   assert.ok(profile.byCluster["mainnet-beta"] > 0);
