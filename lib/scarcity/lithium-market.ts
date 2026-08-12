@@ -9,7 +9,9 @@
  * Everything hashed here is immutable after `create_curve_market`, so the anchors, the liquidity
  * gates, the trailing-median window and the settlement calendar all have to be right first.
  */
+import type { CompiledCurveMarket, CurveMetricDocument, CurveRulesDocument } from "@/lib/scarcity-curves";
 import { canonicalJson, sha256Hex } from "@/lib/scarcity-markets";
+import { MAINNET_USDC_MINT } from "@/lib/scarcity-exchange";
 import {
   CURVE_SLOPE_ANCHORS,
   LIQUIDITY_ENTRY,
@@ -35,21 +37,58 @@ export interface LithiumRoundWindow {
   resolveAfter: string;
 }
 
-export interface CompiledLithiumRound {
-  slug: string;
-  marketId: string;
-  metricHash: string;
-  rulesHash: string;
-  canonicalMetric: string;
-  canonicalRules: string;
-  metric: unknown;
-  rules: unknown;
+/**
+ * The lithium metric document carries the whole calculation, which the general curve document does
+ * not, so it is a strict extension of `CurveMetricDocument`. Staying assignable matters: it lets a
+ * lithium round flow through the existing curve resolver, API and UI rather than needing a parallel
+ * stack, and any drift in the shared shape becomes a compile error here.
+ */
+export type LithiumMetricDocument = CurveMetricDocument & {
+  calculation: {
+    parameter: string;
+    formula: string;
+    trailingMedianTradingDays: number;
+    contractSelection: {
+      rule: string;
+      entry: { openInterest: number; volume: number };
+      exit: { openInterest: number; volume: number };
+    };
+    anchors: Array<{ value: number; score: number }>;
+    anchorInterpolation: string;
+  };
+};
+
+/**
+ * The rules document likewise extends the shared one. The additions are the two promises a
+ * parimutuel cannot make after the fact: that stake locks before the observation window opens, and
+ * that the settled value is never restated for later upstream revisions.
+ */
+export type LithiumRulesDocument = Omit<CurveRulesDocument, "schedule" | "resolution"> & {
+  schedule: CurveRulesDocument["schedule"] & {
+    stakeLocksBeforeObservationWindow: true;
+    minimumTenorTradingDays: number;
+  };
+  resolution: CurveRulesDocument["resolution"] & {
+    correctionWindowHours: number;
+    correctionCauses: string[];
+    restatementPolicy: string;
+  };
+};
+
+export interface CompiledLithiumRound extends Omit<CompiledCurveMarket, "metric" | "rules"> {
+  metric: LithiumMetricDocument;
+  rules: LithiumRulesDocument;
+}
+
+/** A lithium round slug the curve resolver should recognise. */
+export function isLithiumRoundSlug(slug: string) {
+  return /^lithium-tightness-\d{4}-\d{2}-curve-v1$/.test(slug);
 }
 
 export function compileLithiumRound(window: LithiumRoundWindow): CompiledLithiumRound {
   const slug = `lithium-tightness-${window.round}-curve-v1`;
 
-  const metric = {
+  const metric: LithiumMetricDocument = {
     schemaVersion: "1.0.0",
     kind: "scalar-curve",
     slug,
@@ -102,7 +141,7 @@ export function compileLithiumRound(window: LithiumRoundWindow): CompiledLithium
     ],
   };
 
-  const rules = {
+  const rules: LithiumRulesDocument = {
     schemaVersion: "1.0.0",
     network: "solana",
     schedule: {
@@ -115,7 +154,7 @@ export function compileLithiumRound(window: LithiumRoundWindow): CompiledLithium
       stakeLocksBeforeObservationWindow: true,
       minimumTenorTradingDays: MINIMUM_TENOR_TRADING_DAYS,
     },
-    collateral: { mint: "usdc", decimals: 6 },
+    collateral: { symbol: "USDC", decimals: 6, mint: String(MAINNET_USDC_MINT) },
     engine: {
       bucketCount: 41,
       midpointTieBreak: "higher",
@@ -150,4 +189,28 @@ export function compileLithiumRound(window: LithiumRoundWindow): CompiledLithium
   const rulesHash = sha256Hex(canonicalRules);
   const marketId = sha256Hex(canonicalJson({ schemaVersion: "1.0.0", slug, metricHash, rulesHash }));
   return { slug, marketId, metricHash, rulesHash, canonicalMetric, canonicalRules, metric, rules };
+}
+
+/**
+ * Declared rounds. A round's window is committed into its hashes, so it is declared here rather
+ * than derived from the slug, and adding one is a deliberate act with a code review attached.
+ *
+ * Round cadence: staking locks twenty trading days after open, the five-trading-day observation
+ * window runs after that with none of it visible at close, and resolution follows the correction
+ * window.
+ */
+export const LITHIUM_ROUNDS: Readonly<Record<string, LithiumRoundWindow>> = Object.freeze({
+  "2026-09": {
+    round: "2026-09",
+    opensAt: "2026-08-12T12:00:00.000Z",
+    closesAt: "2026-09-10T07:00:00.000Z",
+    observedAt: "2026-09-17T07:00:00.000Z",
+    resolveAfter: "2026-09-21T07:00:00.000Z",
+  },
+});
+
+export function lithiumRoundWindow(slug: string): LithiumRoundWindow | null {
+  if (!isLithiumRoundSlug(slug)) return null;
+  const round = slug.slice("lithium-tightness-".length, -"-curve-v1".length);
+  return LITHIUM_ROUNDS[round] ?? null;
 }

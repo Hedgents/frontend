@@ -1204,3 +1204,72 @@
     animation-iteration-count: 1 !important;
   }
 }
+
+/* Live payout-per-bucket strip. The weight curve above it is the static kernel and looks the same
+   whatever anyone else staked; this is what the pool actually pays right now, so a crowded forecast
+   visibly pays less. That is the lesson a parimutuel has to teach before someone stakes, not after. */
+.multipleStrip {
+  position: relative;
+  z-index: 2;
+  margin-top: 14px;
+  padding: 11px 12px 10px;
+  border: 1px solid rgba(230, 226, 216, .1);
+  border-radius: 10px;
+  background: rgba(230, 226, 216, .028);
+}
+
+.multipleStripHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--faint);
+  font: 600 8px/1.3 var(--font-mono), monospace;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.multipleStripHead strong {
+  color: var(--metal-tone);
+  font: 600 11px/1.2 var(--font-mono), monospace;
+  letter-spacing: .01em;
+  white-space: nowrap;
+}
+
+.multipleStripHead em {
+  color: var(--faint);
+  font-style: normal;
+  font-weight: 500;
+}
+
+.multipleBars {
+  display: flex;
+  align-items: flex-end;
+  gap: 1px;
+  height: 42px;
+  margin-top: 8px;
+}
+
+.multipleBars i {
+  flex: 1;
+  height: var(--multiple-height, 3%);
+  min-height: 2px;
+  border-radius: 1px 1px 0 0;
+  background: rgba(230, 226, 216, .22);
+  transition: height .18s ease, background .18s ease;
+}
+
+.multipleBars i[data-selected="true"] {
+  background: var(--metal-tone);
+}
+
+.multipleNote {
+  margin: 8px 0 0;
+  color: var(--faint);
+  font-size: 10.5px;
+  line-height: 1.45;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .multipleBars i { transition: none; }
+}

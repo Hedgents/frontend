@@ -241,6 +241,41 @@ export function ScarcityCurveMarket({
     const y = 190 - weight / curve.bucketCount * 138;
     return `${x},${y}`;
   }).join(" ");
+
+  /**
+   * What a stake in each bucket would actually return if that bucket wins, against the live book.
+   *
+   * The weight curve above is the static kernel and it is the same shape whatever anyone else has
+   * staked. This is the number that decides whether a forecast is worth making, because a
+   * parimutuel dilutes: the crowded bucket pays least, so following the pool is punished even when
+   * it is right. Showing it before the stake turns that from a hidden trap into a visible choice,
+   * and it is information an order book cannot display at all.
+   */
+  const bucketMultiples = (() => {
+    // One collateral unit when nothing is typed yet, so the strip is populated on first paint.
+    const stakeUnit = newStake > 0n ? newStake : 1_000_000n;
+    const live = Boolean(chainState) && chainState?.market.status === "unresolved";
+    const book = live ? bucketStakes : Array.from({ length: curve.bucketCount }, () => 5_000_000n);
+    return Array.from({ length: curve.bucketCount }, (_, bucket) => {
+      const stakes = [...book];
+      stakes[bucket] = (stakes[bucket] ?? 0n) + stakeUnit;
+      const result = curveScenarioPayout({
+        bucketStakes: stakes,
+        positionBucket: bucket,
+        positionStake: stakeUnit,
+        winningBucket: bucket,
+        feeBps: chainState?.market.feeBps ?? 50,
+        jackpotBps: chainState?.market.jackpotBps ?? curve.targetJackpotBps,
+        jackpotLeverageCap: chainState?.market.jackpotLeverageCap ?? curve.jackpotLeverageCap,
+      });
+      return { bucket, multiple: Number(result.payout * 100n / stakeUnit) / 100, live };
+    });
+  })();
+  const bestMultiple = bucketMultiples.reduce(
+    (best, entry) => (entry.multiple > best.multiple ? entry : best),
+    bucketMultiples[0],
+  );
+  const selectedMultiple = bucketMultiples[selectedBucket]?.multiple ?? 0;
   const selectedBucketStake = bucketStakes[selectedBucket] ?? 0n;
   const status = chainState?.market.status;
   const displayUnit = metricUnit(curve.metric.unit);
@@ -368,6 +403,40 @@ export function ScarcityCurveMarket({
           <div className={styles.plotLegend}>
             <span><i /> Line = your payout weight by published result</span>
             <span><i /> Bars = USDC staked across the pool</span>
+          </div>
+          <div className={styles.multipleStrip} aria-label="Payout if each forecast turns out to be exactly right">
+            <div className={styles.multipleStripHead}>
+              <span>{bucketMultiples[0]?.live ? "If you are exactly right, this bucket pays" : "Sample pool · pays if exactly right"}</span>
+              <strong>
+                {selectedMultiple.toFixed(2)}× here
+                {bestMultiple && bestMultiple.bucket !== selectedBucket ? (
+                  <em> · {bestMultiple.multiple.toFixed(2)}× at {normalizedToDisplayValue(
+                    curveBucketToNormalized(bestMultiple.bucket, curve.bucketCount),
+                    curve.displayRange.minimum,
+                    curve.displayRange.maximum,
+                  ).toFixed(1)}</em>
+                ) : null}
+              </strong>
+            </div>
+            <div className={styles.multipleBars} aria-hidden="true">
+              {bucketMultiples.map((entry) => (
+                <i
+                  key={entry.bucket}
+                  data-selected={entry.bucket === selectedBucket}
+                  title={`${entry.multiple.toFixed(2)}×`}
+                  style={{
+                    "--multiple-height": `${Math.max(
+                      3,
+                      Math.min(100, entry.multiple / Math.max(bestMultiple?.multiple ?? 1, 0.01) * 100),
+                    )}%`,
+                  } as CSSProperties}
+                />
+              ))}
+            </div>
+            <p className={styles.multipleNote}>
+              A crowded forecast splits the same pool more ways, so it pays less even when it wins.
+              Picking where others have not is what a shared pool rewards.
+            </p>
           </div>
           <div className={styles.plot}>
             <svg className={styles.accuracyTrace} viewBox="0 0 1000 220" preserveAspectRatio="none" aria-hidden="true">

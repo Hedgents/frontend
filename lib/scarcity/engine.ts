@@ -7,7 +7,6 @@ import {
   SOURCE_RELIABILITY,
   STATUS_CONFIDENCE,
   confidenceGrade,
-  scarcityParameterHash,
 } from "./methodology";
 import type {
   DataStatus,
@@ -369,4 +368,35 @@ export function calculateScarcitySnapshot(
       latestObservationAt,
     },
   };
+}
+
+/**
+ * Content address of every constant that can move a published score: metric definitions with their
+ * anchors and weights, the coverage floors, the reliability and status tables, and the fill policy.
+ *
+ * A market commits this alongside its question. Hashing only SCARCITY_METHODOLOGY_VERSION, as the
+ * engine used to, meant an edit to any anchor changed every score while the on-chain commitment
+ * stayed byte-identical, so the commitment guaranteed nothing at all.
+ */
+export function scarcityParameterHash() {
+  const canonical = JSON.stringify({
+    version: SCARCITY_METHODOLOGY_VERSION,
+    minimumDimensionCoverage: Object.entries(MINIMUM_DIMENSION_COVERAGE).sort(),
+    sourceReliability: Object.entries(SOURCE_RELIABILITY).sort(),
+    statusConfidence: Object.entries(STATUS_CONFIDENCE).sort(),
+    neutralFillScore: NEUTRAL_FILL_SCORE,
+    metrics: [...SCARCITY_METRICS]
+      .sort((left, right) => left.id.localeCompare(right.id))
+      .map((metric) => ({
+        id: metric.id,
+        dimension: metric.dimension,
+        unit: metric.unit,
+        weight: metric.weight,
+        maximumAgeDays: metric.maximumAgeDays,
+        anchors: [...metric.anchors]
+          .sort((left, right) => left.value - right.value)
+          .map((anchor) => [anchor.value, anchor.score]),
+      })),
+  });
+  return createHash("sha256").update(canonical).digest("hex");
 }

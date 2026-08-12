@@ -7,6 +7,7 @@ import {
   SCARCITY_EXCHANGE_PROGRAM_ADDRESS,
 } from "@/lib/scarcity-exchange";
 import { compileCurveMarket, type CompiledCurveMarket } from "@/lib/scarcity-curves";
+import { compileLithiumRound, isLithiumRoundSlug, lithiumRoundWindow } from "@/lib/scarcity/lithium-market";
 import { hexToBytes } from "@/lib/scarcity-markets";
 import { getStoredScarcityMarket } from "@/lib/scarcity-market-store";
 import { validateScarcityGovernance, type ScarcityGovernanceManifest } from "@/lib/scarcity-governance";
@@ -62,6 +63,13 @@ export async function resolveStoredCurveMarket(identifier: string): Promise<{
   sourceSlug: string;
   compiled: CompiledCurveMarket;
 } | null> {
+  // Lithium rounds are compiled from the shipped v1 index rather than from a stored catalog record,
+  // because that index is its own methodology with its own frozen anchors. The documents are strict
+  // extensions of the shared curve shapes, so everything downstream of here is unchanged.
+  if (isLithiumRoundSlug(identifier)) {
+    const round = lithiumRoundWindow(identifier);
+    return round ? { sourceSlug: identifier, compiled: compileLithiumRound(round) } : null;
+  }
   const direct = await getStoredScarcityMarket(identifier);
   if (direct) {
     const compiled = compileCurveMarket(direct);
