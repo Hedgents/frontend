@@ -329,3 +329,51 @@
   .readinessQueue, .readinessComplete > div { grid-template-columns: 1fr; }
   .readinessQueueHeader { align-items: start; flex-direction: column; }
 }
+
+.note {
+  margin: 0 0 12px;
+  color: rgba(230, 226, 216, .55);
+  font-size: 12px;
+  line-height: 1.5;
+  max-width: 62ch;
+}
+
+.inlineForm {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 10px;
+  margin: 10px 0 14px;
+}
+
+.inlineForm label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1 1 12rem;
+  font-size: 11px;
+  color: rgba(230, 226, 216, .55);
+}
+
+.inlineForm input {
+  padding: 8px 10px;
+  border: 1px solid rgba(230, 226, 216, .16);
+  border-radius: 7px;
+  background: rgba(0, 0, 0, .2);
+  color: inherit;
+  font: 500 12px/1.2 var(--font-mono), monospace;
+}
+
+.inlineForm input:focus-visible { outline: 2px solid rgba(230, 226, 216, .5); outline-offset: 1px; }
+
+.inlineForm button {
+  padding: 9px 14px;
+  border: 1px solid rgba(230, 226, 216, .3);
+  border-radius: 7px;
+  background: transparent;
+  color: inherit;
+  font: 600 11px/1 var(--font-mono), monospace;
+  cursor: pointer;
+}
+
+.inlineForm button:disabled { opacity: .55; cursor: progress; }

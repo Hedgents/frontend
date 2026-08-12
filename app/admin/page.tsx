@@ -8,6 +8,7 @@ import { InviteManager } from "./InviteManager";
 import { ScarcityMarketManager } from "./ScarcityMarketManager";
 import { ScarcityDataManager } from "./ScarcityDataManager";
 import { OnlineDetectorManager } from "./OnlineDetectorManager";
+import { XpManager } from "./XpManager";
 import { loadScarcityMarketCatalog } from "@/lib/scarcity-market-store";
 import { loadScarcityOperatorConfig } from "@/lib/scarcity-operator";
 import { scarcityDataStorageConfigured } from "@/lib/scarcity-data-store";
@@ -122,6 +123,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
       <OnlineDetectorManager durableStorage={scarcityStorageReady} />
       <ScarcityDataManager durableStorage={scarcityStorageReady} />
       <InviteManager />
+      <XpManager />
       <div className={styles.grid}>
         <section className={styles.card}>
           <h2>Recent signal</h2>

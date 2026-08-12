@@ -120,6 +120,12 @@ export async function recordAward(input: {
   return mutateIndex((index) => applyAward(index, { ...input, now }));
 }
 
+/** Whole-index read for the operator analytics view. Never exposed to a tester-facing route. */
+export async function readXpIndexForAnalytics() {
+  const { index } = await readIndex();
+  return index;
+}
+
 export function resetXpStoreForTests() {
   if (process.env.NODE_ENV === "production") throw new Error("Cannot reset XP state in production.");
   globalXpState.__hedgentsXpIndex = undefined;

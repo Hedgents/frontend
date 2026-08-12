@@ -53,6 +53,7 @@ import {
 import type { AppSolanaClient } from "@/app/providers";
 import { useMetalQuotes } from "@/hooks/use-metal-quotes";
 import { usePortfolio } from "@/hooks/use-portfolio";
+import { TesterXpPanel } from "@/components/TesterXpPanel";
 import { useProductRegistry } from "@/hooks/use-product-registry";
 import { useRouteComparison } from "@/hooks/use-route-comparison";
 import {
@@ -2572,6 +2573,8 @@ function PortfolioView({
         owner={owner}
         onOpenScarcity={onNavigateToScarcity}
       />
+
+      <TesterXpPanel onConnect={onConnectWallet} />
     </section>
   );
 }
