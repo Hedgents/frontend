@@ -124,7 +124,7 @@ export function TesterXpPanel({ onConnect }: { onConnect: () => void }) {
         ) : null}
       </div>
 
-      {profile?.rounds.length ? (
+      {profile && (profile.rounds.length || profile.binary.length || profile.terminal.length) ? (
         <div className={styles.rounds}>
           <h3>How it was earned</h3>
           <table>
@@ -142,6 +142,32 @@ export function TesterXpPanel({ onConnect }: { onConnect: () => void }) {
                   <td>{round.accuracy || "—"}</td>
                   <td>{round.settlementClaim || "—"}</td>
                   <td><strong>{round.total || "—"}</strong></td>
+                </tr>
+              ))}
+              {profile.binary.map((position) => (
+                <tr key={`binary-${position.cluster}-${position.marketSlug}`}>
+                  <td>
+                    <span>{position.marketSlug}</span>
+                    <small>{position.note ?? "Binary market"}</small>
+                  </td>
+                  <td>{position.participation || "—"}</td>
+                  <td>{position.correct || "—"}</td>
+                  <td>—</td>
+                  <td><strong>{position.total || "—"}</strong></td>
+                </tr>
+              ))}
+              {profile.terminal.map((entry) => (
+                <tr key={`terminal-${entry.cluster}`}>
+                  <td>
+                    <span>Terminal trading</span>
+                    <small>
+                      {entry.trades} trade{entry.trades === 1 ? "" : "s"}
+                      {entry.roundTrips ? `, ${entry.roundTrips} round trip${entry.roundTrips === 1 ? "" : "s"}` : ""}
+                      {entry.trades > entry.countedTrades ? ` · ${entry.countedTrades} counted after the daily cap` : ""}
+                    </small>
+                  </td>
+                  <td colSpan={3} />
+                  <td><strong>{entry.total || "—"}</strong></td>
                 </tr>
               ))}
               {profile.breadth.total ? (

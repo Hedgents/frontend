@@ -551,6 +551,22 @@ export interface TesterXpProfile {
     effectiveBucket: number | null;
     note: string | null;
   }>;
+  binary: Array<{
+    marketSlug: string;
+    cluster: "devnet" | "mainnet-beta";
+    participation: number;
+    correct: number;
+    total: number;
+    note: string | null;
+  }>;
+  terminal: Array<{
+    cluster: "devnet" | "mainnet-beta";
+    countedTrades: number;
+    roundTripProducts: string[];
+    trades: number;
+    roundTrips: number;
+    total: number;
+  }>;
   breadth: { firstRound: number; returningRounds: number; total: number };
   awards: { count: number; total: number };
   wallets: Array<{ wallet: string; linkedAt: string }>;
