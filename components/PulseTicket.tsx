@@ -33,6 +33,7 @@ export interface PulseTradeableRound {
   paused: boolean | null;
   status: string | null;
   offers: { yes: PulseOffer | null; no: PulseOffer | null };
+  bookUnavailable: boolean;
 }
 
 type Side = "yes" | "no";
@@ -88,7 +89,10 @@ export function PulseTicket({
           ? "This round is already resolved."
           : !round.collateralMint || !round.feeRecipient
             ? "The round's collateral accounts are unavailable."
-            : null;
+            : round.bookUnavailable
+              // Not the same as an empty book. We could not read it, so we do not know.
+              ? "The order book could not be read just now, so no offer can be quoted. This is a connection problem, not an empty market."
+              : null;
 
   return (
     <div className={styles.ticket}>
@@ -136,8 +140,9 @@ export function PulseTicket({
 
       {!offer ? (
         <p className={styles.muted}>
-          There is no resting offer on this side, so it cannot be taken. Try the other side or wait
-          for the next round to be quoted.
+          {round.bookUnavailable
+            ? "The order book could not be read just now. This is a connection problem, not an empty market, so it will come back on its own."
+            : "There is no resting offer on this side, so it cannot be taken. Try the other side or wait for the next round to be quoted."}
         </p>
       ) : !ticket ? (
         <p className={styles.muted}>This side is sold out for the round.</p>

@@ -90,6 +90,7 @@ export async function GET(request: Request) {
         collateralMint: deployment?.collateralMint ?? null,
         feeRecipient: deployment?.feeRecipient ?? null,
         offers: book?.offers ?? { yes: null, no: null },
+        bookUnavailable: book?.bookUnavailable ?? false,
       } : null,
     }, { headers: { ...headers, "cache-control": "no-store" } });
   } catch (error) {

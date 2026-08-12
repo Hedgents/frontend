@@ -202,6 +202,57 @@ export interface PulseRoundBook {
   status: string | null;
   closesAt: string | null;
   offers: { yes: PulseBookOffer | null; no: PulseBookOffer | null };
+  /**
+   * True when the order read failed rather than came back empty.
+   *
+   * These are not the same thing and must never be shown as the same thing: an empty book means
+   * nobody is quoting, a failed read means we do not know. Collapsing them tells someone there is
+   * no offer when there may be six.
+   */
+  bookUnavailable: boolean;
+}
+
+/**
+ * Read a market's orders, tolerating providers that refuse the method.
+ *
+ * `getProgramAccounts` is expensive and not every provider serves it: Alchemy's devnet endpoint
+ * answers it with HTTP 400. The shared RPC helper treats a 400 as fatal and stops rather than
+ * moving on, which is right for a malformed request and wrong for an unsupported one, so this walks
+ * the endpoints itself and only gives up once every one has failed.
+ */
+async function fetchPulseOrders(input: {
+  endpoints: readonly string[];
+  market: string;
+  marketId: string;
+}) {
+  let lastError: unknown = null;
+  for (const endpoint of input.endpoints) {
+    try {
+      return await solanaRpcRequestFrom<Array<{ pubkey: string; account: { data: [string, string]; owner: string } }>>(
+        [endpoint],
+        "getProgramAccounts",
+        [String(SCARCITY_EXCHANGE_PROGRAM_ADDRESS), {
+          encoding: "base64",
+          commitment: "confirmed",
+          filters: [
+            { dataSize: SCARCITY_ORDER_ACCOUNT_SIZE },
+            { memcmp: { offset: 0, bytes: limitOrderDiscriminatorBase64(), encoding: "base64" } },
+            {
+              memcmp: {
+                offset: SCARCITY_ORDER_MARKET_OFFSET,
+                bytes: Buffer.from(getAddressEncoder().encode(address(input.market))).toString("base64"),
+                encoding: "base64",
+              },
+            },
+          ],
+        }],
+        { id: `pulse-orders-${input.marketId}`, timeoutMs: 12_000 },
+      );
+    } catch (error) {
+      lastError = error;
+    }
+  }
+  throw lastError ?? new Error("No Solana RPC endpoint could read the round's order book.");
 }
 
 /**
@@ -223,7 +274,8 @@ export async function readMetalPulseBook(input: {
   nowUnix: number;
 }): Promise<PulseRoundBook> {
   const empty: PulseRoundBook = {
-    onChain: false, paused: null, status: null, closesAt: null, offers: { yes: null, no: null },
+    onChain: false, paused: null, status: null, closesAt: null,
+    offers: { yes: null, no: null }, bookUnavailable: false,
   };
   const deployment = await loadScarcityDeployment();
   if (!deployment) return empty;
@@ -263,26 +315,17 @@ export async function readMetalPulseBook(input: {
     Uint8Array.from(Buffer.from(marketAccount.value.data[0], "base64")),
   );
 
-  const accounts = await solanaRpcRequestFrom<Array<{ pubkey: string; account: { data: [string, string]; owner: string } }>>(
-    endpoints,
-    "getProgramAccounts",
-    [String(SCARCITY_EXCHANGE_PROGRAM_ADDRESS), {
-      encoding: "base64",
-      commitment: "confirmed",
-      filters: [
-        { dataSize: SCARCITY_ORDER_ACCOUNT_SIZE },
-        { memcmp: { offset: 0, bytes: limitOrderDiscriminatorBase64(), encoding: "base64" } },
-        {
-          memcmp: {
-            offset: SCARCITY_ORDER_MARKET_OFFSET,
-            bytes: Buffer.from(getAddressEncoder().encode(address(String(input.market)))).toString("base64"),
-            encoding: "base64",
-          },
-        },
-      ],
-    }],
-    { id: `pulse-orders-${input.marketId}`, timeoutMs: 12_000 },
-  ).catch(() => []);
+  // A failed read and an empty book look identical downstream unless they are kept apart here.
+  let accounts: Array<{ pubkey: string; account: { data: [string, string]; owner: string } }>;
+  try {
+    accounts = await fetchPulseOrders({ endpoints, market: String(input.market), marketId: input.marketId });
+  } catch {
+    return {
+      onChain: true, paused, status: decodedMarket.status,
+      closesAt: decodedMarket.closesAt.toString(),
+      offers: { yes: null, no: null }, bookUnavailable: true,
+    };
+  }
 
   const now = BigInt(input.nowUnix);
   const best = { yes: null as PulseBookOffer | null, no: null as PulseBookOffer | null };
@@ -319,5 +362,6 @@ export async function readMetalPulseBook(input: {
     status: decodedMarket.status,
     closesAt: decodedMarket.closesAt.toString(),
     offers: best,
+    bookUnavailable: false,
   };
 }
