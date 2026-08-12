@@ -1,8 +1,12 @@
 import { NextResponse } from "next/server";
 import { requireInviteAccess } from "@/lib/access-auth";
 import { apiSecurityError, enforceRateLimit } from "@/lib/api-security";
-import { METAL_PULSE_INTERVAL_SECONDS, pulseRoundStart } from "@/lib/metal-pulse";
-import { fetchMetalPulseSnapshot } from "@/lib/metal-pulse-source";
+import {
+  isMetalPulseMarketOpen,
+  METAL_PULSE_INTERVAL_SECONDS,
+  pulseRoundStart,
+} from "@/lib/metal-pulse";
+import { fetchMetalPulseSnapshot, fetchMetalPulseTrack } from "@/lib/metal-pulse-source";
 import { deriveMetalPulseRound, readMetalPulseBook } from "@/lib/metal-pulse-chain";
 import { loadScarcityDeployment } from "@/lib/scarcity-deployment";
 
@@ -44,6 +48,14 @@ export async function GET(request: Request) {
       ? await readMetalPulseBook({ ...tradeable, nowUnix }).catch(() => null)
       : null;
 
+    // The running round's price path, so the chart draws what happened rather than only what this
+    // browser has polled since the tab opened.
+    const track = await fetchMetalPulseTrack({
+      startsAtUnix: currentStart,
+      nowUnix,
+      apiKey: process.env.PYTH_API_KEY,
+    }).catch(() => []);
+
     return NextResponse.json({
       cluster: deployment?.cluster ?? null,
       nowUnix,
@@ -57,8 +69,17 @@ export async function GET(request: Request) {
         providerState: snapshot.providerState,
         refreshAfterMs: snapshot.refreshAfterMs,
         mode: snapshot.mode,
+        // Provider health and market hours are different things. Hermes answers happily through the
+        // 21:00 UTC break and the whole weekend, it just returns the same frozen price, and a round
+        // inside that window ties and refunds. The publish time is the only thing that tells them
+        // apart, so the screen gets it explicitly rather than inferring from a flat line.
+        marketOpen: isMetalPulseMarketOpen({
+          publishedAt: snapshot.current.latest?.publishedAt ?? null,
+          nowUnix,
+        }),
+        lastPublishedAt: snapshot.current.latest?.publishedAt ?? null,
       },
-      running,
+      running: running ? { ...running, track } : null,
       tradeable: tradeable ? {
         ...tradeable,
         onChain: book?.onChain ?? false,

@@ -57,11 +57,13 @@ const SIDES = [
 export function PulseTicket({
   round,
   cluster,
+  marketOpen,
   onConnect,
   onFilled,
 }: {
   round: PulseTradeableRound;
   cluster: "devnet" | "mainnet-beta";
+  marketOpen: boolean;
   onConnect: () => void;
   onFilled: (signature: string) => void;
 }) {
@@ -74,15 +76,19 @@ export function PulseTicket({
     [offer, stakeUnits],
   );
 
-  const blocked = !round.onChain
-    ? "This round has not been opened on chain yet."
-    : round.paused
-      ? "The exchange is paused. No new positions can be taken."
-      : round.status && round.status !== "unresolved"
-        ? "This round is already resolved."
-        : !round.collateralMint || !round.feeRecipient
-          ? "The round's collateral accounts are unavailable."
-          : null;
+  const blocked = !marketOpen
+    // Selling a side into a frozen feed would be selling a bet that cannot win: the round opens and
+    // closes on the same price, ties, and refunds. Better to say so than to take the stake.
+    ? "Spot gold is closed, so this round would open and close on the same frozen price. It would tie, settle invalid and refund, so there is nothing to win."
+    : !round.onChain
+      ? "This round has not been opened on chain yet."
+      : round.paused
+        ? "The exchange is paused. No new positions can be taken."
+        : round.status && round.status !== "unresolved"
+          ? "This round is already resolved."
+          : !round.collateralMint || !round.feeRecipient
+            ? "The round's collateral accounts are unavailable."
+            : null;
 
   return (
     <div className={styles.ticket}>

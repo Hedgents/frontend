@@ -1,4 +1,26 @@
 export const METAL_PULSE_INTERVAL_SECONDS = 15 * 60;
+
+/**
+ * How stale the gold feed may be before the underlying market counts as shut.
+ *
+ * Pyth publishes XAU/USD roughly every second while spot gold trades, and stops dead at the daily
+ * break (21:00 UTC) and over the weekend. The API stays healthy throughout, so provider health says
+ * nothing about whether the market is open: only the publish time does.
+ *
+ * This matters beyond presentation. A round whose window falls inside the break opens and closes at
+ * the same frozen price, ties, and settles invalid, so every bet placed in it is refunded and none
+ * can win. Three minutes is far beyond any normal publishing gap and well short of the shortest
+ * closure.
+ */
+export const METAL_PULSE_STALE_AFTER_SECONDS = 180;
+
+/** Whether the feed is still publishing, given its most recent publish time. */
+export function isMetalPulseMarketOpen(input: { publishedAt: string | null; nowUnix: number }) {
+  if (!input.publishedAt) return false;
+  const publishedAtUnix = Math.floor(Date.parse(input.publishedAt) / 1_000);
+  if (!Number.isFinite(publishedAtUnix)) return false;
+  return input.nowUnix - publishedAtUnix <= METAL_PULSE_STALE_AFTER_SECONDS;
+}
 export const METAL_PULSE_FREEZE_SECONDS = 15;
 export const METAL_PULSE_ENTRY_FREEZE_SECONDS = 15;
 export const METAL_PULSE_OBSERVATION_TOLERANCE_SECONDS = 60;

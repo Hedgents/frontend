@@ -242,3 +242,53 @@ export async function fetchMetalPulseRound(input: {
     ...(errors.length ? { providerMessage: [...new Set(errors)].join(" ") } : {}),
   };
 }
+
+/** The cadence the round track samples at. Thirty seconds gives 30 points across a 15-minute round. */
+export const METAL_PULSE_TRACK_STEP_SECONDS = 30;
+
+export interface MetalPulseTrackPoint {
+  atUnix: number;
+  price: number;
+}
+
+/**
+ * The round's price path so far, sampled at a fixed cadence.
+ *
+ * Without this the chart can only draw what the browser has polled since the tab opened, so
+ * somebody arriving ten minutes into a round sees a single straight line from the opening price to
+ * now. That is not a slow chart, it is a wrong one: it draws a smooth move that did not happen.
+ *
+ * Every sample is a historical Pyth publish time, which `fetchPythPoint` caches for a day, so a
+ * round costs at most thirty upstream requests once and is served from cache after that. Points
+ * that fail are dropped rather than interpolated: a gap in the line is honest, an invented price is
+ * not.
+ */
+export async function fetchMetalPulseTrack(input: {
+  startsAtUnix: number;
+  nowUnix?: number;
+  fetchImpl?: PulseFetch;
+  apiKey?: string;
+}): Promise<MetalPulseTrackPoint[]> {
+  const nowUnix = input.nowUnix ?? Math.floor(Date.now() / 1_000);
+  const fetchImpl = input.fetchImpl ?? fetch;
+  const endsAtUnix = input.startsAtUnix + METAL_PULSE_INTERVAL_SECONDS;
+  const stamps: number[] = [];
+  for (
+    let at = input.startsAtUnix;
+    at <= Math.min(nowUnix, endsAtUnix);
+    at += METAL_PULSE_TRACK_STEP_SECONDS
+  ) {
+    stamps.push(at);
+  }
+  if (!stamps.length) return [];
+  const settled = await Promise.all(stamps.map((timestamp) => settledPoint(
+    fetchPythPoint({ timestamp, fetchImpl, apiKey: input.apiKey }),
+  )));
+  const points: MetalPulseTrackPoint[] = [];
+  for (const [index, result] of settled.entries()) {
+    const price = result.value?.point?.priceUsd;
+    if (typeof price !== "number" || !Number.isFinite(price)) continue;
+    points.push({ atUnix: stamps[index], price });
+  }
+  return points;
+}

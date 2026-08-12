@@ -12,6 +12,8 @@ interface PulseRunningRound {
   startsAtUnix: number;
   endsAtUnix: number;
   onChain: boolean;
+  /** The round's price path so far, sampled server side from Pyth. */
+  track: PulsePricePoint[];
 }
 
 interface PulseLive {
@@ -25,6 +27,8 @@ interface PulseLive {
     providerState: "online" | "degraded";
     refreshAfterMs: number;
     mode: string;
+    marketOpen: boolean;
+    lastPublishedAt: string | null;
   };
   running: PulseRunningRound | null;
   tradeable: PulseTradeableRound | null;
@@ -69,20 +73,32 @@ export function PulseMarket({ onConnect }: { onConnect: () => void }) {
   const opening = data?.price.opening ?? null;
   const runningRound = data?.running?.roundId ?? null;
 
+  const track = data?.running?.track;
+
   useEffect(() => {
     // Each round is its own chart. Carrying ticks across a boundary would draw a line against an
     // opening price that no longer applies.
     if (roundRef.current !== runningRound) {
       roundRef.current = runningRound;
-      setSeries(opening ? [{ atUnix: Math.floor(Date.parse(opening.publishedAt) / 1_000), price: opening.price }] : []);
+      setSeries(track ?? []);
       return;
     }
-    if (!latest) return;
-    const atUnix = Math.floor(Date.parse(latest.publishedAt) / 1_000);
-    setSeries((current) => (current.at(-1)?.atUnix === atUnix
-      ? current
-      : [...current, { atUnix, price: latest.price }].slice(-360)));
-  }, [latest, opening, runningRound]);
+    // The server's track is the round's real path; live polls only extend its tail. Merging by
+    // timestamp means a reconnect or a slow tab recovers the whole round rather than drawing a
+    // straight line from wherever it happened to rejoin.
+    setSeries((current) => {
+      const merged = new Map(current.map((point) => [point.atUnix, point]));
+      for (const point of track ?? []) merged.set(point.atUnix, point);
+      if (latest) {
+        const atUnix = Math.floor(Date.parse(latest.publishedAt) / 1_000);
+        merged.set(atUnix, { atUnix, price: latest.price });
+      }
+      const next = [...merged.values()].sort((left, right) => left.atUnix - right.atUnix);
+      return next.length === current.length && next.every((point, index) => point === current[index])
+        ? current
+        : next;
+    });
+  }, [latest, track, runningRound]);
 
   if (live.isLoading) return <section className={styles.panel}><p className={styles.muted}>Loading the round…</p></section>;
 
@@ -117,7 +133,25 @@ export function PulseMarket({ onConnect }: { onConnect: () => void }) {
           <span>Round in progress{runningRound ? ` · ${runningRound.replace("gold-15m-", "")}` : ""}</span>
           {data.running ? <strong>{countdown(data.running.endsAtUnix, data.nowUnix)} to close</strong> : null}
         </div>
-        <PulsePriceChart points={series} openingPrice={opening?.price ?? null} />
+        <PulsePriceChart
+          points={series}
+          openingPrice={opening?.price ?? null}
+          startsAtUnix={data.running?.startsAtUnix ?? null}
+          endsAtUnix={data.running?.endsAtUnix ?? null}
+          nowUnix={data.nowUnix}
+        />
+        {!data.price.marketOpen ? (
+          <p className={styles.warn}>
+            <CircleAlert size={13} aria-hidden="true" />
+            Spot gold is closed, so the price is frozen at its last print
+            {data.price.lastPublishedAt
+              ? ` of ${new Date(data.price.lastPublishedAt).toUTCString().replace("GMT", "UTC")}`
+              : ""}
+            . Rounds that run and close on a frozen price tie, settle invalid and refund, so there is
+            nothing to win until it reopens. Gold breaks daily around 21:00 UTC and is shut from
+            Friday evening to Sunday evening.
+          </p>
+        ) : null}
         {data.price.providerState === "degraded" ? (
           <p className={styles.warn}>
             <CircleAlert size={13} aria-hidden="true" />
@@ -149,6 +183,7 @@ export function PulseMarket({ onConnect }: { onConnect: () => void }) {
           <PulseTicket
             round={tradeable}
             cluster={data.cluster ?? "devnet"}
+            marketOpen={data.price.marketOpen}
             onConnect={onConnect}
             onFilled={(signature) => {
               setFilled(signature);

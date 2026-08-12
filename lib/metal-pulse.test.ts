@@ -2,7 +2,9 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   METAL_PULSE_INTERVAL_SECONDS,
+  METAL_PULSE_STALE_AFTER_SECONDS,
   buildPulseRound,
+  isMetalPulseMarketOpen,
   createMetalPulsePaperAccount,
   parsePulseRoundId,
   placeMetalPulsePaperPosition,
@@ -139,4 +141,29 @@ test("degrades without inventing a current round when Pyth is unavailable", asyn
   assert.equal(snapshot.current.status, "session-closed");
   assert.equal(snapshot.current.opening, null);
   assert.match(snapshot.providerMessage ?? "", /503/);
+});
+
+test("a frozen feed is recognised as a shut market, not a healthy one", () => {
+  const nowUnix = Math.floor(Date.parse("2026-08-12T21:51:54.000Z") / 1_000);
+  // The real observation that surfaced this: Hermes answered happily, providerState was "online",
+  // and gold's last print was 52 minutes old because spot had closed for its daily break.
+  assert.equal(
+    isMetalPulseMarketOpen({ publishedAt: "2026-08-12T20:59:59.000Z", nowUnix }),
+    false,
+  );
+  // A normal publishing gap is a second or two, so ordinary freshness stays open.
+  assert.equal(isMetalPulseMarketOpen({ publishedAt: "2026-08-12T21:51:52.000Z", nowUnix }), true);
+  assert.equal(isMetalPulseMarketOpen({ publishedAt: "2026-08-12T21:50:00.000Z", nowUnix }), true);
+});
+
+test("the staleness boundary is inclusive and bad input reads as closed", () => {
+  const nowUnix = 1_000_000;
+  const at = (secondsAgo: number) => new Date((nowUnix - secondsAgo) * 1_000).toISOString();
+  assert.equal(isMetalPulseMarketOpen({ publishedAt: at(METAL_PULSE_STALE_AFTER_SECONDS), nowUnix }), true);
+  assert.equal(isMetalPulseMarketOpen({ publishedAt: at(METAL_PULSE_STALE_AFTER_SECONDS + 1), nowUnix }), false);
+  // Missing or unparseable timestamps must fail closed: no observation is not proof of a live market.
+  assert.equal(isMetalPulseMarketOpen({ publishedAt: null, nowUnix }), false);
+  assert.equal(isMetalPulseMarketOpen({ publishedAt: "not a date", nowUnix }), false);
+  // A publish time in the future is still fresh rather than an error.
+  assert.equal(isMetalPulseMarketOpen({ publishedAt: at(-30), nowUnix }), true);
 });
