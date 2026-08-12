@@ -42,6 +42,7 @@ import {
 } from "./ScarcityWalletActions";
 import { ScarcityOracle } from "./ScarcityOracle";
 import { MetalPulse } from "./MetalPulse";
+import { PulseMarket } from "./PulseMarket";
 import { ScarcityCurveMarket } from "./ScarcityCurveMarket";
 import { ScarcityInstrumentTabs } from "./ScarcityInstrumentTabs";
 import {
@@ -129,7 +130,7 @@ type ScarcityInstrument = "curve" | "event";
 const scarcityNavigation: Array<{ view: ScarcityView; label: string }> = [
   { view: "oracle", label: "Intelligence" },
   { view: "markets", label: "Trade" },
-  { view: "pulse", label: "Gold 15" },
+  { view: "pulse", label: "Price market" },
 ];
 
 const scarcityViews = new Set<ScarcityView>(["oracle", "markets", "pulse", "evidence"]);
@@ -615,7 +616,14 @@ export function ScarcityExchange({ markets, defaultDataset, initialView = "marke
         onRecovered={recoverTransactions}
       />
 
-      {view === "pulse" ? <MetalPulse /> : view === "oracle" ? (
+      {view === "pulse" ? (
+        <>
+          {/* The real, on-chain round: this is what a tester takes a side on. The paper simulator
+              below it is a rehearsal tool and stays clearly second. */}
+          <PulseMarket onConnect={() => setWalletOpen(true)} />
+          <MetalPulse />
+        </>
+      ) : view === "oracle" ? (
         <ScarcityOracle
           markets={markets}
           dataset={defaultDataset}

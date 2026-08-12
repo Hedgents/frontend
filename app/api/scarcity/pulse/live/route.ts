@@ -12,6 +12,11 @@ import { loadScarcityDeployment } from "@/lib/scarcity-deployment";
 
 export const dynamic = "force-dynamic";
 
+/** The two fields the screen draws, and nothing else. */
+function pricePoint(point: { priceUsd: number; publishedAt: string } | null | undefined) {
+  return point ? { price: point.priceUsd, publishedAt: point.publishedAt } : null;
+}
+
 /**
  * Everything the Gold 15 screen needs in one call: which round is tradeable, whether it exists on
  * chain, what is currently offered, and the live price against the round's opening price.
@@ -63,8 +68,14 @@ export async function GET(request: Request) {
       price: {
         // The bet is the close against the open, so both are returned explicitly rather than left
         // for a client that may have joined the round late to infer from its own series.
-        latest: snapshot.current.latest,
-        opening: snapshot.current.opening,
+        //
+        // Narrowed to exactly what the screen draws. The snapshot's points carry raw mantissas and a
+        // per-point evidence artifact, which is the right record for a resolution report and pure
+        // weight on a poll that runs every five seconds. Naming the field `price` also matches what
+        // the client reads: it was reading `price` off a point that only had `priceUsd`, so the
+        // opening price arrived undefined and the chart never drew.
+        latest: pricePoint(snapshot.current.latest),
+        opening: pricePoint(snapshot.current.opening),
         roundStatus: snapshot.current.status,
         providerState: snapshot.providerState,
         refreshAfterMs: snapshot.refreshAfterMs,

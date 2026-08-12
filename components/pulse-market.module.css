@@ -89,10 +89,15 @@
 .sides button small { color: var(--faint); font-size: 10px; line-height: 1.4; }
 .sides button:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
 
-.up { border-color: rgba(78, 169, 129, .5); color: #4ea981; }
-.up:hover { background: rgba(78, 169, 129, .09); }
-.down { border-color: rgba(224, 136, 119, .5); color: #e08877; }
-.down:hover { background: rgba(224, 136, 119, .09); }
+/*
+ * Qualified with `.sides button` deliberately. A `… button` rule in the surrounding exchange styles
+ * outranks a bare `.up`, so the side colour lost, currentColor fell back to the default ink, and the
+ * selected side rendered cream instead of its own colour.
+ */
+.sides button.up { border-color: rgba(78, 169, 129, .5); color: #4ea981; }
+.sides button.up:hover { background: rgba(78, 169, 129, .09); }
+.sides button.down { border-color: rgba(224, 136, 119, .5); color: #e08877; }
+.sides button.down:hover { background: rgba(224, 136, 119, .09); }
 
 @media (max-width: 560px) { .sides { grid-template-columns: 1fr; } }
 @media (prefers-reduced-motion: reduce) { .sides button { transition: none; } }
@@ -225,3 +230,72 @@
 .ticket [data-scarcity-wallet-action] > small { color: var(--faint); font-size: 10px; line-height: 1.45; }
 
 @media (max-width: 560px) { .economics { grid-template-columns: 1fr 1fr; } }
+
+/*
+ * Chart styling lives here rather than in inline style attributes.
+ *
+ * The app serves a strict `style-src 'self' 'nonce-…'` with no 'unsafe-inline', and a nonce does
+ * not cover style ATTRIBUTES, so every React inline style on the chart was being dropped by the
+ * browser. Geometry still has to be inline, since it is computed per frame, but everything that is
+ * presentation belongs in a stylesheet.
+ */
+.chartFigure { margin: 0; display: block; }
+.chartSvg { display: block; overflow: visible; }
+
+.chartWaiting {
+  display: grid;
+  place-items: center;
+  height: 200px;
+  color: var(--faint);
+  font-size: 11px;
+}
+
+.axisLabel {
+  font: 400 9px/1 var(--font-mono), monospace;
+  fill: var(--faint);
+}
+
+.axisLabelOpen {
+  font-weight: 600;
+  fill: var(--metal-tone);
+}
+
+.gridLine { stroke: rgba(230, 226, 216, .09); stroke-width: 1; }
+.gridLineOpen { stroke: rgba(230, 226, 216, .4); stroke-width: 1; stroke-dasharray: 4 4; }
+.gridLineTime { stroke: rgba(230, 226, 216, .06); stroke-width: 1; }
+.axisBase { stroke: rgba(230, 226, 216, .14); stroke-width: 1; }
+.nowMarker { stroke-opacity: .35; stroke-width: 1; stroke-dasharray: 2 3; }
+.chartLine { fill: none; stroke-width: 1.75; stroke-linejoin: round; stroke-linecap: round; }
+
+.chartCaption {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  margin-top: 8px;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+}
+
+.chartCaption > span { color: var(--faint); }
+.chartCaption > strong { font-size: 13px; }
+.chartUp { color: #4ea981; }
+.chartDown { color: #e08877; }
+
+/*
+ * The wallet action renders a bare button when nobody is connected, outside the
+ * [data-scarcity-wallet-action] wrapper, so it needs matching on its own or the primary call to
+ * action renders as unstyled text.
+ */
+.ticket > button {
+  padding: 13px 16px;
+  border: 1px solid var(--metal-tone);
+  border-radius: 9px;
+  background: transparent;
+  color: var(--metal-tone);
+  font: 650 13px/1 var(--font-mono), monospace;
+  cursor: pointer;
+}
+
+.ticket > button:hover { background: var(--metal-tone); color: #10100e; }
+.ticket > button:focus-visible { outline: 2px solid var(--metal-tone); outline-offset: 2px; }

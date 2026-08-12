@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import styles from "./pulse-market.module.css";
 
 export interface PulsePricePoint {
   atUnix: number;
@@ -116,26 +117,26 @@ export function PulsePriceChart({
     };
   }, [points, openingPrice, startsAtUnix, endsAtUnix, nowUnix, width, height]);
 
-  const tone = model?.up === false ? "#e08877" : "#4ea981";
+  const toneClass = model?.up === false ? styles.chartDown : styles.chartUp;
 
   return (
-    <figure style={{ margin: 0 }} ref={hostRef}>
+    <figure className={styles.chartFigure} ref={hostRef}>
       {!model ? (
-        <div style={{ height, display: "grid", placeItems: "center", color: "var(--faint)", fontSize: 11 }}>
+        <div className={styles.chartWaiting}>
           Waiting for the opening price and the first ticks.
         </div>
       ) : (
         <svg
           width={width}
           height={height}
-          style={{ display: "block", overflow: "visible" }}
+          className={`${styles.chartSvg} ${toneClass}`}
           role="img"
-          aria-label={`Gold is ${model.up ? "above" : "below"} the round's opening price by ${Math.abs(model.changePct).toFixed(3)} percent, ${model.timeTicks.length ? "" : ""}plotted over the round's fifteen minute window`}
+          aria-label={`Gold is ${model.up ? "above" : "below"} the round's opening price by ${Math.abs(model.changePct).toFixed(3)} percent, plotted across the round's fifteen minute window`}
         >
           <defs>
             <linearGradient id="pulse-fill" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0" stopColor={tone} stopOpacity=".2" />
-              <stop offset="1" stopColor={tone} stopOpacity="0" />
+              <stop offset="0" stopColor="currentColor" stopOpacity=".2" />
+              <stop offset="1" stopColor="currentColor" stopOpacity="0" />
             </linearGradient>
           </defs>
 
@@ -144,14 +145,11 @@ export function PulsePriceChart({
             <g key={tick.label}>
               <line
                 x1={model.plot.left} y1={tick.y} x2={model.plot.right} y2={tick.y}
-                stroke={tick.isOpen ? "rgba(230,226,216,.4)" : "rgba(230,226,216,.09)"}
-                strokeWidth="1"
-                strokeDasharray={tick.isOpen ? "4 4" : undefined}
+                className={tick.isOpen ? styles.gridLineOpen : styles.gridLine}
               />
               <text
                 x={model.plot.right + 7} y={tick.y + 3}
-                fill={tick.isOpen ? "var(--metal-tone)" : "var(--faint)"}
-                style={{ font: `${tick.isOpen ? 600 : 400} 9px var(--font-mono), monospace` }}
+                className={`${styles.axisLabel}${tick.isOpen ? ` ${styles.axisLabelOpen}` : ""}`}
               >
                 {tick.label}
               </text>
@@ -161,18 +159,17 @@ export function PulsePriceChart({
           {/* Time axis, fixed to the round window so the line advances in real time. */}
           <line
             x1={model.plot.left} y1={model.plot.bottom} x2={model.plot.right} y2={model.plot.bottom}
-            stroke="rgba(230,226,216,.14)" strokeWidth="1"
+            className={styles.axisBase}
           />
           {model.timeTicks.map((tick) => (
             <g key={tick.label}>
               <line
                 x1={tick.x} y1={model.plot.top} x2={tick.x} y2={model.plot.bottom}
-                stroke="rgba(230,226,216,.06)" strokeWidth="1"
+                className={styles.gridLineTime}
               />
               <text
                 x={tick.x} y={model.plot.bottom + 13}
-                fill="var(--faint)" textAnchor="middle"
-                style={{ font: "400 9px var(--font-mono), monospace" }}
+                textAnchor="middle" className={styles.axisLabel}
               >
                 {tick.label}
               </text>
@@ -181,33 +178,25 @@ export function PulsePriceChart({
 
           {!model.single ? <polygon points={model.area} fill="url(#pulse-fill)" /> : null}
           {!model.single ? (
-            <polyline
-              points={model.line} fill="none" stroke={tone} strokeWidth="1.75"
-              strokeLinejoin="round" strokeLinecap="round"
-            />
+            <polyline points={model.line} stroke="currentColor" className={styles.chartLine} />
           ) : null}
-          <circle cx={model.lastX} cy={model.lastY} r="3" fill={tone} />
+          <circle cx={model.lastX} cy={model.lastY} r="3" fill="currentColor" />
 
           {/* Where the round has reached. Everything to the right of it has not happened yet. */}
           {model.nowX !== null && model.nowX < model.plot.right - 1 ? (
             <line
               x1={model.nowX} y1={model.plot.top} x2={model.nowX} y2={model.plot.bottom}
-              stroke={tone} strokeOpacity=".35" strokeWidth="1" strokeDasharray="2 3"
+              stroke="currentColor" className={styles.nowMarker}
             />
           ) : null}
         </svg>
       )}
-      <figcaption
-        style={{
-          display: "flex", justifyContent: "space-between", alignItems: "baseline",
-          gap: 12, marginTop: 8, fontFamily: "var(--font-mono), monospace", fontSize: 11,
-        }}
-      >
-        <span style={{ color: "var(--faint)" }}>
+      <figcaption className={styles.chartCaption}>
+        <span>
           Opening {openingPrice ? openingPrice.toFixed(2) : "—"} · XAU/USD
         </span>
         {model ? (
-          <strong style={{ color: tone, fontSize: 13 }}>
+          <strong className={toneClass}>
             {model.up ? "▲" : "▼"} {model.change >= 0 ? "+" : "−"}{Math.abs(model.change).toFixed(2)}
             {" "}({model.changePct >= 0 ? "+" : "−"}{Math.abs(model.changePct).toFixed(3)}%)
           </strong>
