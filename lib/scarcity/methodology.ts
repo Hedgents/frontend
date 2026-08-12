@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import type {
   ConfidenceGrade,
   MetricDefinition,
@@ -219,4 +220,54 @@ export function confidenceGrade(score: number): ConfidenceGrade {
   if (score >= 50) return "medium";
   if (score >= 30) return "low";
   return "insufficient";
+}
+
+/**
+ * The score a missing metric contributes to its dimension. Neutral by construction, never
+ * favourable, and the denominator stays the full methodology weight. Renormalising over only the
+ * available weight, as the engine used to, handed whoever controls whether an input publishes
+ * control of the weight vector: withholding an input that was about to move the score adversely
+ * pushed it toward whatever the survivors said. Filling at neutral makes suppression buy nothing.
+ *
+ * How much may be filled is NOT a separate global threshold. MINIMUM_DIMENSION_COVERAGE already
+ * states, per dimension and in a form already hashed into live market commitments, how much
+ * evidence a dimension needs before it will publish at all. A second tighter cap would silently
+ * retighten a published rule.
+ */
+export const NEUTRAL_FILL_SCORE = 50;
+
+/** Fillable weight is exactly the complement of the published coverage floor. */
+export function maximumFilledWeightShare(dimension: ScarcityDimension) {
+  return 1 - MINIMUM_DIMENSION_COVERAGE[dimension];
+}
+
+/**
+ * Content address of every constant that can move a published score: metric definitions with their
+ * anchors and weights, the coverage floors, the reliability and status tables, and the fill policy.
+ *
+ * A market commits this alongside its question. Hashing only SCARCITY_METHODOLOGY_VERSION, as the
+ * engine used to, meant an edit to any anchor changed every score while the on-chain commitment
+ * stayed byte-identical, so the commitment guaranteed nothing at all.
+ */
+export function scarcityParameterHash() {
+  const canonical = JSON.stringify({
+    version: SCARCITY_METHODOLOGY_VERSION,
+    minimumDimensionCoverage: Object.entries(MINIMUM_DIMENSION_COVERAGE).sort(),
+    sourceReliability: Object.entries(SOURCE_RELIABILITY).sort(),
+    statusConfidence: Object.entries(STATUS_CONFIDENCE).sort(),
+    neutralFillScore: NEUTRAL_FILL_SCORE,
+    metrics: [...metrics]
+      .sort((left, right) => left.id.localeCompare(right.id))
+      .map((metric) => ({
+        id: metric.id,
+        dimension: metric.dimension,
+        unit: metric.unit,
+        weight: metric.weight,
+        maximumAgeDays: metric.maximumAgeDays,
+        anchors: [...metric.anchors]
+          .sort((left, right) => left.value - right.value)
+          .map((anchor) => [anchor.value, anchor.score]),
+      })),
+  });
+  return createHash("sha256").update(canonical).digest("hex");
 }

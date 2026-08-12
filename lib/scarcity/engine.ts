@@ -1,11 +1,13 @@
 import { createHash } from "node:crypto";
 import {
   MINIMUM_DIMENSION_COVERAGE,
+  NEUTRAL_FILL_SCORE,
   SCARCITY_METHODOLOGY_VERSION,
   SCARCITY_METRICS,
   SOURCE_RELIABILITY,
   STATUS_CONFIDENCE,
   confidenceGrade,
+  scarcityParameterHash,
 } from "./methodology";
 import type {
   DataStatus,
@@ -97,18 +99,28 @@ function calculateMetric(
       0,
       1,
     );
-    const confidence = source
+    // The blend weight must NOT contain freshness. It is the weight used to combine source values
+    // into the metric value, and freshness is a continuous function of `asOf`, so including it made
+    // the published value drift with wall-clock time: two parties recomputing the same final
+    // observations at different moments got different numbers. Freshness is a publication GATE
+    // instead (below), which is a step function of the committed observation time and therefore
+    // reproducible by anyone holding the commitment.
+    const blendWeight = source
       ? SOURCE_RELIABILITY[source.kind]
         * observation.coverageRatio
-        * freshness.score
         * STATUS_CONFIDENCE[observation.status]
         * independentSourceFactor
       : 0;
-    return { observation, source, freshness, confidence };
+    // Reported metadata only. Never a settlement input.
+    const confidence = blendWeight * freshness.score;
+    return { observation, source, freshness, blendWeight, confidence };
   });
 
-  const usable = candidates.filter((candidate) => candidate.confidence > 0);
-  const totalConfidence = usable.reduce((sum, candidate) => sum + candidate.confidence, 0);
+  // The gate: an observation past three times its metric's maximum age carries no weight at all.
+  const usable = candidates.filter(
+    (candidate) => candidate.blendWeight > 0 && candidate.freshness.score > 0,
+  );
+  const totalConfidence = usable.reduce((sum, candidate) => sum + candidate.blendWeight, 0);
   if (totalConfidence === 0) {
     return {
       metricId: metric.id,
@@ -128,18 +140,21 @@ function calculateMetric(
   }
 
   const value = usable.reduce(
-    (sum, candidate) => sum + candidate.observation.value * candidate.confidence,
+    (sum, candidate) => sum + candidate.observation.value * candidate.blendWeight,
     0,
   ) / totalConfidence;
   const weightedFreshness = usable.reduce(
-    (sum, candidate) => sum + candidate.freshness.score * candidate.confidence,
+    (sum, candidate) => sum + candidate.freshness.score * candidate.blendWeight,
     0,
   ) / totalConfidence;
   const weightedAge = usable.reduce(
-    (sum, candidate) => sum + candidate.freshness.ageDays * candidate.confidence,
+    (sum, candidate) => sum + candidate.freshness.ageDays * candidate.blendWeight,
     0,
   ) / totalConfidence;
-  const averageConfidence = totalConfidence / usable.length;
+  const averageConfidence = usable.reduce(
+    (sum, candidate) => sum + candidate.confidence,
+    0,
+  ) / usable.length;
   const latestObservedAt = usable
     .map((candidate) => candidate.observation.observedAt)
     .sort((left, right) => Date.parse(right) - Date.parse(left))[0];
@@ -181,11 +196,19 @@ function calculateDimension(
   const availableWeight = available.reduce((sum, metric) => sum + metric.methodologyWeight, 0);
   const coverageRatio = totalWeight > 0 ? availableWeight / totalWeight : 0;
   const hasCoverage = coverageRatio + 1e-9 >= MINIMUM_DIMENSION_COVERAGE[dimension];
-  const score = hasCoverage && availableWeight > 0
-    ? available.reduce(
-      (sum, metric) => sum + (metric.normalizedScore ?? 0) * metric.methodologyWeight,
-      0,
-    ) / availableWeight
+  // Missing weight is filled at the neutral score and the denominator stays the FULL methodology
+  // weight. The engine used to divide by availableWeight, which redistributed a missing metric's
+  // weight to the survivors: suppressing an input that was about to push the score adversely moved
+  // the score toward whatever the remaining inputs said, which is exactly the wrong incentive.
+  // Neutral fill makes suppression move the score toward 50 instead, so it buys nothing.
+  const filledWeight = totalWeight - availableWeight;
+  const score = hasCoverage && totalWeight > 0
+    ? (
+      available.reduce(
+        (sum, metric) => sum + (metric.normalizedScore ?? 0) * metric.methodologyWeight,
+        0,
+      ) + filledWeight * NEUTRAL_FILL_SCORE
+    ) / totalWeight
     : null;
   const confidenceScore = totalWeight > 0
     ? metrics.reduce(
@@ -223,6 +246,7 @@ function calculationId(
   dataset: ScarcityDataset,
   asOf: string,
   dimensions: DimensionResult[],
+  sourceById: Map<string, ScarcitySource>,
 ) {
   const inputs = dimensions
     .flatMap((dimension) => dimension.metrics)
@@ -233,18 +257,29 @@ function calculationId(
       return observation
         ? {
           id: observation.id,
+          metricId: observation.metricId,
           value: observation.value,
           unit: observation.unit,
           observedAt: observation.observedAt,
           publishedAt: observation.publishedAt,
           sourceId: observation.sourceId,
+          // sourceKind, coverageRatio and independentSourceCount are multiplicative terms in the
+          // blend weight, so omitting them let two datasets that produce scores fourteen buckets
+          // apart hash to the same fingerprint.
+          sourceKind: sourceById.get(observation.sourceId)?.kind ?? null,
+          coverageRatio: observation.coverageRatio,
+          independentSourceCount: observation.independentSourceCount,
           status: observation.status,
         }
         : { id: observationId, missing: true };
     });
   return createHash("sha256")
     .update(JSON.stringify({
+      // Content-address the whole parameter object, not the version string. Hashing only the string
+      // meant an edit to any anchor, weight or threshold changed every published score while the
+      // on-chain commitment stayed byte-identical, so the hash committed to nothing.
       methodologyVersion: SCARCITY_METHODOLOGY_VERSION,
+      parameterHash: scarcityParameterHash(),
       metalId: metal.id,
       datasetId: dataset.id,
       asOf,
@@ -322,7 +357,7 @@ export function calculateScarcitySnapshot(
     methodologyVersion: SCARCITY_METHODOLOGY_VERSION,
     generatedAt: new Date().toISOString(),
     asOf,
-    calculationId: calculationId(metal, dataset, asOf, dimensions),
+    calculationId: calculationId(metal, dataset, asOf, dimensions, sourceById),
     marketTightness,
     structuralScarcity,
     dataConfidence: {
