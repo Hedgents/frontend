@@ -42,3 +42,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local research cache for exchange source backfills (raw bodies, refetchable)
+/.scarcity-cache/
