@@ -18,7 +18,7 @@ import { randomBytes } from "node:crypto";
 import { readFileSync } from "node:fs";
 import {
   address,
-  appendTransactionMessageInstruction,
+  appendTransactionMessageInstructions,
   createKeyPairSignerFromBytes,
   createSolanaRpc,
   createSolanaRpcSubscriptions,
@@ -37,6 +37,7 @@ import { compileMetalPulseMarket } from "@/lib/metal-pulse-market";
 import {
   deriveAssociatedTokenAddress,
   deriveMarketAddresses,
+  getCreateAssociatedTokenIdempotentInstruction,
   getMintCompleteSetInstruction,
   getPlaceOrderInstruction,
 } from "@/lib/scarcity-exchange";
@@ -69,13 +70,14 @@ async function main() {
   const feeRecipient = address(required("SCARCITY_FEE_RECIPIENT"));
   const quantity = contracts * 1_000_000n;
 
-  const submit = async (instruction: Instruction, label: string) => {
+  const submit = async (instructions: Instruction | Instruction[], label: string) => {
+    const list = Array.isArray(instructions) ? instructions : [instructions];
     const { value: blockhash } = await rpc.getLatestBlockhash({ commitment: "confirmed" }).send();
     const signed = await signTransactionMessageWithSigners(pipe(
       createTransactionMessage({ version: 0 }),
       (draft) => setTransactionMessageFeePayerSigner(maker as KeyPairSigner, draft),
       (draft) => setTransactionMessageLifetimeUsingBlockhash(blockhash, draft),
-      (draft) => appendTransactionMessageInstruction(instruction, draft),
+      (draft) => appendTransactionMessageInstructions(list, draft),
     ));
     await sendAndConfirm(signed as Parameters<typeof sendAndConfirm>[0], {
       commitment: "confirmed", skipPreflight: false,
@@ -102,10 +104,21 @@ async function main() {
     const [makerYes] = await deriveAssociatedTokenAddress(maker.address, addresses.yesMint);
     const [makerNo] = await deriveAssociatedTokenAddress(maker.address, addresses.noMint);
 
-    await submit(await getMintCompleteSetInstruction({
-      owner: maker.address, marketId, amount: quantity,
-      ownerCollateral: makerCollateral, ownerYes: makerYes, ownerNo: makerNo, collateralMint,
-    }), `${compiled.question.roundId} mint`);
+    // Every round mints its own YES and NO tokens, so the maker's outcome accounts never exist yet.
+    // Creating them idempotently in the same transaction is what makes this safe to run on a cron:
+    // without it the mint fails with AccountNotInitialized on every single round.
+    await submit([
+      getCreateAssociatedTokenIdempotentInstruction({
+        payer: maker.address, owner: maker.address, mint: addresses.yesMint, associatedToken: makerYes,
+      }),
+      getCreateAssociatedTokenIdempotentInstruction({
+        payer: maker.address, owner: maker.address, mint: addresses.noMint, associatedToken: makerNo,
+      }),
+      await getMintCompleteSetInstruction({
+        owner: maker.address, marketId, amount: quantity,
+        ownerCollateral: makerCollateral, ownerYes: makerYes, ownerNo: makerNo, collateralMint,
+      }),
+    ], `${compiled.question.roundId} mint`);
 
     // Trading closes fifteen seconds before the round opens, so the orders must expire with it.
     const expiresAt = BigInt(compiled.onchainSchedule.closesAt);
@@ -136,5 +149,10 @@ async function main() {
 
 void main().catch((error) => {
   console.error(error instanceof Error ? error.message : String(error));
+  // "Transaction simulation failed" on its own is not actionable on a cron run, so surface whatever
+  // the RPC attached: the program logs are the only thing that says which require! rejected it.
+  const logs = (error as { context?: { logs?: string[] } })?.context?.logs
+    ?? (error as { cause?: { context?: { logs?: string[] } } })?.cause?.context?.logs;
+  if (logs?.length) console.error(logs.join("\n"));
   process.exitCode = 1;
 });

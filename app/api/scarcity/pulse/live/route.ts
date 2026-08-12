@@ -3,9 +3,8 @@ import { requireInviteAccess } from "@/lib/access-auth";
 import { apiSecurityError, enforceRateLimit } from "@/lib/api-security";
 import { METAL_PULSE_INTERVAL_SECONDS, pulseRoundStart } from "@/lib/metal-pulse";
 import { fetchMetalPulseSnapshot } from "@/lib/metal-pulse-source";
-import { deriveMetalPulseRound } from "@/lib/metal-pulse-chain";
+import { deriveMetalPulseRound, readMetalPulseBook } from "@/lib/metal-pulse-chain";
 import { loadScarcityDeployment } from "@/lib/scarcity-deployment";
-import { getScarcityMarketChainState } from "@/lib/scarcity-exchange-index";
 
 export const dynamic = "force-dynamic";
 
@@ -38,8 +37,12 @@ export async function GET(request: Request) {
       })
       : null;
 
-    const chainFor = async (slug: string | null) =>
-      slug ? await getScarcityMarketChainState(slug).catch(() => null) : null;
+    // The tradeable round is the only one the screen can act on, so it is the only one whose book
+    // is read. Rounds are derived from a timestamp and never appear in the deployment manifest, so
+    // this reads the market and its orders straight from the addresses they derive to.
+    const book = tradeable
+      ? await readMetalPulseBook({ ...tradeable, nowUnix }).catch(() => null)
+      : null;
 
     return NextResponse.json({
       cluster: deployment?.cluster ?? null,
@@ -55,8 +58,18 @@ export async function GET(request: Request) {
         refreshAfterMs: snapshot.refreshAfterMs,
         mode: snapshot.mode,
       },
-      running: running ? { ...running, chain: await chainFor(`metal-pulse-${running.roundId}`) } : null,
-      tradeable: tradeable ? { ...tradeable, chain: await chainFor(`metal-pulse-${tradeable.roundId}`) } : null,
+      running,
+      tradeable: tradeable ? {
+        ...tradeable,
+        onChain: book?.onChain ?? false,
+        paused: book?.paused ?? null,
+        status: book?.status ?? null,
+        // Everything the client needs to build a fill, so it never has to re-derive program accounts
+        // or carry its own copy of the deployment.
+        collateralMint: deployment?.collateralMint ?? null,
+        feeRecipient: deployment?.feeRecipient ?? null,
+        offers: book?.offers ?? { yes: null, no: null },
+      } : null,
     }, { headers: { ...headers, "cache-control": "no-store" } });
   } catch (error) {
     const security = apiSecurityError(error);

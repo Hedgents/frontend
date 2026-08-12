@@ -2,19 +2,16 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { CircleAlert, LockKeyhole, TrendingDown, TrendingUp } from "lucide-react";
+import { CircleAlert, Check, LockKeyhole } from "lucide-react";
 import { PulsePriceChart, type PulsePricePoint } from "./PulsePriceChart";
+import { PulseTicket, type PulseTradeableRound } from "./PulseTicket";
 import styles from "./pulse-market.module.css";
 
-interface PulseSide {
+interface PulseRunningRound {
   roundId: string;
-  marketId: string;
-  market: string;
-  yesMint: string;
-  noMint: string;
   startsAtUnix: number;
   endsAtUnix: number;
-  chain: unknown;
+  onChain: boolean;
 }
 
 interface PulseLive {
@@ -29,8 +26,8 @@ interface PulseLive {
     refreshAfterMs: number;
     mode: string;
   };
-  running: PulseSide | null;
-  tradeable: PulseSide | null;
+  running: PulseRunningRound | null;
+  tradeable: PulseTradeableRound | null;
   error?: string;
 }
 
@@ -64,6 +61,7 @@ export function PulseMarket({ onConnect }: { onConnect: () => void }) {
     retry: 1,
   });
   const [series, setSeries] = useState<PulsePricePoint[]>([]);
+  const [filled, setFilled] = useState<string | null>(null);
   const roundRef = useRef<string | null>(null);
 
   const data = live.data ?? null;
@@ -148,19 +146,25 @@ export function PulseMarket({ onConnect }: { onConnect: () => void }) {
             opening price is effectively known.
           </p>
         ) : (
-          <div className={styles.sides}>
-            <button type="button" onClick={onConnect} className={styles.up}>
-              <TrendingUp size={16} aria-hidden="true" />
-              <span>Higher</span>
-              <small>Pays 1.00 if gold closes above the open</small>
-            </button>
-            <button type="button" onClick={onConnect} className={styles.down}>
-              <TrendingDown size={16} aria-hidden="true" />
-              <span>Lower</span>
-              <small>Pays 1.00 if gold closes below the open</small>
-            </button>
-          </div>
+          <PulseTicket
+            round={tradeable}
+            cluster={data.cluster ?? "devnet"}
+            onConnect={onConnect}
+            onFilled={(signature) => {
+              setFilled(signature);
+              // The book has moved, so pull it again rather than leaving a stale remainder on screen.
+              void live.refetch();
+            }}
+          />
         )}
+
+        {filled ? (
+          <p className={styles.filled} role="status">
+            <Check size={13} aria-hidden="true" />
+            Your side is taken. It settles automatically when the round closes, and you redeem from
+            the portfolio once it does. Signature {filled.slice(0, 8)}…{filled.slice(-6)}
+          </p>
+        ) : null}
 
         <p className={styles.muted}>
           {data.cluster === "mainnet-beta"

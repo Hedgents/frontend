@@ -6,6 +6,7 @@ import {
 } from "@solana/kit";
 import idl from "./generated/scarcity_exchange.json";
 import {
+  ASSOCIATED_TOKEN_PROGRAM_ADDRESS,
   assertBytes32,
   deriveConfigAddress,
   deriveCurveMarketAddresses,
@@ -742,5 +743,32 @@ export async function getSetResolverInstruction(input: {
       instructionDiscriminator("set_resolver"),
       addressEncoder.encode(input.resolver),
     ),
+  };
+}
+
+/**
+ * Create an associated token account if it does not already exist.
+ *
+ * Discriminator 1 is the token program's `CreateIdempotent`, which succeeds when the account is
+ * already there. That matters because a fill has to work for a first-time taker and a returning one
+ * from the same instruction list, without a read to tell them apart.
+ */
+export function getCreateAssociatedTokenIdempotentInstruction(input: {
+  payer: Address;
+  owner: Address;
+  mint: Address;
+  associatedToken: Address;
+}): Instruction {
+  return {
+    programAddress: ASSOCIATED_TOKEN_PROGRAM_ADDRESS,
+    accounts: [
+      writableSigner(input.payer),
+      writable(input.associatedToken),
+      readonly(input.owner),
+      readonly(input.mint),
+      readonly(SYSTEM_PROGRAM_ADDRESS),
+      readonly(TOKEN_PROGRAM_ADDRESS),
+    ],
+    data: Uint8Array.of(1),
   };
 }

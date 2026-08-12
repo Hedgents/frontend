@@ -159,3 +159,15 @@ function assertU8(value: number, label: string) {
     throw new Error(`${label} must be an unsigned 8-bit integer.`);
   }
 }
+
+/**
+ * Decode a 32-byte hexadecimal id.
+ *
+ * The canonicalisation module has a copy of this, but it imports `node:crypto` and so cannot be
+ * pulled into a browser bundle. Market ids and order ids are needed on both sides of the wire, so
+ * the decoder lives here with the rest of the client-safe address plumbing.
+ */
+export function hexToBytes(value: string) {
+  if (!/^[a-f0-9]{64}$/i.test(value)) throw new Error("Expected a 32-byte hexadecimal value.");
+  return Uint8Array.from({ length: 32 }, (_, index) => Number.parseInt(value.slice(index * 2, index * 2 + 2), 16));
+}

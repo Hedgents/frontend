@@ -1,14 +1,25 @@
 import "server-only";
-import { address, type Address } from "@solana/kit";
+import { address, getAddressEncoder, type Address } from "@solana/kit";
 import {
   METAL_PULSE_INTERVAL_SECONDS,
   pulseRoundStart,
   pulseRoundWindow,
 } from "@/lib/metal-pulse";
 import { compileMetalPulseMarket } from "@/lib/metal-pulse-market";
-import { decodeScarcityMarketAccount, deriveMarketAddresses } from "@/lib/scarcity-exchange";
+import {
+  decodeExchangeConfigAccount,
+  decodeLimitOrderAccount,
+  decodeScarcityMarketAccount,
+  deriveConfigAddress,
+  deriveMarketAddresses,
+  limitOrderDiscriminatorBase64,
+  SCARCITY_EXCHANGE_PROGRAM_ADDRESS,
+  SCARCITY_ORDER_ACCOUNT_SIZE,
+  SCARCITY_ORDER_MARKET_OFFSET,
+} from "@/lib/scarcity-exchange";
 import { hexToBytes } from "@/lib/scarcity-markets";
 import { loadScarcityDeployment, scarcityRpcUrls } from "@/lib/scarcity-deployment";
+import { solanaRpcRequestFrom } from "@/lib/solana-rpc";
 
 /**
  * On-chain view of Gold 15 rounds.
@@ -171,4 +182,130 @@ export async function readPulsePositions(input: {
     });
   }
   return { cluster: deployment.cluster, positions };
+}
+
+export interface PulseBookOffer {
+  maker: string;
+  orderId: string;
+  priceMicroUsdc: string;
+  remainingQuantity: string;
+  originalQuantity: string;
+  quoteFilled: string;
+  feePaid: string;
+  feeBps: number;
+}
+
+export interface PulseRoundBook {
+  onChain: boolean;
+  /** The exchange-wide kill switch. A paused exchange refuses fills, so the screen must not offer one. */
+  paused: boolean | null;
+  status: string | null;
+  closesAt: string | null;
+  offers: { yes: PulseBookOffer | null; no: PulseBookOffer | null };
+}
+
+/**
+ * Read a round's market account and resting asks straight from derived addresses.
+ *
+ * The catalog reader cannot serve this: it resolves a slug through the deployment manifest, and a
+ * round that is derived from a timestamp is never in one. So this walks the same path by hand,
+ * verifying each order against the reviewed deployment's collateral mint and fee recipient before
+ * it is allowed to price anything on the screen.
+ *
+ * Returns only the cheapest ask per side, because the screen offers one action and a bettor picking
+ * between resting orders is exactly the complexity a binary market is supposed to remove.
+ */
+export async function readMetalPulseBook(input: {
+  marketId: string;
+  market: Address | string;
+  yesMint: string;
+  noMint: string;
+  nowUnix: number;
+}): Promise<PulseRoundBook> {
+  const empty: PulseRoundBook = {
+    onChain: false, paused: null, status: null, closesAt: null, offers: { yes: null, no: null },
+  };
+  const deployment = await loadScarcityDeployment();
+  if (!deployment) return empty;
+  const endpoints = scarcityRpcUrls(deployment.cluster);
+
+  const [configAddress] = await deriveConfigAddress();
+  const configAccount = await solanaRpcRequestFrom<{ value: { data: [string, string] } | null }>(
+    endpoints,
+    "getAccountInfo",
+    [String(configAddress), { encoding: "base64", commitment: "confirmed" }],
+    { id: "pulse-config" },
+  ).catch(() => null);
+  const paused = configAccount?.value
+    ? decodeExchangeConfigAccount(Uint8Array.from(Buffer.from(configAccount.value.data[0], "base64"))).paused
+    : null;
+
+  const marketAccount = await solanaRpcRequestFrom<{ value: { data: [string, string]; owner: string } | null }>(
+    endpoints,
+    "getAccountInfo",
+    [String(input.market), { encoding: "base64", commitment: "confirmed" }],
+    { id: `pulse-market-${input.marketId}` },
+  ).catch(() => null);
+  if (!marketAccount?.value) return empty;
+  const decodedMarket = decodeScarcityMarketAccount(
+    Uint8Array.from(Buffer.from(marketAccount.value.data[0], "base64")),
+  );
+
+  const accounts = await solanaRpcRequestFrom<Array<{ pubkey: string; account: { data: [string, string]; owner: string } }>>(
+    endpoints,
+    "getProgramAccounts",
+    [String(SCARCITY_EXCHANGE_PROGRAM_ADDRESS), {
+      encoding: "base64",
+      commitment: "confirmed",
+      filters: [
+        { dataSize: SCARCITY_ORDER_ACCOUNT_SIZE },
+        { memcmp: { offset: 0, bytes: limitOrderDiscriminatorBase64(), encoding: "base64" } },
+        {
+          memcmp: {
+            offset: SCARCITY_ORDER_MARKET_OFFSET,
+            bytes: Buffer.from(getAddressEncoder().encode(address(String(input.market)))).toString("base64"),
+            encoding: "base64",
+          },
+        },
+      ],
+    }],
+    { id: `pulse-orders-${input.marketId}`, timeoutMs: 12_000 },
+  ).catch(() => []);
+
+  const now = BigInt(input.nowUnix);
+  const best = { yes: null as PulseBookOffer | null, no: null as PulseBookOffer | null };
+  for (const candidate of accounts) {
+    if (candidate.account.owner !== String(SCARCITY_EXCHANGE_PROGRAM_ADDRESS)) continue;
+    const order = decodeLimitOrderAccount(Uint8Array.from(Buffer.from(candidate.account.data[0], "base64")));
+    if (order.version !== 1 || order.side !== "ask") continue;
+    // The order must belong to the deployment the rest of the screen is describing. An order quoting
+    // a different collateral mint would debit a token the bettor never agreed to spend.
+    if (String(order.collateralMint) !== deployment.collateralMint) continue;
+    if (String(order.feeRecipient) !== deployment.feeRecipient) continue;
+    if (order.remainingQuantity <= 0n || order.expiresAt <= now) continue;
+    const outcome = String(order.outcomeMint) === input.yesMint
+      ? "yes"
+      : String(order.outcomeMint) === input.noMint ? "no" : null;
+    if (!outcome) continue;
+    const current = best[outcome];
+    if (current && BigInt(current.priceMicroUsdc) <= order.priceMicroUsdc) continue;
+    best[outcome] = {
+      maker: String(order.maker),
+      orderId: order.orderId,
+      priceMicroUsdc: order.priceMicroUsdc.toString(),
+      remainingQuantity: order.remainingQuantity.toString(),
+      originalQuantity: order.originalQuantity.toString(),
+      quoteFilled: order.quoteFilled.toString(),
+      feePaid: order.feePaid.toString(),
+      feeBps: order.feeBps,
+    };
+  }
+
+  return {
+    onChain: true,
+    paused,
+    status: decodedMarket.status,
+    closesAt: decodedMarket.closesAt.toString(),
+    offers: best,
+  };
 }
