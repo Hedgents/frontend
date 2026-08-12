@@ -1273,3 +1273,23 @@
 @media (prefers-reduced-motion: reduce) {
   .multipleBars i { transition: none; }
 }
+
+/* A devnet pool on a live site has to say so on the market view itself, not only inside the wallet
+   confirmation. The collateral is an operator-issued test token, so a staker who misses that is
+   being misled about what they are risking and what they could win. */
+.testnetNotice {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0 0 14px;
+  padding: 9px 11px;
+  border: 1px solid rgba(226, 176, 92, .32);
+  border-radius: 8px;
+  background: rgba(226, 176, 92, .08);
+  color: #e2b05c;
+  font-size: 11.5px;
+  line-height: 1.45;
+}
+
+.testnetNotice svg { flex: none; margin-top: 1px; }
+.testnetNotice strong { font-weight: 650; }

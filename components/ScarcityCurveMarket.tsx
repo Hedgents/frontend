@@ -328,6 +328,16 @@ export function ScarcityCurveMarket({
       <main className={styles.marketMain}>
         <div className={styles.marketMiddle} data-testid="curve-middle-scroll">
         <div className={styles.marketIntro}>
+        {chainState && chainState.deployment.cluster !== "mainnet-beta" ? (
+          <p className={styles.testnetNotice} role="status">
+            <CircleAlert size={14} aria-hidden="true" />
+            <span>
+              <strong>Solana devnet.</strong> This pool settles in a test token with no value, issued
+              by the operator for rehearsal. Nothing staked here is real money and nothing paid out is
+              worth anything.
+            </span>
+          </p>
+        ) : null}
         <header className={styles.metricHeader}>
           <div>
             <span>SCX / {curveMarket.metal.symbol} / forecast pool</span>
