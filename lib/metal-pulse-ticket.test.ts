@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   formatPulseAmount,
+  formatPulseExact,
   priceMetalPulseTicket,
   pulseFee,
   pulseQuote,
@@ -120,4 +121,39 @@ test("amounts format without a float round trip", () => {
   assert.equal(formatPulseAmount(1n), "0.00");
   assert.equal(formatPulseAmount(-2_500_000n), "−2.50");
   assert.equal(formatPulseAmount(999_999_999_999n), "999999.99");
+});
+
+test("a displayed cost never understates the real debit", () => {
+  // The live exchange charges 25bps, so a five unit bet costs 5.0125. Rounding that down to 5.01
+  // would have the screen quote less than the wallet is about to be asked for.
+  const ticket = priceMetalPulseTicket({
+    offer: { ...FRESH, feeBps: 25 },
+    stake: 5n * PULSE_TOKEN_SCALE,
+  });
+  assert.ok(ticket);
+  assert.equal(ticket.fee, 12_500n);
+  assert.equal(ticket.cost, 5_012_500n);
+  assert.equal(formatPulseAmount(ticket.cost, 2, "up"), "5.02");
+  assert.equal(formatPulseExact(ticket.cost), "5.0125");
+  // An amount already on the boundary must not be nudged to the next cent.
+  assert.equal(formatPulseAmount(5_010_000n, 2, "up"), "5.01");
+  assert.equal(formatPulseAmount(0n, 2, "up"), "0.00");
+});
+
+test("rounding up is never below, and rounding down never above, the true amount", () => {
+  for (const value of [1n, 9_999n, 10_000n, 10_001n, 5_012_500n, 999_999n, 1_000_001n]) {
+    const up = Number(formatPulseAmount(value, 2, "up"));
+    const down = Number(formatPulseAmount(value, 2, "down"));
+    const exact = Number(value) / 1_000_000;
+    assert.ok(up >= exact, `${value} rounded up to ${up}, below ${exact}`);
+    assert.ok(down <= exact, `${value} rounded down to ${down}, above ${exact}`);
+  }
+});
+
+test("exact formatting trims trailing zeros but keeps every significant base unit", () => {
+  assert.equal(formatPulseExact(5_012_500n), "5.0125");
+  assert.equal(formatPulseExact(10n * PULSE_TOKEN_SCALE), "10");
+  assert.equal(formatPulseExact(1n), "0.000001");
+  assert.equal(formatPulseExact(0n), "0");
+  assert.equal(formatPulseExact(-12_500n), "−0.0125");
 });

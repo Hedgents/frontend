@@ -11,6 +11,7 @@ import {
 } from "@/lib/scarcity-exchange";
 import {
   formatPulseAmount,
+  formatPulseExact,
   priceMetalPulseTicket,
   PULSE_STAKE_CHOICES,
   PULSE_TOKEN_SCALE,
@@ -137,10 +138,10 @@ export function PulseTicket({
       ) : (
         <>
           <dl className={styles.economics}>
-            <div><dt>You pay</dt><dd>{formatPulseAmount(ticket.cost)}</dd></div>
+            <div><dt>You pay</dt><dd>{formatPulseAmount(ticket.cost, 2, "up")}</dd></div>
             <div><dt>You win</dt><dd data-win="">{formatPulseAmount(ticket.payout)}</dd></div>
             <div><dt>Profit if right</dt><dd data-win="">+{formatPulseAmount(ticket.profit)}</dd></div>
-            <div><dt>Loss if wrong</dt><dd data-lose="">−{formatPulseAmount(ticket.cost)}</dd></div>
+            <div><dt>Loss if wrong</dt><dd data-lose="">−{formatPulseAmount(ticket.cost, 2, "up")}</dd></div>
           </dl>
 
           {ticket.capped ? (
@@ -159,7 +160,7 @@ export function PulseTicket({
           ) : (
             <ScarcityWalletTransaction
               cluster={cluster}
-              label={`Bet ${formatPulseAmount(ticket.cost)} on ${side === "yes" ? "Higher" : "Lower"}`}
+              label={`Bet ${formatPulseAmount(ticket.cost, 2, "up")} on ${side === "yes" ? "Higher" : "Lower"}`}
               reviewTitle={`${side === "yes" ? "Higher" : "Lower"} · ${round.roundId.replace("gold-15m-", "")}`}
               confirmLabel="Continue to wallet"
               review={(
@@ -167,11 +168,11 @@ export function PulseTicket({
                   <div><dt>Question</dt><dd>Will gold close {side === "yes" ? "above" : "below"} the round&rsquo;s opening price?</dd></div>
                   <div><dt>Round</dt><dd>{round.roundId}</dd></div>
                   <div><dt>Network</dt><dd>{cluster === "devnet" ? "Solana devnet · test token, no value" : "Solana mainnet"}</dd></div>
-                  <div><dt>Contracts</dt><dd>{formatPulseAmount(ticket.quantity)}</dd></div>
-                  <div><dt>To the maker</dt><dd>{formatPulseAmount(ticket.gross)}</dd></div>
-                  <div><dt>Protocol fee</dt><dd>{formatPulseAmount(ticket.fee)} · {(offer.feeBps / 100).toFixed(2)}%</dd></div>
-                  <div><dt>Total debit</dt><dd>{formatPulseAmount(ticket.cost)}</dd></div>
-                  <div><dt>Pays if right</dt><dd>{formatPulseAmount(ticket.payout)}</dd></div>
+                  <div><dt>Contracts</dt><dd>{formatPulseExact(ticket.quantity)}</dd></div>
+                  <div><dt>To the maker</dt><dd>{formatPulseExact(ticket.gross)}</dd></div>
+                  <div><dt>Protocol fee</dt><dd>{formatPulseExact(ticket.fee)} · {(offer.feeBps / 100).toFixed(2)}%</dd></div>
+                  <div><dt>Total debit</dt><dd>{formatPulseExact(ticket.cost)}</dd></div>
+                  <div><dt>Pays if right</dt><dd>{formatPulseExact(ticket.payout)}</dd></div>
                   <div>
                     <dt>If the round ties</dt>
                     <dd>It settles invalid and both sides redeem one for one, so the stake comes back.</dd>

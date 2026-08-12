@@ -104,12 +104,40 @@ export function priceMetalPulseTicket(input: { offer: PulseOffer; stake: bigint 
   };
 }
 
-/** Base units to a human string, without the float round trip. */
-export function formatPulseAmount(baseUnits: bigint, decimals = 2) {
+/**
+ * Base units to a human string, without the float round trip.
+ *
+ * The rounding direction is a parameter because getting it wrong is a lie rather than a rounding
+ * error. Collateral carries six decimals and a 25bps fee on a five unit bet is 0.0125, so a cost
+ * shown to two decimals has to round UP or the screen quotes 5.01 for a wallet that debits 5.0125.
+ * Costs round up, payouts round down: whichever direction is worse for the person betting.
+ */
+export function formatPulseAmount(baseUnits: bigint, decimals = 2, rounding: "down" | "up" = "down") {
+  const negative = baseUnits < 0n;
+  const magnitude = negative ? -baseUnits : baseUnits;
+  const step = 10n ** BigInt(PULSE_TOKEN_DECIMALS - decimals);
+  const rounded = rounding === "up" && magnitude % step !== 0n
+    ? magnitude + (step - (magnitude % step))
+    : magnitude;
+  const whole = rounded / PULSE_TOKEN_SCALE;
+  const fraction = rounded % PULSE_TOKEN_SCALE;
+  const padded = fraction.toString().padStart(PULSE_TOKEN_DECIMALS, "0").slice(0, decimals);
+  return `${negative ? "−" : ""}${whole}${decimals > 0 ? `.${padded}` : ""}`;
+}
+
+/**
+ * The exact amount, to the base unit, with trailing zeros trimmed.
+ *
+ * Used in the review dialog, where the point is to state precisely what the wallet is about to be
+ * asked for rather than to be readable at a glance.
+ */
+export function formatPulseExact(baseUnits: bigint) {
   const negative = baseUnits < 0n;
   const magnitude = negative ? -baseUnits : baseUnits;
   const whole = magnitude / PULSE_TOKEN_SCALE;
-  const fraction = magnitude % PULSE_TOKEN_SCALE;
-  const padded = fraction.toString().padStart(PULSE_TOKEN_DECIMALS, "0").slice(0, decimals);
-  return `${negative ? "−" : ""}${whole}${decimals > 0 ? `.${padded}` : ""}`;
+  const fraction = (magnitude % PULSE_TOKEN_SCALE)
+    .toString()
+    .padStart(PULSE_TOKEN_DECIMALS, "0")
+    .replace(/0+$/, "");
+  return `${negative ? "−" : ""}${whole}${fraction ? `.${fraction}` : ""}`;
 }
