@@ -82,6 +82,16 @@ export type ScarcityMarket = {
     qualifyingOutcome: string;
     resolvesAt: string;
     resolverLabel: string;
+  } | {
+    // A scalar curve round settles on a continuous value, so it has no comparator and no threshold.
+    // Giving it the data shape would mean displaying a threshold that does not exist.
+    kind: "curve";
+    metricId: string;
+    metricLabel: string;
+    methodologyVersion: string;
+    unit: string;
+    observedAt: string;
+    precision: number;
   };
   sources: Array<{ id: string; publisher: string; title: string; url: string; cadence: string }>;
   schedule: { opensAt: string; closesAt: string; resolveAfter: string };
@@ -665,7 +675,7 @@ export function ScarcityExchange({ markets, defaultDataset, initialView = "marke
               <span className={styles.featuredMarketMeta}>
                 <em>{market.slug === active.slug && chainState ? `${chainState.deployment.cluster} live` : market.lifecycle}</em>
                 <small>Closes {formatDate(market.schedule.closesAt)}</small>
-                <small>{cardResolution.kind === "data" ? cardResolution.methodologyVersion : cardResolution.resolverLabel} · {market.sources.length} source{market.sources.length === 1 ? "" : "s"}</small>
+                <small>{cardResolution.kind === "event" ? cardResolution.resolverLabel : cardResolution.methodologyVersion} · {market.sources.length} source{market.sources.length === 1 ? "" : "s"}</small>
               </span>
             </button>;
           })}
