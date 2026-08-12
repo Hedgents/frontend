@@ -2,12 +2,13 @@
 
 import styles from "./scarcity-instrument-tabs.module.css";
 
-type ScarcityInstrument = "curve" | "event";
+type ScarcityInstrument = "curve" | "event" | "price";
 
 interface ScarcityInstrumentTabsProps {
   active: ScarcityInstrument;
   onCurve: () => void;
   onEvent: () => void;
+  onPrice?: () => void;
 }
 
 const instruments = [
@@ -21,12 +22,18 @@ const instruments = [
     label: "Event markets",
     description: "Predict whether it happens",
   },
+  {
+    id: "price" as const,
+    label: "Price market",
+    description: "Gold 15, up or down",
+  },
 ];
 
 export function ScarcityInstrumentTabs({
   active,
   onCurve,
   onEvent,
+  onPrice,
 }: ScarcityInstrumentTabsProps) {
   return (
     <div
@@ -46,7 +53,12 @@ export function ScarcityInstrumentTabs({
             aria-label={instrument.label}
             aria-selected={selected}
             aria-pressed={selected}
-            onClick={instrument.id === "curve" ? onCurve : onEvent}
+            disabled={instrument.id === "price" && !onPrice}
+            onClick={
+              instrument.id === "curve" ? onCurve
+                : instrument.id === "price" ? onPrice
+                  : onEvent
+            }
           >
             <span>{instrument.label}</span>
             <small>{instrument.description}</small>

@@ -10,6 +10,7 @@ function terminalRpcEndpoints() {
   ].map((value) => value.trim()).filter(Boolean);
 }
 import { readTerminalTrades } from "./terminal-activity";
+import { readPulsePositions } from "@/lib/metal-pulse-chain";
 import { deriveXpRounds, type WalletPortfolio } from "./derive";
 import { buildXpProfile, type XpBinaryPosition, type XpProfile, type XpTerminalTrade } from "./rules";
 import { listAwards, listLinkedWallets } from "./store";
@@ -64,6 +65,19 @@ export async function getXpProfile(granteeId: string): Promise<XpProfile & {
           status: position.status as XpBinaryPosition["status"],
         });
       }
+    }
+    // Gold 15 rounds are binary markets too, but derived per round rather than listed in the
+    // manifest, so they are read separately and scored by the same binary rules.
+    const pulse = await readPulsePositions({ wallet: link.wallet }).catch(() => null);
+    for (const position of pulse?.positions ?? []) {
+      if (position.status === "missing") continue;
+      binary.push({
+        marketSlug: position.roundId,
+        cluster: pulse!.cluster,
+        yes: BigInt(position.yes),
+        no: BigInt(position.no),
+        status: position.status,
+      });
     }
     // Terminal trades are always mainnet: the product registry holds mainnet mints and the terminal
     // executes there, independently of whichever cluster the scarcity exchange is deployed on.
