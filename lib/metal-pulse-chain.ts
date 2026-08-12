@@ -236,9 +236,21 @@ export async function readMetalPulseBook(input: {
     [String(configAddress), { encoding: "base64", commitment: "confirmed" }],
     { id: "pulse-config" },
   ).catch(() => null);
-  const paused = configAccount?.value
-    ? decodeExchangeConfigAccount(Uint8Array.from(Buffer.from(configAccount.value.data[0], "base64"))).paused
-    : null;
+  if (!configAccount?.value) return empty;
+  const config = decodeExchangeConfigAccount(
+    Uint8Array.from(Buffer.from(configAccount.value.data[0], "base64")),
+  );
+  // The catalog reader refuses to serve a market whose manifest disagrees with the chain, and the
+  // same has to hold here. Everything below prices a bet against `deployment.collateralMint`, so a
+  // stale manifest would have the screen quote a token the exchange no longer settles in.
+  if (
+    String(config.collateralMint) !== deployment.collateralMint
+    || String(config.feeRecipient) !== deployment.feeRecipient
+    || String(config.admin) !== deployment.admin
+  ) {
+    throw new Error("Onchain scarcity configuration does not match the reviewed deployment manifest.");
+  }
+  const paused = config.paused;
 
   const marketAccount = await solanaRpcRequestFrom<{ value: { data: [string, string]; owner: string } | null }>(
     endpoints,

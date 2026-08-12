@@ -38,7 +38,7 @@ import { SYSTEM_PROGRAM_ADDRESS, TOKEN_PROGRAM_ADDRESS } from "@/lib/scarcity-ex
 import { METAL_PULSE_INTERVAL_SECONDS, pulseRoundStart } from "@/lib/metal-pulse";
 import { deriveMetalPulseRound, readMetalPulseBook } from "@/lib/metal-pulse-chain";
 import {
-  formatPulseAmount,
+  formatPulseExact,
   priceMetalPulseTicket,
   PULSE_TOKEN_SCALE,
 } from "@/lib/metal-pulse-ticket";
@@ -216,17 +216,17 @@ async function main() {
     taker: String(taker.address),
     signature,
     quoted: {
-      contracts: formatPulseAmount(ticket.quantity),
-      toMaker: formatPulseAmount(ticket.gross),
-      fee: formatPulseAmount(ticket.fee),
-      cost: formatPulseAmount(ticket.cost),
-      paysIfRight: formatPulseAmount(ticket.payout),
+      contracts: formatPulseExact(ticket.quantity),
+      toMaker: formatPulseExact(ticket.gross),
+      fee: formatPulseExact(ticket.fee),
+      cost: formatPulseExact(ticket.cost),
+      paysIfRight: formatPulseExact(ticket.payout),
     },
     observed: {
-      debited: formatPulseAmount(debited),
-      contracts: formatPulseAmount(contracts),
-      makerReceived: formatPulseAmount(makerReceived),
-      feeAccountReceived: formatPulseAmount(feeReceived),
+      debited: formatPulseExact(debited),
+      contracts: formatPulseExact(contracts),
+      makerReceived: formatPulseExact(makerReceived),
+      feeAccountReceived: formatPulseExact(feeReceived),
       feeSharesMakerAccount,
     },
     checks: { quoteMatches, contractsMatch, creditsMatch },
