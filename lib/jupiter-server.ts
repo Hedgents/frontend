@@ -248,17 +248,19 @@ export async function verifySolanaSettlement(
         lastError = "Solana RPC did not return the settled transaction bytes.";
         continue;
       }
-      const settledBinding = bindSolanaTransaction(encodedTransaction, claims.taker, { requireFirstSignature: true });
-      if (settledBinding.messageDigest !== claims.transactionMessageDigest) {
-        return {
-          status: "failed",
-          errorCode: "verification_failed",
-          receivedAmount: null,
-          expectedMinimumAmount: claims.minimumOutputAmount,
-          verifiedAt: new Date().toISOString(),
-          error: "The transaction does not match the authenticated executable quote.",
-        };
-      }
+      // Binding still asserts the settled transaction's fee payer is the taker. What it must NOT do
+      // is require the bytes to equal the quoted ones.
+      //
+      // This is fetched BY SIGNATURE, and a Solana signature is over the message, so whatever came
+      // back is definitionally the transaction that was signed. Comparing its digest to the quote
+      // therefore proves nothing about substitution and only detects that the wallet edited the
+      // transaction before signing, which Phantom does to every order by adding its Lighthouse
+      // assertions. That check reported a completed purchase as a failure: the swap had settled,
+      // the taker held the metal, and the receipt said it had not happened.
+      //
+      // What settlement actually has to establish is below, and is about outcome rather than form:
+      // the transaction did not error, and the taker received at least the authenticated minimum.
+      bindSolanaTransaction(encodedTransaction, claims.taker, { requireFirstSignature: true });
       if (result.meta.err) {
         return {
           status: "failed",

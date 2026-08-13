@@ -88,9 +88,18 @@ test("post-Jupiter outcomes stay recoverable until independent settlement eviden
   assert.doesNotMatch(route, /venueStatus === "Success"[^\n]*\?[^\n]*verifySolanaSettlement/);
 
   const verifier = routeSource("./jupiter-server.ts");
-  const binding = verifier.indexOf("const settledBinding = bindSolanaTransaction");
+  const binding = verifier.indexOf("bindSolanaTransaction(encodedTransaction");
   const onchainFailure = verifier.indexOf("if (result.meta.err)", binding);
   assert.ok(binding >= 0 && onchainFailure > binding, "transaction bytes must be bound before trusting meta.err");
+  // Binding must assert the fee payer, and must NOT reject a settled transaction for differing
+  // from the quoted bytes: wallets edit before signing, and that comparison reported a completed
+  // purchase as a failure.
+  const settlementSlice = verifier.slice(binding, onchainFailure);
+  assert.doesNotMatch(
+    settlementSlice,
+    /messageDigest !== claims\.transactionMessageDigest/,
+    "settlement must verify the received amount, not the transaction bytes",
+  );
 });
 
 test("orders exclude RFQ signatures and authenticate a fail-closed debit report", () => {
