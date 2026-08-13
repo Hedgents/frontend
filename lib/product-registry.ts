@@ -59,6 +59,39 @@ export function getSolanaSettlementAsset(value: unknown): SolanaSettlementAsset 
   return ownEntry(solanaSettlementAssets as Record<string, SolanaSettlementAsset>, value);
 }
 
+/**
+ * Which settlement assets may actually be traded.
+ *
+ * USDT and USDG are defined and correct, and Jupiter prices both, but selling into them routes
+ * through venues the operator program allowlist has not reviewed, so an order built against them
+ * dead-ends at the review gate after the size is chosen. Offering a choice that cannot complete is
+ * worse than offering one option, so the beta settles in USDC until the venue set is reviewed.
+ *
+ * Config rather than deletion: the assets stay defined, holdings in them stay visible, and
+ * re-enabling is an environment change rather than a code change.
+ */
+export function enabledSettlementAssetIds(
+  environment: { HEDGENTS_SETTLEMENT_ASSETS?: string | undefined } = process.env as {
+    HEDGENTS_SETTLEMENT_ASSETS?: string | undefined;
+  },
+): SettlementAssetId[] {
+  const configured = environment.HEDGENTS_SETTLEMENT_ASSETS?.trim();
+  if (!configured) return ["usdc"];
+  const requested = configured.split(",").map((entry) => entry.trim().toLowerCase());
+  const enabled = requested.filter((entry): entry is SettlementAssetId =>
+    Object.prototype.hasOwnProperty.call(solanaSettlementAssets, entry));
+  // Never resolve to nothing: a malformed list must not silently disable trading altogether.
+  return enabled.length > 0 ? [...new Set(enabled)] : ["usdc"];
+}
+
+export function isSettlementAssetEnabled(
+  id: unknown,
+  environment?: { HEDGENTS_SETTLEMENT_ASSETS?: string | undefined },
+): boolean {
+  return typeof id === "string"
+    && (enabledSettlementAssetIds(environment) as string[]).includes(id);
+}
+
 export interface RegistrySource {
   label: string;
   url: string;

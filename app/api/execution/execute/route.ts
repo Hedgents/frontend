@@ -18,7 +18,11 @@ import {
   verifySolanaSettlement,
 } from "@/lib/jupiter-server";
 import { validateExecutionAuthorization } from "@/lib/execution-authorization";
-import { getSolanaExecutionProduct, getSolanaSettlementAsset } from "@/lib/product-registry";
+import {
+  getSolanaExecutionProduct,
+  getSolanaSettlementAsset,
+  isSettlementAssetEnabled,
+} from "@/lib/product-registry";
 import { bindSolanaTransaction, solanaTransactionMessageBytes } from "@/lib/solana-transaction-binding";
 import { solanaMessageSemanticDigest } from "@/lib/solana-message-semantics";
 import {
@@ -66,6 +70,12 @@ export async function POST(request: Request) {
     const settlementAsset = getSolanaSettlementAsset(claims.settlementAssetId);
     if (!settlementAsset) {
       throw new ExecutionValidationError("The execution settlement asset is no longer supported.");
+    }
+    // An authorization issued before an asset was disabled must not still execute against it.
+    if (!isSettlementAssetEnabled(settlementAsset.id)) {
+      throw new ExecutionValidationError(
+        `${settlementAsset.symbol} settlement is no longer available. Build a fresh quote in USDC.`,
+      );
     }
     assertExecutionWithinBetaCap(
       claims,

@@ -33,6 +33,7 @@ import {
 import {
   getSolanaExecutionProduct,
   getSolanaSettlementAsset,
+  isSettlementAssetEnabled,
 } from "@/lib/product-registry";
 
 export const dynamic = "force-dynamic";
@@ -108,7 +109,14 @@ export async function POST(request: Request) {
       side === "buy" ? "usdc" : body.settlementAssetId,
     );
     if (!settlementAsset) {
-      throw new ExecutionValidationError("Choose USDC, USDT, or USDG settlement on Solana.");
+      throw new ExecutionValidationError("Choose a supported settlement asset on Solana.");
+    }
+    // Enforced here, not just hidden in the picker. Hiding an option a request can still name is
+    // not a gate, and this one exists because those routes dead-end at the program review.
+    if (!isSettlementAssetEnabled(settlementAsset.id)) {
+      throw new ExecutionValidationError(
+        `${settlementAsset.symbol} settlement is not available in this beta. Settle in USDC.`,
+      );
     }
     const taker = validateSolanaAddress(body.taker);
     const inputAmount = side === "buy"

@@ -88,6 +88,7 @@ import {
   getSolanaSettlementAsset,
   isSolanaExecutionProduct,
   solanaSettlementAssets,
+  enabledSettlementAssetIds,
   type SettlementAssetId,
 } from "@/lib/product-registry";
 import type { LiveQuote, MetalQuoteResponse } from "@/lib/quote-types";
@@ -2071,6 +2072,16 @@ function OrderTicket({
 }: OrderTicketProps) {
   const product = market.products.find((item) => item.id === productId) ?? market.products[0];
   const settlementAsset = getSolanaSettlementAsset(settlementAssetId) ?? solanaSettlementAssets.usdc;
+  // Only offer what the server will accept. USDT and USDG stay defined, and holdings in them stay
+  // visible in the portfolio; they are simply not sellable into while their routes dead-end at the
+  // program review.
+  //
+  // The browser cannot read the server's setting, so this resolves to the same default the server
+  // uses, USDC alone. If the server list is ever widened, this stays narrow until it is widened
+  // here too. That direction is the safe one: the picker can only ever under-offer, never offer
+  // something the server would refuse. The server is the gate; this is presentation.
+  const enabledSettlementAssets = enabledSettlementAssetIds({})
+    .map((id) => solanaSettlementAssets[id]);
   const executionAdapterReady = isSolanaExecutionProduct(product.id);
   const selectedFundingSource =
     fundingSources.find((source) => source.id === fundingSourceId) ?? fundingSources[0];
@@ -2168,7 +2179,7 @@ function OrderTicket({
         <div className={styles.settlementPicker}>
           <span>Receive on Solana</span>
           <div role="group" aria-label="Sale settlement asset">
-            {Object.values(solanaSettlementAssets).map((asset) => (
+            {enabledSettlementAssets.map((asset) => (
               <button
                 type="button"
                 key={asset.id}
