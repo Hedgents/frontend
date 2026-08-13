@@ -134,18 +134,36 @@ function pythConfig() {
     : { baseUrl: "https://hermes.pyth.network", headers: {} as Record<string, string> };
 }
 
+/**
+ * Prices for a set of feeds, from the keyed endpoint where it will serve them and the public one
+ * where it will not.
+ *
+ * The paid Pyth plan does not cover every feed this terminal quotes: seven of eleven answer 403,
+ * and because a single failure threw, one uncovered feed took the whole board down and every metal
+ * showed as unavailable. Public Hermes serves all of them, so it is the fallback rather than the
+ * failure. The key is still tried first, since it is the one with the rate limit worth having.
+ */
 async function fetchPrices(path: string, ids: string[], signal: AbortSignal) {
-  const { baseUrl, headers } = pythConfig();
   const params = new URLSearchParams({ parsed: "true", ignore_invalid_price_ids: "true" });
   ids.forEach((id) => params.append("ids[]", id));
-  const response = await fetch(`${baseUrl}${path}?${params}`, {
-    headers,
-    cache: "no-store",
-    signal,
-  });
-  if (!response.ok) throw new Error(`Pyth returned ${response.status}`);
-  const payload = await readBoundedUpstreamJson<PythResponse>(response, 2_000_000, "Pyth");
-  return new Map((payload.parsed ?? []).map((item) => [item.id, item]));
+
+  const attempt = async (baseUrl: string, headers: Record<string, string>) => {
+    const response = await fetch(`${baseUrl}${path}?${params}`, { headers, cache: "no-store", signal });
+    if (!response.ok) throw new Error(`Pyth returned ${response.status}`);
+    const payload = await readBoundedUpstreamJson<PythResponse>(response, 2_000_000, "Pyth");
+    return new Map((payload.parsed ?? []).map((item) => [item.id, item]));
+  };
+
+  const keyed = pythConfig();
+  const PUBLIC_HERMES = "https://hermes.pyth.network";
+  try {
+    return await attempt(keyed.baseUrl, keyed.headers);
+  } catch (error) {
+    if (keyed.baseUrl === PUBLIC_HERMES) throw error;
+    // Abort is the caller giving up, not the endpoint refusing; retrying would hang the request.
+    if (error instanceof Error && error.name === "AbortError") throw error;
+    return attempt(PUBLIC_HERMES, {});
+  }
 }
 
 function unavailableQuote(id: string, note: string): LiveQuote {
