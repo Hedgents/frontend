@@ -76,26 +76,19 @@ export async function POST(request: Request) {
     // True once the wallet has returned something other than what it was handed. It gates the fee
     // tolerance below, so an untouched transaction is still held to byte-for-byte equality.
     const walletModified = submittedBinding.messageDigest !== claims.transactionMessageDigest;
-    if (walletModified) {
-      // The bytes differ, which is expected: `signTransaction` is a modifying signer and wallets
-      // routinely insert a ComputeBudget instruction to set their own priority fee. Refusing that
-      // would reject most real users for doing nothing wrong, so fall through to the commitment
-      // over what the route MEANS, which tolerates exactly that edit and nothing else.
-      if (!claims.transactionSemanticDigest) {
-        throw new ExecutionValidationError(
-          "This quote predates the current route commitment. Build a fresh quote.",
-        );
-      }
-      const submittedMessage = solanaTransactionMessageBytes(signedTransaction);
-      if (solanaMessageSemanticDigest(submittedMessage) !== claims.transactionSemanticDigest) {
-        throw new ExecutionValidationError(
-          "The signed transaction does not match the authenticated executable quote.",
-        );
-      }
-      // No separate "what was added" check is possible or needed here: the server keeps digests,
-      // not the original transaction, and the semantic digest already covers every instruction that
-      // is not a compute-budget one. An injected transfer lands in that hashed list and fails above.
+    if (walletModified && !claims.transactionGuard?.routeDigest) {
+      // Older quotes committed only to the bytes, so there is nothing left to check a modified
+      // transaction against.
+      throw new ExecutionValidationError(
+        "This quote predates the current route commitment. Build a fresh quote.",
+      );
     }
+    // A modified transaction is NOT checked against the message bytes. Wallets add instructions and
+    // their own address lookup tables, and a lookup table means an instruction's accounts are
+    // resolved at runtime, so comparing the raw message cannot see what an instruction actually
+    // touches and shifts position when a table is appended. The authority for these is the guard
+    // below, which re-simulates the submitted transaction and receives every lookup resolved to a
+    // real address before comparing the route.
     if (!submittedBinding.firstSignature) {
       throw new ExecutionValidationError("The signed transaction does not contain a recoverable fee-payer signature.");
     }

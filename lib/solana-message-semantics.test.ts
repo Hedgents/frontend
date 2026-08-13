@@ -5,6 +5,8 @@ import { solanaMessageSemanticDigest } from "./solana-message-semantics";
 import {
   addedInstructionPrograms,
   COMPUTE_BUDGET_PROGRAM_ADDRESS,
+  describeMessageDrift,
+  LIGHTHOUSE_PROGRAM_ADDRESS,
   parseSolanaMessage,
 } from "./solana-message-parse";
 
@@ -162,4 +164,45 @@ test("a legacy message parses too", () => {
   assert.equal(parsed.version, "legacy");
   assert.equal(parsed.feePayer, TAKER);
   assert.equal(parsed.instructions[0].programAddress, JUPITER);
+});
+
+test("Phantom's real edit is tolerated: Lighthouse assertions plus its own lookup table", () => {
+  // What the wallet actually returned: two route instructions became five, with a new lookup table.
+  const signed = message({
+    accounts: [TAKER, MINT, JUPITER, COMPUTE_BUDGET_PROGRAM_ADDRESS, LIGHTHOUSE_PROGRAM_ADDRESS],
+    instructions: [
+      { program: 3, accounts: [], data: [2, 0x40, 0x42, 0x0f, 0x00] },
+      { program: 2, accounts: [0, 1], data: [1, 2, 3, 4] },
+      { program: 4, accounts: [0], data: [9] },
+      { program: 4, accounts: [1], data: [9] },
+    ],
+    lookups: [{ key: TOKEN, writable: [3], readonly: [] }],
+  });
+  const drift = describeMessageDrift({ before: message(ROUTE), after: signed });
+  // The client refuses nothing here: the tables moved, so only the server can judge the rest.
+  assert.deepEqual(drift.blocking, []);
+  assert.ok(drift.deferred.length > 0);
+  assert.deepEqual(
+    addedInstructionPrograms({ before: message(ROUTE), after: signed }),
+    [COMPUTE_BUDGET_PROGRAM_ADDRESS, LIGHTHOUSE_PROGRAM_ADDRESS],
+  );
+});
+
+test("a changed fee payer or blockhash is still refused in the browser", () => {
+  for (const [label, after] of [
+    ["blockhash", message({ ...ROUTE, blockhash: MINT })],
+    ["fee payer", message({ accounts: [MINT, TAKER, JUPITER], instructions: ROUTE.instructions })],
+  ] as const) {
+    const drift = describeMessageDrift({ before: message(ROUTE), after });
+    assert.ok(drift.blocking.length > 0, `${label} should block`);
+  }
+});
+
+test("a retargeted account still blocks in the browser while the tables are unchanged", () => {
+  const tampered = message({
+    accounts: [TAKER, MINT, JUPITER, TOKEN],
+    instructions: [{ program: 2, accounts: [0, 3], data: [1, 2, 3, 4] }],
+  });
+  const drift = describeMessageDrift({ before: message(ROUTE), after: tampered });
+  assert.ok(drift.blocking.some((entry) => entry.startsWith("instruction ")));
 });

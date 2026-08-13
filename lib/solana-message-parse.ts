@@ -29,6 +29,26 @@ import { ExecutionValidationError } from "@/lib/execution-validation";
 /** ComputeBudget111111111111111111111111111111 */
 export const COMPUTE_BUDGET_PROGRAM_ADDRESS = "ComputeBudget111111111111111111111111111111";
 
+/**
+ * Lighthouse, the assertion program Phantom injects into transactions it is asked to sign.
+ *
+ * Its instructions only assert post-conditions and abort the transaction when they do not hold, so
+ * they can cause a swap to fail but never to move value anywhere it was not already going. Phantom
+ * adds them unprompted, together with its own address lookup table.
+ */
+export const LIGHTHOUSE_PROGRAM_ADDRESS = "L2TExMFKdjpN9kozasaurPirfHy9P8sbXoAN1qA3S95";
+
+/**
+ * The only programs a wallet may add instructions for without invalidating a quote.
+ *
+ * Both are incapable of moving funds: one sets the fee, the other asserts and aborts. Any other
+ * addition changes what the transaction does and is refused.
+ */
+export const INJECTABLE_PROGRAM_ADDRESSES: ReadonlySet<string> = new Set([
+  COMPUTE_BUDGET_PROGRAM_ADDRESS,
+  LIGHTHOUSE_PROGRAM_ADDRESS,
+]);
+
 const addressDecoder = getAddressDecoder();
 
 export interface ParsedMessageInstruction {
@@ -208,6 +228,33 @@ export function solanaTransactionMessageBytes(transaction: Uint8Array) {
  * an account, or added an instruction that is not a compute budget.
  */
 export function diffSolanaMessages(input: { before: Uint8Array; after: Uint8Array }): string[] {
+  return describeMessageDrift(input).differences;
+}
+
+/**
+ * The same comparison, split by whether the client can actually judge it.
+ *
+ * A wallet that appends its own address lookup table shifts the position of every account the
+ * existing instructions resolve through, so once the tables differ the client can no longer tell a
+ * retargeted account from an unmoved one. Those cases are `deferred`: only the server, which
+ * re-simulates and receives the tables resolved, can decide them. `blocking` covers what needs no
+ * resolution to judge and can be refused before a pointless round trip.
+ */
+export function describeMessageDrift(input: { before: Uint8Array; after: Uint8Array }) {
+  const differences = collectDifferences(input);
+  const lookupsChanged = differences.includes("address lookup tables");
+  const blocking = differences.filter((difference) => {
+    if (difference === "message version" || difference === "fee payer") return true;
+    if (difference === "blockhash") return true;
+    if (difference === "unreadable transaction") return true;
+    // Instruction-level drift is only judgeable while the tables are unchanged.
+    if (lookupsChanged) return false;
+    return difference.startsWith("instruction ");
+  });
+  return { differences, blocking, deferred: differences.filter((d) => !blocking.includes(d)) };
+}
+
+function collectDifferences(input: { before: Uint8Array; after: Uint8Array }): string[] {
   let before: ParsedSolanaMessage;
   let after: ParsedSolanaMessage;
   try {

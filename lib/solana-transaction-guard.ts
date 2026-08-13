@@ -5,7 +5,7 @@ import {
   getCompiledTransactionMessageDecoder,
   getTransactionDecoder,
 } from "@solana/kit";
-import { COMPUTE_BUDGET_PROGRAM_ADDRESS } from "@/lib/solana-message-semantics";
+import { INJECTABLE_PROGRAM_ADDRESSES } from "@/lib/solana-message-parse";
 import { ExecutionValidationError } from "@/lib/execution-validation";
 import { bindSolanaTransaction } from "@/lib/solana-transaction-binding";
 
@@ -721,11 +721,13 @@ export function guardSolanaTransaction(
       if (!account) guardFailure("an outer instruction references an unresolved account.");
       return account;
     });
-    // Compute-budget instructions are excluded from the route's identity. A wallet is entitled to
-    // add one to set its own priority fee, and folding that into the fingerprint would make every
-    // such user's transaction look like a different route. Its only consequence is the fee, which
-    // is bounded numerically by assertTransactionGuardCompatible instead.
-    if (programId !== COMPUTE_BUDGET_PROGRAM_ADDRESS) {
+    // Wallet-injected instructions are excluded from the route's identity. A wallet may set its own
+    // priority fee (ComputeBudget) and Phantom appends assertions (Lighthouse) unprompted; folding
+    // either into the fingerprint would make every such user's transaction look like a different
+    // route. Neither can move value: one sets a fee, the other asserts and aborts. Any OTHER
+    // injected program is left in, so it changes the fingerprint and the submission is refused.
+    // The fee itself is bounded numerically by assertTransactionGuardCompatible.
+    if (!INJECTABLE_PROGRAM_ADDRESSES.has(programId)) {
       programIds.push(programId);
       effects.push(analyzeInstruction(
         programId,
@@ -775,7 +777,7 @@ export function guardSolanaTransaction(
           ? []
           : requireStringArray(instruction.accounts, "inner-instruction accounts");
       }
-      if (programId !== COMPUTE_BUDGET_PROGRAM_ADDRESS) {
+      if (!INJECTABLE_PROGRAM_ADDRESSES.has(programId)) {
         programIds.push(programId);
         effects.push(analyzeInstruction(
           programId,

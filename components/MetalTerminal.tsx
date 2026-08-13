@@ -41,8 +41,7 @@ import {
   getTransactionEncoder,
 } from "@solana/kit";
 import { createTransactionSignerFromWalletAccount } from "@solana/wallet-account-signer";
-import { describeWalletTampering } from "@/lib/wallet-transaction-tamper";
-import { diffSolanaMessages, solanaTransactionMessageBytes } from "@/lib/solana-message-parse";
+import { describeMessageDrift, solanaTransactionMessageBytes } from "@/lib/solana-message-parse";
 import { useClient } from "@solana/react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
@@ -951,25 +950,19 @@ export function MetalTerminal({
       const signedBase64 = encodeBase64(signedBytes);
       const signedSignature = String(getSignatureFromTransaction(signedTransaction));
 
-      // A wallet may set its own priority fee, which changes these bytes. The server tolerates
-      // exactly that and nothing else, so only a change that goes further is stopped here, where
-      // both transactions are in hand and the reason can be named rather than guessed at.
-      const tampering = describeWalletTampering({
-        original: decodeBase64(executionOrder.transaction),
-        signed: new Uint8Array(signedBytes),
+      // A wallet may set its own priority fee and Phantom appends Lighthouse assertions, both of
+      // which the server tolerates. Only refuse here what the client can actually judge: once the
+      // wallet has brought its own lookup table, an instruction's accounts resolve at runtime and
+      // the browser can no longer tell a retargeted account from an unmoved one. Those go to the
+      // server, which re-simulates and sees the tables resolved.
+      const drift = describeMessageDrift({
+        before: solanaTransactionMessageBytes(decodeBase64(executionOrder.transaction)),
+        after: solanaTransactionMessageBytes(new Uint8Array(signedBytes)),
       });
-      // Name what moved. A priority fee shows up only as added compute-budget instructions, which
-      // the server tolerates; anything listed here is a change it will refuse, so say which.
-      const drifted = tampering.changed
-        ? diffSolanaMessages({
-          before: solanaTransactionMessageBytes(decodeBase64(executionOrder.transaction)),
-          after: solanaTransactionMessageBytes(new Uint8Array(signedBytes)),
-        })
-        : [];
-      if (drifted.length > 0) {
+      if (drift.blocking.length > 0) {
         setExecutionError(
-          `Your wallet changed the ${drifted.join(", ")} before signing, which this quote does not `
-          + "allow. Nothing was submitted and no funds moved. Build a fresh quote.",
+          `Your wallet changed the ${drift.blocking.join(", ")} before signing, which this quote `
+          + "does not allow. Nothing was submitted and no funds moved. Build a fresh quote.",
         );
         setExecutionErrorCode("wallet_modified_transaction");
         setExecutionPhase("failed");
