@@ -39,6 +39,10 @@ while true; do
     && echo "  next round quoted" || echo "  quoting failed"
   npx tsx scripts/resolve-pulse-rounds.ts 8 >/dev/null 2>&1 \
     && echo "  settled what was due" || echo "  settlement failed"
+  # Reclaim rent from rounds that are fully settled. Without this a round costs 0.023 SOL forever;
+  # with it about 0.003 stays spent, being the two outcome mints the token program cannot close.
+  npx tsx --conditions=react-server scripts/close-settled-pulse-rounds.ts 24 >/dev/null 2>&1 \
+    && echo "  reclaimed settled rent" || echo "  rent reclaim failed"
 
   # Wake a little after each quarter-hour boundary, so a freshly opened round is quoted promptly.
   now=$(date -u +%s)

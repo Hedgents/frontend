@@ -276,6 +276,87 @@ export type ScarcityExchange = {
       "args": []
     },
     {
+      "name": "closeMarket",
+      "docs": [
+        "Reclaim the rent of a settled market whose vault owes nothing.",
+        "",
+        "A market account is permanent otherwise, which at one round every fifteen minutes is the",
+        "dominant running cost of the price market. Closing recovers the market account and its",
+        "vault; the two outcome mints cannot be closed by the SPL token program and stay behind.",
+        "",
+        "The guard is that the vault has no remaining liability. `redeem` is bounded by",
+        "`total_redeemed <= open_interest`, so once those are equal nobody can redeem anything ever",
+        "again and the vault balance is dust-free by construction; both are checked rather than",
+        "inferred. A winner who has not redeemed yet keeps the market open, which is the point:",
+        "nothing here may strand a claim to reclaim rent."
+      ],
+      "discriminator": [
+        88,
+        154,
+        248,
+        186,
+        48,
+        14,
+        123,
+        244
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "relations": [
+            "market"
+          ]
+        },
+        {
+          "name": "admin",
+          "docs": [
+            "Receives the reclaimed rent, and is the only party allowed to reclaim it."
+          ],
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "config"
+          ]
+        },
+        {
+          "name": "market",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  97,
+                  114,
+                  107,
+                  101,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "market.market_id",
+                "account": "scarcityMarket"
+              }
+            ]
+          }
+        },
+        {
+          "name": "vault",
+          "writable": true,
+          "relations": [
+            "market"
+          ]
+        },
+        {
+          "name": "tokenProgram",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "createCurveMarket",
       "discriminator": [
         238,
@@ -2321,6 +2402,19 @@ export type ScarcityExchange = {
       ]
     },
     {
+      "name": "marketClosed",
+      "discriminator": [
+        86,
+        91,
+        119,
+        43,
+        94,
+        0,
+        217,
+        113
+      ]
+    },
+    {
       "name": "marketCreated",
       "discriminator": [
         88,
@@ -3414,6 +3508,35 @@ export type ScarcityExchange = {
           {
             "name": "expiresAt",
             "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "marketClosed",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "market",
+            "type": "pubkey"
+          },
+          {
+            "name": "marketId",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "openInterest",
+            "type": "u64"
+          },
+          {
+            "name": "totalRedeemed",
+            "type": "u64"
           }
         ]
       }

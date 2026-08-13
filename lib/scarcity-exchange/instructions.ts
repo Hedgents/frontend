@@ -37,6 +37,7 @@ type InstructionName =
   | "redeem"
   | "set_paused"
   | "set_resolver"
+  | "close_market"
   | "place_order"
   | "fill_ask"
   | "fill_bid"
@@ -716,6 +717,33 @@ export async function getRedeemInstruction(input: {
       readonly(TOKEN_PROGRAM_ADDRESS),
     ],
     data: concatBytes(instructionDiscriminator("redeem"), encodeU64(input.amount)),
+  };
+}
+
+/**
+ * Reclaim the rent of a settled market whose vault owes nothing.
+ *
+ * The program refuses unless the market is resolved and `total_redeemed == open_interest`, so a
+ * winner who has not redeemed keeps their market open. Recovers the market account and its vault;
+ * the two outcome mints cannot be closed by the SPL token program.
+ */
+export async function getCloseMarketInstruction(input: {
+  admin: Address;
+  marketId: Uint8Array;
+}): Promise<Instruction> {
+  assertBytes32(input.marketId, "market ID");
+  const [config] = await deriveConfigAddress();
+  const addresses = await deriveMarketAddresses(input.marketId);
+  return {
+    programAddress: SCARCITY_EXCHANGE_PROGRAM_ADDRESS,
+    accounts: [
+      readonly(config),
+      writableSigner(input.admin),
+      writable(addresses.market),
+      writable(addresses.vault),
+      readonly(TOKEN_PROGRAM_ADDRESS),
+    ],
+    data: instructionDiscriminator("close_market"),
   };
 }
 
