@@ -56,3 +56,12 @@ test("an Error already poisoned with [object Object] does not pass it on", () =>
   const withCause = new Error(String({}), { cause: { message: "Slippage exceeded" } });
   assert.equal(executionErrorMessage(withCause), "Slippage exceeded");
 });
+
+test("a Jupiter-style structured body yields readable text, not [object Object]", () => {
+  // The exact shape that hid the venue's complaint: `error` is an object, not a string.
+  assert.equal(
+    executionErrorMessage({ error: { code: 6001, message: "Slippage tolerance exceeded" } }),
+    "Slippage tolerance exceeded (6001)",
+  );
+  assert.match(executionErrorMessage({ error: { instruction: 3, custom: 6001 } }), /6001/);
+});

@@ -1,5 +1,6 @@
 import "server-only";
 
+import { executionErrorMessage } from "@/lib/execution-errors";
 import { ExecutionValidationError } from "@/lib/execution-validation";
 import type { ExecutionAuthorizationClaims } from "@/lib/execution-authorization";
 import type { SettlementVerification } from "@/lib/execution-types";
@@ -26,10 +27,18 @@ import {
 
 const JUPITER_SWAP_V2 = "https://api.jup.ag/swap/v2";
 
+/**
+ * Jupiter's failure bodies, whose `error` is sometimes a string and sometimes an object.
+ *
+ * Typing it as a string was the bug: the object was passed straight through as an error message
+ * and reached the operator as "[object Object]", hiding the venue's actual complaint through four
+ * rounds of debugging. `unknown` forces every reader to extract rather than assume.
+ */
 interface JupiterErrorPayload {
-  error?: string;
-  errorMessage?: string;
-  message?: string;
+  error?: unknown;
+  errorMessage?: unknown;
+  message?: unknown;
+  code?: unknown;
 }
 
 export function hasJupiterApiKey() {
@@ -50,7 +59,21 @@ function jupiterApiKey() {
 async function errorMessage(response: Response) {
   try {
     const payload = await readBoundedUpstreamJson<JupiterErrorPayload>(response, 64_000, "Jupiter");
-    return payload.errorMessage ?? payload.error ?? payload.message ?? `Jupiter returned ${response.status}.`;
+    for (const candidate of [payload.errorMessage, payload.error, payload.message]) {
+      if (candidate === undefined || candidate === null) continue;
+      const extracted = executionErrorMessage(candidate);
+      if (extracted && extracted !== "Execution did not complete.") {
+        const code = payload.code;
+        return typeof code === "number" || typeof code === "string"
+          ? `Jupiter: ${extracted} (${code})`
+          : `Jupiter: ${extracted}`;
+      }
+    }
+    // Nothing readable in the body, but the body itself is still the best evidence there is.
+    const serialised = JSON.stringify(payload);
+    return serialised && serialised !== "{}"
+      ? `Jupiter returned ${response.status}: ${serialised.slice(0, 300)}`
+      : `Jupiter returned ${response.status}.`;
   } catch {
     return `Jupiter returned ${response.status}.`;
   }
