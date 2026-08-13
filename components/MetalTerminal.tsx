@@ -42,6 +42,7 @@ import {
 } from "@solana/kit";
 import { createTransactionSignerFromWalletAccount } from "@solana/wallet-account-signer";
 import { describeWalletTampering } from "@/lib/wallet-transaction-tamper";
+import { diffSolanaMessages, solanaTransactionMessageBytes } from "@/lib/solana-message-parse";
 import { useClient } from "@solana/react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
@@ -957,8 +958,19 @@ export function MetalTerminal({
         original: decodeBase64(executionOrder.transaction),
         signed: new Uint8Array(signedBytes),
       });
-      if (tampering.changed && !tampering.lengthChanged) {
-        setExecutionError(`${tampering.summary} Nothing was submitted and no funds moved.`);
+      // Name what moved. A priority fee shows up only as added compute-budget instructions, which
+      // the server tolerates; anything listed here is a change it will refuse, so say which.
+      const drifted = tampering.changed
+        ? diffSolanaMessages({
+          before: solanaTransactionMessageBytes(decodeBase64(executionOrder.transaction)),
+          after: solanaTransactionMessageBytes(new Uint8Array(signedBytes)),
+        })
+        : [];
+      if (drifted.length > 0) {
+        setExecutionError(
+          `Your wallet changed the ${drifted.join(", ")} before signing, which this quote does not `
+          + "allow. Nothing was submitted and no funds moved. Build a fresh quote.",
+        );
         setExecutionErrorCode("wallet_modified_transaction");
         setExecutionPhase("failed");
         trackBetaEvent("order_wallet_modified_transaction", {

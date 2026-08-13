@@ -1,12 +1,12 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { getAddressEncoder, address } from "@solana/kit";
+import { solanaMessageSemanticDigest } from "./solana-message-semantics";
 import {
   addedInstructionPrograms,
   COMPUTE_BUDGET_PROGRAM_ADDRESS,
   parseSolanaMessage,
-  solanaMessageSemanticDigest,
-} from "./solana-message-semantics";
+} from "./solana-message-parse";
 
 const encoder = getAddressEncoder();
 const TAKER = "HBvV7YqSRSPW4YEBsDvpvF2PrUWFubqVbTNYafkddTsy";
