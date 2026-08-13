@@ -229,7 +229,14 @@ export function diffSolanaMessages(input: { before: Uint8Array; after: Uint8Arra
   const beforeInstructions = strip(before);
   const afterInstructions = strip(after);
   if (beforeInstructions.length !== afterInstructions.length) {
-    differences.push(`instruction count (${beforeInstructions.length} to ${afterInstructions.length})`);
+    // Name the programs, not just the count. Which program a wallet injected decides whether the
+    // addition is benign, and no amount of counting answers that.
+    const added = addedInstructionPrograms({ before: input.before, after: input.after })
+      .filter((program) => program !== COMPUTE_BUDGET_PROGRAM_ADDRESS);
+    differences.push(
+      `instruction count (${beforeInstructions.length} to ${afterInstructions.length})`
+      + (added.length ? `, added by ${added.join(" and ")}` : ""),
+    );
     return differences;
   }
   for (let index = 0; index < beforeInstructions.length; index += 1) {
