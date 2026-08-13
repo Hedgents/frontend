@@ -1,54 +1,71 @@
-/* Styles live here rather than inline: the app's CSP has no unsafe-inline for style-src. */
+/*
+ * Devnet funding strip, in the workspace idiom: square corners, hairline rules, uppercase mono
+ * labels, metal-tone accent. Tokens come from `.exchange`, which this renders inside.
+ *
+ * Styles live here rather than inline because the app's CSP has no unsafe-inline for style-src.
+ */
 .faucet {
-  display: flex;
-  flex-direction: column;
-  gap: 9px;
-  padding: 13px 14px;
-  border: 1px solid rgba(230, 226, 216, .12);
-  border-radius: 10px;
-  background: rgba(230, 226, 216, .03);
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 20px;
+  padding: 15px 26px;
+  border-bottom: 1px solid var(--line);
+  background: rgba(255, 255, 255, .008);
 }
 
-.head { display: flex; align-items: flex-start; gap: 9px; }
-.head > svg { flex: none; margin-top: 2px; color: var(--metal-tone); }
-.head > div { display: flex; flex-direction: column; gap: 3px; }
+.head { display: flex; align-items: center; gap: 11px; min-width: 0; }
+.head > svg { flex: none; color: var(--metal-tone); }
+.head > div { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
 
 .head strong {
-  font: 600 8px/1.3 var(--font-mono), monospace;
-  letter-spacing: .14em;
-  text-transform: uppercase;
   color: var(--faint);
+  font: 700 12px/1 var(--font-mono), monospace;
+  letter-spacing: .12em;
+  text-transform: uppercase;
 }
 
-.head span {
-  font: 500 12px/1.2 var(--font-mono), monospace;
+/* Qualified past the exchange's blanket 12px rule for span/small/p/dt/dd. */
+.head > div > span {
+  color: var(--paper);
+  font: 500 13px/1.2 var(--font-mono), monospace;
   font-variant-numeric: tabular-nums;
 }
 
 .faucet > button {
-  padding: 10px 14px;
+  grid-column: 2;
+  grid-row: 1;
+  padding: 11px 20px;
   border: 1px solid var(--metal-tone);
-  border-radius: 8px;
   background: transparent;
   color: var(--metal-tone);
-  font: 650 12px/1 var(--font-mono), monospace;
+  font: 700 12px/1 var(--font-mono), monospace;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  white-space: nowrap;
   cursor: pointer;
 }
 
-.faucet > button:hover:not([disabled]) { background: var(--metal-tone); color: #10100e; }
-.faucet > button[disabled] { opacity: .45; cursor: not-allowed; }
-.faucet > button:focus-visible { outline: 2px solid var(--metal-tone); outline-offset: 2px; }
+.faucet > button:hover:not([disabled]) { background: var(--metal-tone); color: var(--ink); }
+.faucet > button[disabled] { opacity: .4; cursor: not-allowed; }
+.faucet > button:focus-visible { outline: 1px solid var(--metal-tone); outline-offset: 2px; }
 
 .granted, .error, .note {
+  grid-column: 1 / -1;
   display: flex;
   align-items: flex-start;
-  gap: 6px;
+  gap: 7px;
   margin: 0;
-  font-size: 11px;
-  line-height: 1.45;
+  font-size: 12px;
+  line-height: 1.55;
 }
 
-.granted { color: #4ea981; }
-.error { color: #e08877; }
-.note { color: var(--faint); }
+.granted { color: var(--yes); }
+.error { color: var(--no); }
+.note { color: var(--faint); max-width: 90ch; }
 .granted svg, .error svg { flex: none; margin-top: 2px; }
+
+@media (max-width: 720px) {
+  .faucet { grid-template-columns: 1fr; }
+  .faucet > button { grid-column: 1; grid-row: auto; }
+}
