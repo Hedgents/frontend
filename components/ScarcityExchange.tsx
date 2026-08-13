@@ -42,6 +42,7 @@ import {
 } from "./ScarcityWalletActions";
 import { ScarcityOracle } from "./ScarcityOracle";
 import { PulseMarket } from "./PulseMarket";
+import { DevnetFaucetButton } from "./DevnetFaucetButton";
 import { ScarcityCurveMarket } from "./ScarcityCurveMarket";
 import { ScarcityInstrumentTabs } from "./ScarcityInstrumentTabs";
 import {
@@ -609,6 +610,8 @@ export function ScarcityExchange({ markets, defaultDataset, initialView = "marke
           <span className={`${styles.buildBadge} ${view === "evidence" || view === "pulse" || view === "oracle" || instrument === "curve" || !chainState ? styles.specificationBadge : ""}`}><i /> {view === "evidence" ? "Rules + policies" : view === "pulse" ? "Onchain rounds" : view === "oracle" ? "99 metal paths" : instrument === "curve" ? "Curve forecasts" : chainState ? `${chainState.deployment.cluster} live` : "Specification only"}</span>
         </div>
       </header>
+
+      <DevnetFaucetButton />
 
       <ScarcityTransactionRecovery
         wallet={ownerAddress}

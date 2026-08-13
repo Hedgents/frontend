@@ -23,8 +23,6 @@ import {
 } from "@/lib/scarcity-deployment";
 import { curveWeight, normalizedToCurveBucket } from "@/lib/scarcity-curve-math";
 import { calculateCurvePositionClaimable } from "@/lib/scarcity-curve-payout";
-import { compileCurveMarket } from "@/lib/scarcity-curves";
-import { getStoredScarcityMarket } from "@/lib/scarcity-market-store";
 import { solanaRpcRequestFrom } from "@/lib/solana-rpc";
 
 interface RpcAccountData {
@@ -217,8 +215,11 @@ async function verifyCurveCommitments(input: {
 }) {
   const manifest = input.deployment.curveMarkets[input.slug];
   if (!manifest) throw new Error("The curve market is not present in the deployment manifest.");
-  const catalog = await getStoredScarcityMarket(manifest.sourceSlug);
-  const compiled = catalog ? compileCurveMarket(catalog) : null;
+  // Recompile through the same resolver the deployment loader used. Going straight to the catalog
+  // silently excludes the lithium rounds, which compile from their own frozen index rather than from
+  // a stored catalog record, so every one of them failed this check and could never be traded.
+  const resolved = await resolveStoredCurveMarket(input.slug);
+  const compiled = resolved?.compiled ?? null;
   if (!compiled || compiled.slug !== input.slug) {
     throw new Error("The deployed curve no longer compiles from its canonical source market.");
   }
