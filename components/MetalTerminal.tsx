@@ -41,6 +41,7 @@ import {
   getTransactionEncoder,
 } from "@solana/kit";
 import { createTransactionSignerFromWalletAccount } from "@solana/wallet-account-signer";
+import { describeWalletTampering } from "@/lib/wallet-transaction-tamper";
 import { useClient } from "@solana/react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
@@ -945,8 +946,29 @@ export function MetalTerminal({
         "solana:mainnet",
       );
       const [signedTransaction] = await signer.modifyAndSignTransactions([transaction]);
-      const signedBase64 = encodeBase64(getTransactionEncoder().encode(signedTransaction));
+      const signedBytes = getTransactionEncoder().encode(signedTransaction);
+      const signedBase64 = encodeBase64(signedBytes);
       const signedSignature = String(getSignatureFromTransaction(signedTransaction));
+
+      // The wallet standard's signTransaction is a MODIFYING signer: the wallet may hand back
+      // something other than what it was given, and several do, to set their own priority fee. The
+      // server authorised one exact message and will refuse anything else, so catch it here where
+      // both transactions are in hand and the reason can actually be named.
+      const tampering = describeWalletTampering({
+        original: decodeBase64(executionOrder.transaction),
+        signed: new Uint8Array(signedBytes),
+      });
+      if (tampering.changed) {
+        setExecutionError(`${tampering.summary} Nothing was submitted and no funds moved.`);
+        setExecutionErrorCode("wallet_modified_transaction");
+        setExecutionPhase("failed");
+        trackBetaEvent("order_wallet_modified_transaction", {
+          productId: selectedProduct.id,
+          metal: selectedMarket.id,
+          amountBucket: amountBucket(parsedAmount),
+        });
+        return;
+      }
 
       if (executionControl.rejectionOnly) {
         const message = "The wallet approved the request. The transaction was signed locally, intentionally discarded, and never submitted. No funds moved.";

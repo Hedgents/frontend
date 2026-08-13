@@ -11,6 +11,7 @@ export const analyticsEventNames = [
   "order_quote_ready",
   "order_quote_failed",
   "order_signature_requested",
+  "order_wallet_modified_transaction",
   "wallet_qa_approved",
   "order_submitted",
   "order_execution_failed",
