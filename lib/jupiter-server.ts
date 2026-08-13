@@ -1,6 +1,7 @@
 import "server-only";
 
 import { executionErrorMessage } from "@/lib/execution-errors";
+import { jupiterExecuteBody, type JupiterExecuteInput } from "@/lib/jupiter-execute-body";
 import { ExecutionValidationError } from "@/lib/execution-validation";
 import type { ExecutionAuthorizationClaims } from "@/lib/execution-authorization";
 import type { SettlementVerification } from "@/lib/execution-types";
@@ -103,11 +104,16 @@ export async function getJupiterOrder(params: URLSearchParams) {
   }
 }
 
-export async function executeJupiterOrder(body: {
-  signedTransaction: string;
-  requestId: string;
-  lastValidBlockHeight?: number;
-}) {
+/**
+ * Submit a signed transaction to Jupiter.
+ *
+ * `lastValidBlockHeight` goes over the wire as a STRING. Sending the number it is everywhere else
+ * in this codebase makes Jupiter's schema reject the whole request before it looks at the
+ * transaction, with a validation error and no execution, so the conversion happens here rather
+ * than being left to each caller to remember.
+ */
+export async function executeJupiterOrder(input: JupiterExecuteInput) {
+  const body = jupiterExecuteBody(input);
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 45_000);
   try {
