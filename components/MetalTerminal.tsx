@@ -62,7 +62,7 @@ import {
   setDiagnosticsConsent,
   trackBetaEvent,
 } from "@/lib/beta-telemetry";
-import { actionableExecutionError, amountBucket } from "@/lib/execution-errors";
+import { actionableExecutionError, amountBucket, executionErrorMessage } from "@/lib/execution-errors";
 import type { PublicExecutionControls } from "@/lib/execution-controls";
 import { readPendingCctpFunding } from "@/lib/cctp-funding-storage";
 import { normalizeExecutionReceipt, parseExecutionReceipt } from "@/lib/execution-receipts";
@@ -1045,9 +1045,20 @@ export function MetalTerminal({
           },
         }),
       });
-      const payload = (await response.json()) as JupiterExecutionResult & {
-        error?: string;
+      // The venue returns structured errors here. The previous `error?: string` annotation was a
+      // lie the compiler could not check, and one reached the screen as "[object Object]", so the
+      // raw shape is read as unknown and flattened to a message once, at this boundary.
+      const rawPayload = (await response.json()) as Omit<JupiterExecutionResult, "error"> & {
+        error?: unknown;
         submissionState?: "submitted" | "not-submitted" | "unknown";
+      };
+      const payload: JupiterExecutionResult & {
+        submissionState?: "submitted" | "not-submitted" | "unknown";
+      } = {
+        ...rawPayload,
+        error: rawPayload.error === undefined || rawPayload.error === null
+          ? null
+          : executionErrorMessage(rawPayload.error),
       };
       serverSubmissionState = payload.submissionState === "not-submitted" ? "not-submitted" : "unknown";
       if (!response.ok && !payload.status) {

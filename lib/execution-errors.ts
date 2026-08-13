@@ -5,8 +5,46 @@ export interface ActionableExecutionError {
   retryable: boolean;
 }
 
+/**
+ * Get a human-readable message out of anything that was thrown or returned.
+ *
+ * `String(value)` on a plain object yields "[object Object]", which is how a real failure reached
+ * someone mid-checkout as no information at all. Wallets and venues both return structured errors,
+ * so the shape has to be interrogated rather than assumed: an Error has `message`, Jupiter nests
+ * `error`, wallets often carry `code` alongside `message`, and anything else is worth serialising
+ * verbatim rather than discarding.
+ */
+export function executionErrorMessage(error: unknown): string {
+  if (error instanceof Error && error.message) return error.message;
+  if (typeof error === "string" && error) return error;
+  if (error && typeof error === "object") {
+    const candidate = error as Record<string, unknown>;
+    for (const key of ["message", "error", "reason", "description"]) {
+      const value = candidate[key];
+      if (typeof value === "string" && value) {
+        const code = candidate.code;
+        return typeof code === "number" || typeof code === "string" ? `${value} (${code})` : value;
+      }
+      // Jupiter nests its failure under `error`, sometimes as another object.
+      if (value && typeof value === "object") {
+        const nested = executionErrorMessage(value);
+        if (nested && nested !== FALLBACK) return nested;
+      }
+    }
+    try {
+      const serialised = JSON.stringify(error);
+      if (serialised && serialised !== "{}") return serialised.slice(0, 400);
+    } catch {
+      // Circular or otherwise unserialisable; fall through to the generic message.
+    }
+  }
+  return FALLBACK;
+}
+
+const FALLBACK = "Execution did not complete.";
+
 export function actionableExecutionError(error: unknown): ActionableExecutionError {
-  const raw = error instanceof Error ? error.message : String(error || "Execution did not complete.");
+  const raw = executionErrorMessage(error);
   const value = raw.toLowerCase();
   if (value.includes("reject") || value.includes("declin") || value.includes("cancel")) {
     return { code: "wallet_rejected", message: raw, action: "No transaction was sent. Build a fresh quote when ready.", retryable: true };
