@@ -1073,6 +1073,15 @@ export function MetalTerminal({
           : executionErrorMessage(rawPayload.error),
       };
       serverSubmissionState = payload.submissionState === "not-submitted" ? "not-submitted" : "unknown";
+      if (!response.ok) {
+        // Printed verbatim on purpose. A rejection here is the operator's own guard refusing the
+        // order, and its reason is the whole diagnosis; three deploys were spent because that
+        // reason kept being lost between the response and the screen.
+        console.error(
+          "[hedgents] execution rejected", response.status,
+          JSON.stringify(rawPayload)?.slice(0, 800),
+        );
+      }
       if (!response.ok && !payload.status) {
         throw new Error(payload.error ?? "The signed route was not accepted.");
       }
