@@ -262,7 +262,11 @@ async function recoverExecutionRecord(record: ExecutionRecord) {
     error?: string;
   };
   if (!response.ok || !payload.status || !payload.settlement) {
-    throw new Error(payload.error ?? "Settlement could not be recovered yet.");
+    throw new Error(
+      payload.error === undefined || payload.error === null
+        ? "Settlement could not be recovered yet."
+        : executionErrorMessage(payload.error),
+    );
   }
   return mergeRecoveredExecutionRecord(record, payload.settlement);
 }
@@ -861,8 +865,16 @@ export function MetalTerminal({
           },
         }),
       });
-      const payload = (await response.json()) as JupiterOrderQuote & { error?: string };
-      if (!response.ok) throw new Error(payload.error ?? "The executable route could not be built.");
+      const payload = (await response.json()) as JupiterOrderQuote & { error?: unknown };
+      if (!response.ok) {
+        // `error` is whatever the server sent; wrapping an object in new Error() produces the
+        // message "[object Object]", which then survives every downstream extraction.
+        throw new Error(
+          payload.error === undefined || payload.error === null
+            ? "The executable route could not be built."
+            : executionErrorMessage(payload.error),
+        );
+      }
       setExecutionOrder(payload);
       setExecutionPhase("ready");
       trackBetaEvent("order_quote_ready", {

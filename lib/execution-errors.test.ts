@@ -48,3 +48,11 @@ test("classification still works through the extracted message", () => {
   const slippage = actionableExecutionError({ error: { message: "insufficient funds for rent" } });
   assert.equal(slippage.code, "insufficient_balance");
 });
+
+test("an Error already poisoned with [object Object] does not pass it on", () => {
+  // How the failure survived the first fix: something upstream did new Error(someObject), so the
+  // useless text was already the Error's own message by the time extraction ran.
+  assert.equal(executionErrorMessage(new Error(String({}))), "Execution did not complete.");
+  const withCause = new Error(String({}), { cause: { message: "Slippage exceeded" } });
+  assert.equal(executionErrorMessage(withCause), "Slippage exceeded");
+});

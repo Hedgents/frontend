@@ -15,7 +15,16 @@ export interface ActionableExecutionError {
  * verbatim rather than discarding.
  */
 export function executionErrorMessage(error: unknown): string {
-  if (error instanceof Error && error.message) return error.message;
+  // An Error built from an object carries the literal text "[object Object]" as its message, which
+  // no later extraction can undo. Treat it as no message at all and keep looking.
+  if (error instanceof Error && error.message && error.message !== "[object Object]") {
+    return error.message;
+  }
+  if (error instanceof Error) {
+    const cause = (error as { cause?: unknown }).cause;
+    if (cause !== undefined && cause !== null) return executionErrorMessage(cause);
+    return FALLBACK;
+  }
   if (typeof error === "string" && error) return error;
   if (error && typeof error === "object") {
     const candidate = error as Record<string, unknown>;
