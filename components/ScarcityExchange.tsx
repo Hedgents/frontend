@@ -41,7 +41,6 @@ import {
   ScarcityTransactionRecovery,
 } from "./ScarcityWalletActions";
 import { ScarcityOracle } from "./ScarcityOracle";
-import { MetalPulse } from "./MetalPulse";
 import { PulseMarket } from "./PulseMarket";
 import { ScarcityCurveMarket } from "./ScarcityCurveMarket";
 import { ScarcityInstrumentTabs } from "./ScarcityInstrumentTabs";
@@ -607,7 +606,7 @@ export function ScarcityExchange({ markets, defaultDataset, initialView = "marke
             <ShieldCheck size={13} aria-hidden="true" />
             <span>Trust center</span>
           </button>
-          <span className={`${styles.buildBadge} ${view === "evidence" || view === "pulse" || view === "oracle" || instrument === "curve" || !chainState ? styles.specificationBadge : ""}`}><i /> {view === "evidence" ? "Rules + policies" : view === "pulse" ? "Paper simulator" : view === "oracle" ? "99 metal paths" : instrument === "curve" ? "Curve forecasts" : chainState ? `${chainState.deployment.cluster} live` : "Specification only"}</span>
+          <span className={`${styles.buildBadge} ${view === "evidence" || view === "pulse" || view === "oracle" || instrument === "curve" || !chainState ? styles.specificationBadge : ""}`}><i /> {view === "evidence" ? "Rules + policies" : view === "pulse" ? "Onchain rounds" : view === "oracle" ? "99 metal paths" : instrument === "curve" ? "Curve forecasts" : chainState ? `${chainState.deployment.cluster} live` : "Specification only"}</span>
         </div>
       </header>
 
@@ -617,12 +616,7 @@ export function ScarcityExchange({ markets, defaultDataset, initialView = "marke
       />
 
       {view === "pulse" ? (
-        <>
-          {/* The real, on-chain round: this is what a tester takes a side on. The paper simulator
-              below it is a rehearsal tool and stays clearly second. */}
-          <PulseMarket onConnect={() => setWalletOpen(true)} />
-          <MetalPulse />
-        </>
+        <PulseMarket onConnect={() => setWalletOpen(true)} />
       ) : view === "oracle" ? (
         <ScarcityOracle
           markets={markets}
