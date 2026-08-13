@@ -19,8 +19,9 @@ import {
   observedCountryCode,
   parseEligibilityEvidence,
 } from "@/lib/eligibility";
-import { getJupiterOrder, simulateSolanaTransaction } from "@/lib/jupiter-server";
-import { transactionGuardCommitment } from "@/lib/solana-transaction-guard";
+import { getJupiterOrder, jupiterApiKeyForRouting, simulateSolanaTransaction } from "@/lib/jupiter-server";
+import { reviewedJupiterVenues } from "@/lib/jupiter-venue-allowlist";
+import { configuredProgramAllowlist, transactionGuardCommitment } from "@/lib/solana-transaction-guard";
 import { solanaMessageSemanticDigest } from "@/lib/solana-message-semantics";
 import { solanaTransactionMessageBytes } from "@/lib/solana-transaction-binding";
 import {
@@ -129,6 +130,14 @@ export async function POST(request: Request) {
       taker,
       excludeRouters: "jupiterz",
     });
+    // Ask only for routes through venues that have passed program review. Without this the router
+    // picks freely from over a hundred venues and the review gate rejects the result afterwards,
+    // which reads to a user as a pair that intermittently does not work.
+    const reviewedVenues = await reviewedJupiterVenues({
+      apiKey: jupiterApiKeyForRouting(),
+      allowlist: configuredProgramAllowlist(),
+    });
+    if (reviewedVenues) params.set("dexes", reviewedVenues);
     const raw = await getJupiterOrder(params);
     const transaction = stringField(raw, "transaction");
     const requestId = stringField(raw, "requestId");

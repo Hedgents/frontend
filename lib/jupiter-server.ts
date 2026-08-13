@@ -42,6 +42,11 @@ interface JupiterErrorPayload {
   code?: unknown;
 }
 
+/** The routing key, for callers that need it to read Jupiter's own metadata endpoints. */
+export function jupiterApiKeyForRouting() {
+  return jupiterApiKey();
+}
+
 export function hasJupiterApiKey() {
   return Boolean(process.env.JUPITER_API_KEY?.trim());
 }
