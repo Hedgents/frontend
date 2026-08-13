@@ -950,15 +950,14 @@ export function MetalTerminal({
       const signedBase64 = encodeBase64(signedBytes);
       const signedSignature = String(getSignatureFromTransaction(signedTransaction));
 
-      // The wallet standard's signTransaction is a MODIFYING signer: the wallet may hand back
-      // something other than what it was given, and several do, to set their own priority fee. The
-      // server authorised one exact message and will refuse anything else, so catch it here where
-      // both transactions are in hand and the reason can actually be named.
+      // A wallet may set its own priority fee, which changes these bytes. The server tolerates
+      // exactly that and nothing else, so only a change that goes further is stopped here, where
+      // both transactions are in hand and the reason can be named rather than guessed at.
       const tampering = describeWalletTampering({
         original: decodeBase64(executionOrder.transaction),
         signed: new Uint8Array(signedBytes),
       });
-      if (tampering.changed) {
+      if (tampering.changed && !tampering.lengthChanged) {
         setExecutionError(`${tampering.summary} Nothing was submitted and no funds moved.`);
         setExecutionErrorCode("wallet_modified_transaction");
         setExecutionPhase("failed");

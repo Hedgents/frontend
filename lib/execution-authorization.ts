@@ -29,6 +29,12 @@ export interface ExecutionAuthorizationClaims {
   /** Cap in force when the order was assembled; optional only for legacy recovery receipts. */
   betaMaximumUsd?: number;
   transactionMessageDigest: string;
+  /**
+   * Commitment over what the message MEANS, so a wallet may add its own priority fee without
+   * invalidating the quote. Optional only so authorizations issued before this existed, and
+   * historical recovery receipts, remain readable; submission requires it.
+   */
+  transactionSemanticDigest?: string;
   /** Required for new executions; optional only so historical recovery receipts remain readable. */
   transactionGuard?: TransactionGuardCommitment;
   lastValidBlockHeight: number | null;
@@ -102,6 +108,12 @@ function validateClaims(claims: ExecutionAuthorizationClaims, requestId?: string
   }
   if (!/^[a-f0-9]{64}$/.test(claims.transactionMessageDigest)) {
     throw new ExecutionValidationError("The executable quote transaction commitment is invalid.");
+  }
+  if (
+    claims.transactionSemanticDigest !== undefined
+    && !/^[a-f0-9]{64}$/.test(claims.transactionSemanticDigest)
+  ) {
+    throw new ExecutionValidationError("The executable quote route commitment is invalid.");
   }
   if (claims.transactionGuard !== undefined && (
     claims.transactionGuard.schema !== TRANSACTION_GUARD_SCHEMA ||

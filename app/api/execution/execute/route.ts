@@ -19,7 +19,8 @@ import {
 } from "@/lib/jupiter-server";
 import { validateExecutionAuthorization } from "@/lib/execution-authorization";
 import { getSolanaExecutionProduct, getSolanaSettlementAsset } from "@/lib/product-registry";
-import { bindSolanaTransaction } from "@/lib/solana-transaction-binding";
+import { bindSolanaTransaction, solanaTransactionMessageBytes } from "@/lib/solana-transaction-binding";
+import { solanaMessageSemanticDigest } from "@/lib/solana-message-semantics";
 import {
   executionStatusFromSettlement,
   submissionStateFromSettlement,
@@ -72,8 +73,28 @@ export async function POST(request: Request) {
       executionControls,
     );
     const submittedBinding = bindSolanaTransaction(signedTransaction, claims.taker, { requireFirstSignature: true });
-    if (submittedBinding.messageDigest !== claims.transactionMessageDigest) {
-      throw new ExecutionValidationError("The signed transaction does not match the authenticated executable quote.");
+    // True once the wallet has returned something other than what it was handed. It gates the fee
+    // tolerance below, so an untouched transaction is still held to byte-for-byte equality.
+    const walletModified = submittedBinding.messageDigest !== claims.transactionMessageDigest;
+    if (walletModified) {
+      // The bytes differ, which is expected: `signTransaction` is a modifying signer and wallets
+      // routinely insert a ComputeBudget instruction to set their own priority fee. Refusing that
+      // would reject most real users for doing nothing wrong, so fall through to the commitment
+      // over what the route MEANS, which tolerates exactly that edit and nothing else.
+      if (!claims.transactionSemanticDigest) {
+        throw new ExecutionValidationError(
+          "This quote predates the current route commitment. Build a fresh quote.",
+        );
+      }
+      const submittedMessage = solanaTransactionMessageBytes(signedTransaction);
+      if (solanaMessageSemanticDigest(submittedMessage) !== claims.transactionSemanticDigest) {
+        throw new ExecutionValidationError(
+          "The signed transaction does not match the authenticated executable quote.",
+        );
+      }
+      // No separate "what was added" check is possible or needed here: the server keeps digests,
+      // not the original transaction, and the semantic digest already covers every instruction that
+      // is not a compute-budget one. An injected transfer lands in that hashed list and fails above.
     }
     if (!submittedBinding.firstSignature) {
       throw new ExecutionValidationError("The signed transaction does not contain a recoverable fee-payer signature.");
@@ -106,7 +127,11 @@ export async function POST(request: Request) {
       },
       { sigVerify: true },
     );
-    assertTransactionGuardCompatible(claims.transactionGuard, observedGuard);
+    // The fee tolerance is offered only when the wallet actually changed the transaction. An
+    // untouched one must still match its safety report exactly, fee included.
+    assertTransactionGuardCompatible(claims.transactionGuard, observedGuard, {
+      allowWalletFee: walletModified,
+    });
     const signature = submittedBinding.firstSignature;
     await recordExecutionSubmissionIntent({
       signature,

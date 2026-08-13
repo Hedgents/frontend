@@ -5,6 +5,7 @@ import {
   getCompiledTransactionMessageDecoder,
   getTransactionDecoder,
 } from "@solana/kit";
+import { COMPUTE_BUDGET_PROGRAM_ADDRESS } from "@/lib/solana-message-semantics";
 import { ExecutionValidationError } from "@/lib/execution-validation";
 import { bindSolanaTransaction } from "@/lib/solana-transaction-binding";
 
@@ -70,12 +71,18 @@ export interface TransactionGuardExpectation {
 export interface TransactionGuardCommitment {
   schema: typeof TRANSACTION_GUARD_SCHEMA;
   reportDigest: string;
+  /**
+   * The fee-independent part of the commitment. Optional only so authorizations issued before this
+   * existed stay readable; submission of a wallet-modified transaction requires it.
+   */
+  routeDigest?: string;
   programFingerprint: string;
   takerSolDebitLamports: string;
   networkFeeLamports: string;
 }
 
 export interface TransactionGuardReport extends TransactionGuardCommitment {
+  routeDigest: string;
   transactionMessageDigest: string;
   inputDebitAmount: string;
   outputCreditAmount: string;
@@ -714,15 +721,21 @@ export function guardSolanaTransaction(
       if (!account) guardFailure("an outer instruction references an unresolved account.");
       return account;
     });
-    programIds.push(programId);
-    effects.push(analyzeInstruction(
-      programId,
-      accounts,
-      instruction.data,
-      null,
-      expectedTaker,
-      takerAccounts,
-    ));
+    // Compute-budget instructions are excluded from the route's identity. A wallet is entitled to
+    // add one to set its own priority fee, and folding that into the fingerprint would make every
+    // such user's transaction look like a different route. Its only consequence is the fee, which
+    // is bounded numerically by assertTransactionGuardCompatible instead.
+    if (programId !== COMPUTE_BUDGET_PROGRAM_ADDRESS) {
+      programIds.push(programId);
+      effects.push(analyzeInstruction(
+        programId,
+        accounts,
+        instruction.data,
+        null,
+        expectedTaker,
+        takerAccounts,
+      ));
+    }
   }
   const seenInnerGroups = new Set<number>();
   for (const group of simulation.innerInstructions) {
@@ -762,15 +775,17 @@ export function guardSolanaTransaction(
           ? []
           : requireStringArray(instruction.accounts, "inner-instruction accounts");
       }
-      programIds.push(programId);
-      effects.push(analyzeInstruction(
-        programId,
-        accounts,
-        instruction.data,
-        instruction.parsed,
-        expectedTaker,
-        takerAccounts,
-      ));
+      if (programId !== COMPUTE_BUDGET_PROGRAM_ADDRESS) {
+        programIds.push(programId);
+        effects.push(analyzeInstruction(
+          programId,
+          accounts,
+          instruction.data,
+          instruction.parsed,
+          expectedTaker,
+          takerAccounts,
+        ));
+      }
     }
   }
 
@@ -791,9 +806,30 @@ export function guardSolanaTransaction(
     programFingerprint,
     effectFingerprint,
   };
+  /**
+   * The same commitment with every fee-sensitive field removed.
+   *
+   * A wallet may set its own priority fee, which moves the message bytes, the lamports debited and
+   * the network fee. Those three are exactly what is omitted here, so this digest pins what the
+   * transaction DOES: who signs, which mints, how much goes in, the floor on what comes out, and
+   * the programs and effects that produce it. The fee is then bounded numerically rather than
+   * frozen, which is the only way a wallet-set fee and a route commitment can both hold.
+   */
+  const routePayload = {
+    schema: TRANSACTION_GUARD_SCHEMA,
+    taker: expectedTaker,
+    inputMint: expectedInputMint,
+    outputMint: expectedOutputMint,
+    inputDebitAmount: inputDebit.toString(),
+    minimumOutputAmount: minimumOutputAmount.toString(),
+    outputMinimumSatisfied: true,
+    programFingerprint,
+    effectFingerprint,
+  };
   return {
     schema: TRANSACTION_GUARD_SCHEMA,
     reportDigest: sha256(JSON.stringify(commitmentPayload)),
+    routeDigest: sha256(JSON.stringify(routePayload)),
     programFingerprint,
     transactionMessageDigest: binding.messageDigest,
     takerSolDebitLamports: takerSolDebit.toString(),
@@ -809,23 +845,80 @@ export function transactionGuardCommitment(report: TransactionGuardReport): Tran
   return {
     schema: report.schema,
     reportDigest: report.reportDigest,
+    routeDigest: report.routeDigest,
     programFingerprint: report.programFingerprint,
     takerSolDebitLamports: report.takerSolDebitLamports,
     networkFeeLamports: report.networkFeeLamports,
   };
 }
 
+/**
+ * How much more SOL than quoted a wallet may take, as its own priority fee, without the operator
+ * re-authorising the order.
+ *
+ * This is the entire cost of letting wallets set fees, so it is a hard ceiling rather than a
+ * guideline. The default is deliberately small: a priority fee is normally a fraction of a cent,
+ * and anything approaching this bound is a wallet behaving unusually, not a busy network.
+ */
+const DEFAULT_MAXIMUM_WALLET_FEE_LAMPORTS = 2_000_000n; // 0.002 SOL
+const HARD_MAXIMUM_WALLET_FEE_LAMPORTS = 20_000_000n; // 0.02 SOL, not configurable past this
+
+export function maximumWalletFeeLamports(
+  environment: { HEDGENTS_MAX_WALLET_FEE_LAMPORTS?: string | undefined } = process.env as {
+    HEDGENTS_MAX_WALLET_FEE_LAMPORTS?: string | undefined;
+  },
+) {
+  const raw = environment.HEDGENTS_MAX_WALLET_FEE_LAMPORTS?.trim();
+  if (!raw) return DEFAULT_MAXIMUM_WALLET_FEE_LAMPORTS;
+  if (!/^\d+$/.test(raw)) return DEFAULT_MAXIMUM_WALLET_FEE_LAMPORTS;
+  const parsed = BigInt(raw);
+  if (parsed > HARD_MAXIMUM_WALLET_FEE_LAMPORTS) return HARD_MAXIMUM_WALLET_FEE_LAMPORTS;
+  return parsed;
+}
+
 export function assertTransactionGuardCompatible(
   expected: TransactionGuardCommitment,
   observed: TransactionGuardReport,
+  options: { allowWalletFee?: boolean; maximumWalletFee?: bigint } = {},
 ) {
+  if (expected.schema !== TRANSACTION_GUARD_SCHEMA) {
+    guardFailure("the signed transaction no longer matches its authenticated safety report.", 400);
+  }
+  // Unmodified transactions must still match exactly. This is the common path and nothing about it
+  // is loosened; the tolerance below applies only once the bytes are already known to differ.
   if (
-    expected.schema !== TRANSACTION_GUARD_SCHEMA ||
-    expected.reportDigest !== observed.reportDigest ||
-    expected.programFingerprint !== observed.programFingerprint ||
-    expected.takerSolDebitLamports !== observed.takerSolDebitLamports ||
-    expected.networkFeeLamports !== observed.networkFeeLamports
+    expected.reportDigest === observed.reportDigest &&
+    expected.programFingerprint === observed.programFingerprint &&
+    expected.takerSolDebitLamports === observed.takerSolDebitLamports &&
+    expected.networkFeeLamports === observed.networkFeeLamports
+  ) {
+    return;
+  }
+  if (!options.allowWalletFee) {
+    guardFailure("the signed transaction no longer matches its authenticated safety report.", 400);
+  }
+  if (!expected.routeDigest) {
+    guardFailure("this quote predates the current route commitment; build a fresh quote.", 400);
+  }
+  // The route must be identical: same signer, same mints, same amount in, same floor on the amount
+  // out, same programs, same effects. Only the fee may move.
+  if (
+    expected.routeDigest !== observed.routeDigest ||
+    expected.programFingerprint !== observed.programFingerprint
   ) {
     guardFailure("the signed transaction no longer matches its authenticated safety report.", 400);
+  }
+  const ceiling = options.maximumWalletFee ?? maximumWalletFeeLamports();
+  const quotedDebit = BigInt(expected.takerSolDebitLamports);
+  const observedDebit = BigInt(observed.takerSolDebitLamports);
+  const quotedFee = BigInt(expected.networkFeeLamports);
+  const observedFee = BigInt(observed.networkFeeLamports);
+  // A fee below the quote is fine; only paying MORE needs consent, and only up to the ceiling.
+  if (observedDebit > quotedDebit + ceiling || observedFee > quotedFee + ceiling) {
+    guardFailure(
+      "the wallet set a priority fee larger than this order allows. Lower it in your wallet or "
+        + "build a fresh quote.",
+      400,
+    );
   }
 }

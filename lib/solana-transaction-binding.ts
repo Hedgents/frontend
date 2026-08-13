@@ -103,3 +103,22 @@ export function bindSolanaTransaction(
       : null,
   };
 }
+
+/**
+ * The message payload of a wire transaction, with the signature block stripped.
+ *
+ * Shared so the semantic commitment is derived from exactly the bytes the byte commitment covers,
+ * rather than from a second, subtly different reader.
+ */
+export function solanaTransactionMessageBytes(transaction: string) {
+  const bytes = decodeBase64Transaction(transaction);
+  const signatures = decodeShortVec(bytes, 0);
+  if (signatures.value < 1 || signatures.value > 64) {
+    throw new ExecutionValidationError("The Solana transaction has an invalid signer count.", 502);
+  }
+  const messageOffset = signatures.offset + signatures.value * 64;
+  if (messageOffset >= bytes.length) {
+    throw new ExecutionValidationError("The Solana transaction message is truncated.", 502);
+  }
+  return bytes.slice(messageOffset);
+}

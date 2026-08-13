@@ -21,6 +21,8 @@ import {
 } from "@/lib/eligibility";
 import { getJupiterOrder, simulateSolanaTransaction } from "@/lib/jupiter-server";
 import { transactionGuardCommitment } from "@/lib/solana-transaction-guard";
+import { solanaMessageSemanticDigest } from "@/lib/solana-message-semantics";
+import { solanaTransactionMessageBytes } from "@/lib/solana-transaction-binding";
 import {
   assertProductExecutionAllowed,
   assertUsdBaseUnitAmountWithinBetaCap,
@@ -212,6 +214,11 @@ export async function POST(request: Request) {
       quotedOutputAmount: outputAmount,
       betaMaximumUsd: executionControls.maxUsd,
       transactionMessageDigest: simulation.transactionMessageDigest,
+      // Commits to what the route means rather than the bytes it arrived in, so a wallet may set
+      // its own priority fee without invalidating the quote. See solana-message-semantics.
+      transactionSemanticDigest: solanaMessageSemanticDigest(
+        solanaTransactionMessageBytes(transaction),
+      ),
       transactionGuard: transactionGuardCommitment(simulation),
       lastValidBlockHeight,
       eligibilityCountryCode: eligibility.countryCode,
