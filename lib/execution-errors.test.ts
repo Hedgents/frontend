@@ -71,7 +71,7 @@ test("an unreviewed venue is not reported as thin liquidity", () => {
   // in route_unavailable and told the tester to try a smaller size, which cannot possibly help.
   const blocked = actionableExecutionError(
     new Error(
-      "The route invokes BiSoNHVpsvpKfTFaFisxJHqPYCPMhCF7Zvy5tGkMoNBg, jupZ4m2Nb9Zw9WCM1UQxJqZ9Wb9wVUn9tGm1kkNoAqQ,"
+      "The route invokes BiSoNHVpsVZW2F7rx2eQ59yQwKxzU5NvBcmKshCSUypi, jupZ4m2GqUCJ5iueMfzQf8khFfH31d4XAQt3RzCT9Vd,"
       + " which has not passed the operator program review.",
     ),
   );
