@@ -157,9 +157,13 @@ export interface XpProfile {
   disclosure: string;
 }
 
+// Deliberately says nothing about which cluster the activity happened on. XP accrues on mainnet as
+// well as devnet, so framing it as a record of testing would go stale the moment a real trade counts
+// toward it. Every disclaimer after the first sentence is load-bearing and must stay: XP has to
+// remain structurally non-transferable and must never read as a promise of a future token.
 export const XP_DISCLOSURE =
-  "XP records testing contribution. It is not a token, it is not transferable, it cannot be "
-  + "redeemed, it has no conversion rate, and no future benefit is promised or implied.";
+  "XP records forecast accuracy and execution activity. It is not a token, it is not transferable, "
+  + "it cannot be redeemed, it has no conversion rate, and no future benefit is promised or implied.";
 
 /**
  * The stake-weighted mean bucket. Reported for display only; accuracy is NOT scored on it.

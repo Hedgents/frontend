@@ -120,7 +120,7 @@ const ScarcityPortfolioPanel = dynamic(
   { ssr: false },
 );
 
-export type TerminalView = "markets" | "scarcity" | "portfolio" | "orders";
+export type TerminalView = "markets" | "scarcity" | "portfolio" | "standing" | "orders";
 type LaneFilter = "All" | ExposureLane;
 type FundingSourceId = "solana" | CctpSourceId;
 type ExecutionPhase =
@@ -147,9 +147,10 @@ const terminalViewLabels: Record<TerminalView, string> = {
   markets: "Metal tokens",
   scarcity: "Scarcity markets",
   portfolio: "Portfolio",
+  standing: "Standing",
   orders: "Orders",
 };
-const terminalViews = new Set<TerminalView>(["markets", "scarcity", "portfolio", "orders"]);
+const terminalViews = new Set<TerminalView>(["markets", "scarcity", "portfolio", "standing", "orders"]);
 const buyAmountPresets = [10, 25, 50, 100] as const;
 const evmSourceNetworks = [
   { id: "ethereum", chainId: 1, label: "Ethereum", tone: "#a7b5d8", funding: "CCTP canary" },
@@ -1254,7 +1255,7 @@ export function MetalTerminal({
         </button>
 
         <nav className={styles.primaryNav} aria-label="Terminal navigation">
-          {(["markets", "scarcity", "portfolio", "orders"] as TerminalView[]).map((item) => (
+          {(["markets", "scarcity", "portfolio", "standing", "orders"] as TerminalView[]).map((item) => (
             <button
               type="button"
               key={item}
@@ -1267,7 +1268,7 @@ export function MetalTerminal({
         </nav>
 
         <div className={styles.topbarActions}>
-          <span className={styles.previewPill}>{view === "scarcity" ? "SCX · Curve + event markets" : view === "portfolio" ? "One wallet · Two metal books" : view === "orders" ? "Verified execution history" : "M2 · Two-way Solana execution"}</span>
+          <span className={styles.previewPill}>{view === "scarcity" ? "SCX · Curve + event markets" : view === "portfolio" ? "Metal holdings · Cost basis" : view === "standing" ? "Scarcity positions · XP" : view === "orders" ? "Verified execution history" : "M2 · Two-way Solana execution"}</span>
           <button
             type="button"
             className={styles.walletButton}
@@ -1374,6 +1375,13 @@ export function MetalTerminal({
           />
         ) : view === "scarcity" ? (
           <ScarcityExchange markets={scarcityMarkets} />
+        ) : view === "standing" ? (
+          <StandingView
+            owner={solanaConnection?.account.address ?? null}
+            scarcityMarkets={scarcityMarkets}
+            onConnectWallet={() => setWalletPanelOpen(true)}
+            onNavigateToScarcity={() => navigateToView("scarcity")}
+          />
         ) : view === "portfolio" ? (
           <PortfolioView
             owner={solanaConnection?.account.address ?? null}
@@ -1383,11 +1391,9 @@ export function MetalTerminal({
             error={portfolio.error?.message ?? null}
             quotes={liveQuotes.data}
             records={executionRecords}
-            scarcityMarkets={scarcityMarkets}
             onConnectWallet={() => setWalletPanelOpen(true)}
             onRefresh={() => void portfolio.refetch()}
             onNavigateToMarkets={() => navigateToView("markets")}
-            onNavigateToScarcity={() => navigateToView("scarcity")}
             onSell={(productId, balance) => {
               const market = metalMarkets.find((item) => item.products.some((product) => product.id === productId));
               if (market) setSelectedMetalId(market.id);
@@ -2461,11 +2467,9 @@ interface PortfolioViewProps {
   error: string | null;
   quotes: MetalQuoteResponse | null;
   records: ExecutionRecord[];
-  scarcityMarkets: ScarcityMarket[];
   onConnectWallet: () => void;
   onRefresh: () => void;
   onNavigateToMarkets: () => void;
-  onNavigateToScarcity: () => void;
   onSell: (productId: string, balance: string) => void;
 }
 
@@ -2477,11 +2481,9 @@ function PortfolioView({
   error,
   quotes,
   records,
-  scarcityMarkets,
   onConnectWallet,
   onRefresh,
   onNavigateToMarkets,
-  onNavigateToScarcity,
   onSell,
 }: PortfolioViewProps) {
   const metalBalances = (snapshot?.balances ?? []).filter(
@@ -2518,9 +2520,9 @@ function PortfolioView({
     <section className={styles.secondaryView}>
       <div className={styles.secondaryMasthead}>
         <div>
-          <p className={styles.overline}>Portfolio / one wallet, two metal books</p>
-          <h1>Inventory and conviction, together.</h1>
-          <p>One portfolio separates token holdings from scarcity-market positions without splitting your wallet state across products.</p>
+          <p className={styles.overline}>Portfolio / metal holdings</p>
+          <h1>What the wallet holds, and what it cost.</h1>
+          <p>Token balances read straight from SPL Token and Token-2022 accounts, marked against live quotes, with cost basis and realised P&amp;L from your own verified orders. Scarcity positions live under Standing.</p>
         </div>
         <div className={styles.portfolioActions}>
           {owner ? (
@@ -2636,14 +2638,56 @@ function PortfolioView({
           </div>
         </>
       )}
+    </section>
+  );
+}
 
-      <ScarcityPortfolioPanel
-        markets={scarcityMarkets}
-        owner={owner}
-        onOpenScarcity={onNavigateToScarcity}
-      />
+/**
+ * Scarcity positions and the XP they produce, split out of the portfolio.
+ *
+ * They were stacked underneath the metal holdings, which read badly in both directions: a wallet
+ * holding one metal showed a short positions table followed by two full-width panels, and the
+ * scarcity book looked like an afterthought to a spot portfolio rather than a separate book with
+ * its own settlement. They are also the two surfaces that stay useful when the wallet holds no
+ * metal at all, so burying them under an empty portfolio hid them exactly when they mattered.
+ */
+function StandingView({
+  owner,
+  scarcityMarkets,
+  onConnectWallet,
+  onNavigateToScarcity,
+}: {
+  owner: string | null;
+  scarcityMarkets: ScarcityMarket[];
+  onConnectWallet: () => void;
+  onNavigateToScarcity: () => void;
+}) {
+  return (
+    <section className={styles.secondaryView}>
+      <div className={styles.secondaryMasthead}>
+        <div>
+          <p className={styles.overline}>Standing / positions and record</p>
+          <h1>Scarcity positions and XP.</h1>
+          <p>
+            Open scarcity-market positions settle on their own schedule, separately from metal
+            holdings. XP tracks forecast accuracy and execution across devnet and mainnet.
+          </p>
+        </div>
+        <div className={styles.portfolioActions}>
+          <button type="button" className={styles.secondaryAction} onClick={onNavigateToScarcity}>
+            Open scarcity markets
+          </button>
+        </div>
+      </div>
 
-      <TesterXpPanel onConnect={onConnectWallet} />
+      <div className={styles.standingGrid}>
+        <ScarcityPortfolioPanel
+          markets={scarcityMarkets}
+          owner={owner}
+          onOpenScarcity={onNavigateToScarcity}
+        />
+        <TesterXpPanel onConnect={onConnectWallet} />
+      </div>
     </section>
   );
 }

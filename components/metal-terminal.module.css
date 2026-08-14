@@ -2196,6 +2196,12 @@
   margin-top: 1px;
 }
 
+/*
+ * Content sits at the top and whatever `.main`'s min-height leaves over stays empty below. That is
+ * deliberate: both alternatives were tried and are worse. Growing the panels to fill relocates the
+ * empty space inside the cards, and centring a short empty state strands it in the middle of the
+ * page with gaps above and below.
+ */
 .secondaryView {
   animation: riseIn 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
@@ -2426,6 +2432,29 @@
   grid-template-columns: minmax(0, 1fr) 356px;
   gap: 14px;
   align-items: start;
+}
+
+/*
+ * Standing: scarcity positions beside the XP record.
+ *
+ * Both are self-contained panels rather than a table with a sidebar, so they get equal columns
+ * instead of the portfolio's content-plus-rail split. They stack before the portfolio does, at
+ * 1220px, because the XP table carries five columns and crushes earlier than a balance list.
+ */
+.standingGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 14px;
+  /* Stretch to each other, not to the viewport. Two panels of unequal natural height read as a
+     mistake when they sit side by side, but growing them to fill the page just relocates the empty
+     space inside the cards, which looks worse than leaving it below them. */
+  align-items: stretch;
+}
+
+@media (max-width: 1220px) {
+  .standingGrid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .portfolioEmpty {

@@ -18,31 +18,46 @@ function shortAddress(value: string) {
 }
 
 /**
- * Tester XP, and the wallet link that makes it possible.
+ * The XP record, and the wallet link that makes it possible.
+ *
+ * Nothing here calls this a tester or testing record. XP accrues on mainnet as well as devnet, so
+ * that framing would be wrong the moment a real trade counts toward it, and it would also imply the
+ * score is a throwaway artifact of a beta rather than a running record.
  *
  * The disclosure comes from the server on every profile rather than being written here, so a
  * surface cannot render a score while quietly dropping what the score is and is not.
  */
-export function TesterXpPanel({ onConnect }: { onConnect: () => void }) {
-  const client = useClient<AppSolanaClient>();
-  const connected = useConnectedWallet(client);
-  const signMessage = useSignMessage(connected?.account as never);
-  const xp = useTesterXp();
+type ConnectedWallet = NonNullable<ReturnType<typeof useConnectedWallet>>;
+
+/**
+ * The link control, mounted only once a wallet is actually connected.
+ *
+ * This is a separate component because `useSignMessage` reads `.features` off the account it is
+ * given and throws outright on undefined. A hook cannot be called conditionally, so the only way to
+ * avoid handing it nothing is to move it behind a component that does not render until there is a
+ * real account. Passing `connected?.account as never` type-checked and then crashed the whole view
+ * for every visitor who had not connected yet, which is most first-time visitors.
+ */
+function LinkWalletControl({
+  account,
+  wallet,
+  onLinked,
+}: {
+  account: ConnectedWallet["account"];
+  wallet: string;
+  onLinked: () => void;
+}) {
+  const signMessage = useSignMessage(account);
   const [linking, setLinking] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const wallet = connected ? String(connected.account.address) : null;
-  const profile = xp.data ?? null;
-  const alreadyLinked = Boolean(wallet && profile?.wallets.some((entry) => entry.wallet === wallet));
-
   async function link() {
-    if (!wallet) return;
     setLinking(true);
     setError(null);
     try {
       const challenge = await requestWalletLinkChallenge(wallet);
       // The wallet signs the server's exact message. Nothing here composes bytes of its own, so
-      // what the tester sees in their wallet prompt is exactly what the server will verify.
+      // what the holder sees in their wallet prompt is exactly what the server will verify.
       const signed = await signMessage({ message: new TextEncoder().encode(challenge.message) });
       const signature = signed?.signature;
       if (!signature) throw new Error("The wallet did not return a signature.");
@@ -54,7 +69,7 @@ export function TesterXpPanel({ onConnect }: { onConnect: () => void }) {
         proof: challenge.proof,
         signature: String(base58),
       });
-      await xp.refetch();
+      onLinked();
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "The wallet link could not be completed.");
     } finally {
@@ -63,9 +78,31 @@ export function TesterXpPanel({ onConnect }: { onConnect: () => void }) {
   }
 
   return (
+    <>
+      <button type="button" onClick={link} disabled={linking}>
+        {linking ? <Loader2 size={14} className={styles.spin} aria-hidden="true" /> : <Link2 size={14} aria-hidden="true" />}
+        {linking ? "Waiting for your wallet…" : `Link ${shortAddress(wallet)}`}
+      </button>
+      {error ? (
+        <p className={styles.error} role="alert"><CircleAlert size={13} aria-hidden="true" /> {error}</p>
+      ) : null}
+    </>
+  );
+}
+
+export function TesterXpPanel({ onConnect }: { onConnect: () => void }) {
+  const client = useClient<AppSolanaClient>();
+  const connected = useConnectedWallet(client);
+  const xp = useTesterXp();
+
+  const wallet = connected ? String(connected.account.address) : null;
+  const profile = xp.data ?? null;
+  const alreadyLinked = Boolean(wallet && profile?.wallets.some((entry) => entry.wallet === wallet));
+
+  return (
     <section className={styles.panel} aria-labelledby="tester-xp-title">
       <header className={styles.head}>
-        <span><Trophy size={14} aria-hidden="true" /> Tester record</span>
+        <span><Trophy size={14} aria-hidden="true" /> XP record</span>
         <h2 id="tester-xp-title">
           {profile ? profile.total.toLocaleString() : "—"} XP
         </h2>
@@ -103,25 +140,23 @@ export function TesterXpPanel({ onConnect }: { onConnect: () => void }) {
           </p>
         )}
 
-        {!connected ? (
+        {!connected || !wallet ? (
           <button type="button" onClick={onConnect}>Connect a wallet</button>
         ) : alreadyLinked ? (
           <p className={styles.linkedNote}>
-            <ShieldCheck size={13} aria-hidden="true" /> {shortAddress(wallet!)} is linked to this invite.
+            <ShieldCheck size={13} aria-hidden="true" /> {shortAddress(wallet)} is linked to this invite.
           </p>
         ) : (
-          <button type="button" onClick={link} disabled={linking}>
-            {linking ? <Loader2 size={14} className={styles.spin} aria-hidden="true" /> : <Link2 size={14} aria-hidden="true" />}
-            {linking ? "Waiting for your wallet…" : `Link ${shortAddress(wallet!)}`}
-          </button>
+          <LinkWalletControl
+            account={connected.account}
+            wallet={wallet}
+            onLinked={() => void xp.refetch()}
+          />
         )}
         <p className={styles.signNote}>
           Linking asks for a signature only. It authorises no transaction, moves no funds, and grants
           no spending permission.
         </p>
-        {error ? (
-          <p className={styles.error} role="alert"><CircleAlert size={13} aria-hidden="true" /> {error}</p>
-        ) : null}
       </div>
 
       {profile && (profile.rounds.length || profile.binary.length || profile.terminal.length) ? (
