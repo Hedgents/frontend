@@ -49,6 +49,13 @@ export interface AnalyticsSnapshot {
   eventCounts: Record<string, number>;
   topProducts: Array<{ label: string; count: number }>;
   topMetals: Array<{ label: string; count: number }>;
+  /**
+   * Which failures testers actually hit. The beta keeps a strict program allowlist, enforced after
+   * Jupiter has already chosen among many venues, so refusals are intermittent and look like bad
+   * luck from the tester's seat. Counting `route_not_reviewed` separately from `route_unavailable`
+   * is what says whether the gate is costing real orders or never firing at all.
+   */
+  topErrorCodes: Array<{ label: string; count: number }>;
   recentEvents: AnalyticsEvent[];
 }
 
@@ -191,6 +198,7 @@ export async function getAnalyticsSnapshot(rangeDays = 7): Promise<AnalyticsSnap
     eventCounts,
     topProducts: ranked(events, "productId"),
     topMetals: ranked(events, "metal"),
+    topErrorCodes: ranked(events, "errorCode"),
     recentEvents: events.slice(0, 24),
   };
 }

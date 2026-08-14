@@ -26,12 +26,15 @@ function fallbackSnapshot(days: number): AnalyticsSnapshot {
     generatedAt: new Date().toISOString(), rangeDays: days, storageConfigured: false, truncated: false,
     totalEvents: 0, uniqueSessions: 0,
     metrics: { inviteRedemptions: 0, quotesReady: 0, ordersSubmitted: 0, ordersConfirmed: 0, failures: 0, quoteToSubmitPct: null, submitToConfirmPct: null },
-    eventCounts: {}, topProducts: [], topMetals: [], recentEvents: [],
+    eventCounts: {}, topProducts: [], topMetals: [], topErrorCodes: [], recentEvents: [],
   };
 }
 
-function Ranking({ rows }: { rows: Array<{ label: string; count: number }> }) {
-  if (!rows.length) return <p className={styles.empty}>No consented product activity in this range.</p>;
+function Ranking(
+  { rows, empty = "No consented product activity in this range." }:
+  { rows: Array<{ label: string; count: number }>; empty?: string },
+) {
+  if (!rows.length) return <p className={styles.empty}>{empty}</p>;
   const maximum = Math.max(...rows.map((row) => row.count));
   return <div className={styles.ranking}>{rows.map((row) => (
     <div className={styles.rank} key={row.label}>
@@ -144,6 +147,8 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
             <div className={styles.metric}><span>Failures</span><strong>{snapshot.metrics.failures}</strong></div>
             <div className={styles.metric}><span>Quote → submit</span><strong>{percent(snapshot.metrics.quoteToSubmitPct)}</strong></div>
           </div>
+          <p className={styles.sectionLabel}>Why they failed</p>
+          <Ranking rows={snapshot.topErrorCodes} empty="No failures reported in this range." />
         </aside>
       </div>
       <p className={styles.privacy}>Privacy boundary: events contain an irreversible anonymous session hash and allowlisted funnel metadata only. Wallet addresses, balances, signed transactions, eligibility evidence, IP addresses, and plaintext invite codes are never written to analytics storage.</p>

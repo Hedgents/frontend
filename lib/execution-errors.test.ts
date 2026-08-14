@@ -65,3 +65,36 @@ test("a Jupiter-style structured body yields readable text, not [object Object]"
   );
   assert.match(executionErrorMessage({ error: { instruction: 3, custom: 6001 } }), /6001/);
 });
+
+test("an unreviewed venue is not reported as thin liquidity", () => {
+  // The real message the guard raises. It contains "route", so before this was classified it landed
+  // in route_unavailable and told the tester to try a smaller size, which cannot possibly help.
+  const blocked = actionableExecutionError(
+    new Error(
+      "The route invokes BiSoNHVpsvpKfTFaFisxJHqPYCPMhCF7Zvy5tGkMoNBg, jupZ4m2Nb9Zw9WCM1UQxJqZ9Wb9wVUn9tGm1kkNoAqQ,"
+      + " which has not passed the operator program review.",
+    ),
+  );
+  assert.equal(blocked.code, "route_not_reviewed");
+  assert.equal(blocked.retryable, true);
+  // Retrying is honest advice here: Jupiter's venue choice is nondeterministic, so a fresh quote
+  // genuinely can route through a reviewed venue.
+  assert.match(blocked.action, /fresh quote/i);
+  assert.doesNotMatch(blocked.action, /smaller size/i);
+
+  const fingerprint = actionableExecutionError(
+    new Error(`The route program fingerprint ${"a".repeat(64)} has not passed the operator canary review.`),
+  );
+  assert.equal(fingerprint.code, "route_not_reviewed");
+});
+
+test("genuine liquidity failures still classify as route_unavailable", () => {
+  assert.equal(
+    actionableExecutionError(new Error("Could not find any route for this pair")).code,
+    "route_unavailable",
+  );
+  assert.equal(
+    actionableExecutionError(new Error("Price impact too high for this size")).code,
+    "route_unavailable",
+  );
+});

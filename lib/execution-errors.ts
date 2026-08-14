@@ -67,6 +67,22 @@ export function actionableExecutionError(error: unknown): ActionableExecutionErr
   if (value.includes("simulation")) {
     return { code: "simulation_failed", message: raw, action: "The transaction was stopped before signing. Try a smaller size or another live product.", retryable: true };
   }
+  // Must precede the generic route branch: the operator-review message contains the word "route"
+  // and would otherwise be reported as thin liquidity. Two costs to that. The tester is told to try
+  // a smaller size, which cannot help because size is not what was refused, so they conclude the
+  // terminal is broken and stop. And in telemetry it becomes indistinguishable from real liquidity
+  // failures, which is the one number that tells the operator whether the strict allowlist is
+  // costing more than it protects.
+  if (value.includes("operator program review") || value.includes("operator canary review")) {
+    return {
+      code: "route_not_reviewed",
+      message: raw,
+      action:
+        "Nothing is wrong with your order or its size. Jupiter picked a venue the operator has not"
+        + " reviewed yet, and a fresh quote often routes through a reviewed one.",
+      retryable: true,
+    };
+  }
   if (value.includes("route") || value.includes("liquidity") || value.includes("price impact")) {
     return { code: "route_unavailable", message: raw, action: "Try a smaller size or choose another product marked live at this size.", retryable: true };
   }
