@@ -1,85 +1,82 @@
 # Program allowlist: candidates for review
 
-Measured 2026-08-14 against mainnet. Method: 84 Jupiter quotes for USDC↔PAXG across the beta size
-ladder ($5 to $100), both directions, with and without `restrictIntermediateTokens`, plus the
-program sets actually invoked by the two canary transactions.
+Measured 2026-08-14 against mainnet. Reproduce with `python3 scripts/allowlist-candidates.py --all`.
 
-Reproduce with `scripts/allowlist-candidates.py`.
+Method: Jupiter quotes across the beta size ladder ($5 to $100), both directions, for each
+settlement asset, run twice; plus the program sets actually invoked by the two mainnet canaries, and
+an on-chain upgrade-authority check on every venue that appeared.
 
-## The headline
+## Measurement caveat, and which way it biases
 
-**PAXG at beta sizes is a three-venue problem, not a 103-venue one.** Across 84 samples Jupiter
-never once returned a multi-hop route, and only three venues appeared at all:
+The free tier refuses `restrictIntermediateTokens=false` (`NOT_SUPPORTED`), so **every sample below
+ran in Jupiter's narrowest routing mode.** Production uses a paid key and routes less constrained.
+Every venue count here is therefore a **floor**, not a census.
 
-| venue | program | share of sampled routes |
+An earlier run reported USDG as having no routes at all. That was rate limiting counted as absence.
+The sampler now distinguishes 429, no-route, and error, and USDG routes fine.
+
+## USDC, the live pair: one candidate
+
+USDC↔PAXG is single-hop and stable across runs. Three venues total, two of them provably present
+already (both canaries passed the guard while touching them).
+
+| venue | program | status |
 | --- | --- | --- |
-| GoonFi V2 | `goonuddtQRrWqqn5nFyczVKaie28f3kDkHWkHtURSLE` | 28/42 |
-| Raydium CLMM | `CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK` | 9/42 |
-| Whirlpool (Orca) | `whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc` | 5/42 |
+| GoonFi V2 | `goonuddtQRrWqqn5nFyczVKaie28f3kDkHWkHtURSLE` | proven present (sell canary) |
+| Whirlpool | `whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc` | proven present (buy canary) |
+| **Raydium CLMM** | `CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK` | **candidate** |
 
-That materially deflates the "routing treadmill" worry for this pair. The fear was that a strict
-allowlist collides with an unbounded set of venues reachable through multi-hop routes. For
-USDC↔PAXG at these sizes, the reachable set is three, and it is stable.
+Raydium CLMM clusters at the **$50 and $100 buys**, the top of the cap where a tester wanting a real
+position lands. The $10 canary passing says little about that size.
 
-## Already allowed, proven from chain
+## USDT and USDG: the set does not converge
 
-Both canary transactions passed the guard, so every program they invoked is necessarily in the
-allowlist today. Excluding the two the guard treats as injectable (ComputeBudget, Lighthouse):
+Both are **multi-hop on essentially every route** (`Mercurial > GoonFi V2`,
+`GoonFi V2 > SolFi V2`, `Aquifer > Manifest > Whirlpool`), which is the case the allowlist was always
+going to struggle with. Two identical runs an hour apart produced materially different venue sets:
 
-```
-JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4   Jupiter Aggregator v6
-whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc   Whirlpool (Orca)          [buy  2Y9kfgRh…]
-goonuddtQRrWqqn5nFyczVKaie28f3kDkHWkHtURSLE   GoonFi V2                 [sell 4fMwmczN…]
-TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA   SPL Token
-TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb   Token-2022
-ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL   Associated Token Account
-11111111111111111111111111111111              System
-MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr   SPL Memo
-```
+- run 1 surfaced Quantum, which run 2 never saw
+- run 2 surfaced Byreal, HumidiFi, JupLend AMM, Perena and ZeroFi, none of which run 1 saw
 
-## The candidate
+Thirteen distinct venues across two runs, in the narrowest routing mode, still growing. This is not
+a list that can be enumerated by sampling and then frozen.
 
-**Raydium CLMM, `CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK`.** It is the only venue Jupiter
-chooses for PAXG that is not proven present. It carried 9 of 42 sampled routes, and its appearances
-cluster at the **$50 and $100 buys**, which is exactly the top of the beta cap where testers who
-want a real position will land. A tester buying $100 has a materially higher chance of hitting it
-than the $10 canary did, which is why the canary passing says less than it appears to.
+| venue | program | needed by | upgrade authority | code age |
+| --- | --- | --- | --- | --- |
+| Mercurial | `MERLuDFBMmsHnsBPZw2sDQZHvXFMwp8EdjudcU2HKky` | USDT buy | PDA | 1570d |
+| Perena | `NUMERUNsFCP3kuNmWZuXtm1AaQCPj9uw6Guv2Ekoi5P` | USDG buy | PDA | 507d |
+| SolFi V2 | `SV2EYYJyRz2YhfXwXnhNAevDEui5Q6yrfyo13WtupPF` | USDT sell | PDA | 154d |
+| Manifest | `MNFSTqtC93rEfYHB6hF82sKdZpUDFWkViLByLd1k1Ms` | USDT buy, USDG buy | PDA | 20d |
+| Raydium CLMM | `CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK` | USDC buy, USDT sell | PDA | 14d |
+| JupLend AMM | `jupZ4m2GqUCJ5iueMfzQf8khFfH31d4XAQt3RzCT9Vd` | USDT sell | PDA | 4d |
+| Aquifer | `AQU1FRd7papthgdrwPTTq5JacJh8YtwEXaBfKU3bTz45` | USDT buy, USDT sell | PDA | 3d |
+| Byreal | `REALQqNEomY6cQGZJUGwywTBD2UmDT32rZcNnfxQ5N2` | USDT sell | PDA | 2d |
+| **AlphaQ** | `ALPHAQmeA7bjrVuccPsYPiCvsi428SNwte66Srvs4pHA` | USDT both, USDG sell | **single keypair** | 76d |
+| **ZeroFi** | `ZERor4xhbUycZ6gb9ntrhqscUcZmAbQDjEAtCf4hbZY` | USDG buy | **single keypair** | 6d |
+| **HumidiFi** | `9H6tua7jkLhdm3w8BvgpTn5LZNU7g4ZynDmCiNN3q6Rp` | USDG sell | **single keypair** | 1d |
+| **Quantum** | `QuaNtZsgYRe5Z9Bk4LZ4cTD9tbkVoyCNf1R2BN9bBDv` | USDT sell | **single keypair** | 1d |
+| **BisonFi** | `BiSoNHVpsVZW2F7rx2eQ59yQwKxzU5NvBcmKshCSUypi` | USDT sell, USDG sell | **single keypair** | **~11h** |
 
-Caveat: `HEDGENTS_SOLANA_PROGRAM_ALLOWLIST` is a Vercel sensitive variable and cannot be read back,
-so this is "not proven present", not "proven absent". Check the current value before adding it.
+"Code age" is time since the last redeploy of the program's bytes. "Single keypair" means the
+upgrade authority is an on-curve address, so one private key can replace the program at will;
+"PDA" means an off-curve address, so a program (multisig or governance) gates upgrades. Determined
+by testing each authority against the ed25519 curve equation, not by reputation.
 
-## Not candidates
+## The problem with allowlisting the single-keypair five
 
-- **BisonFi** `BiSoNHVpsVZW2F7rx2eQ59yQwKxzU5NvBcmKshCSUypi`
-- **JupLend AMM** `jupZ4m2GqUCJ5iueMfzQf8khFfH31d4XAQt3RzCT9Vd`
+An allowlist entry asserts "we reviewed this program." For five of these, whatever you review can be
+replaced by one key immediately afterwards, and the allowlist will not notice because it pins an
+address, not code. BisonFi's bytes changed roughly **eleven hours** before this measurement.
 
-These are the two refusals seen in testing, but they appeared on **USDT and USDG sell routes**, and
-those settlement assets are disabled for the beta. Adding them widens the surface for pairs the
-terminal will not trade. The third refusal, `jupeiUmn…`, is not in Jupiter's program-to-label map at
-all, so it cannot be constrained through `dexes` either way.
+That is a different risk from Raydium CLMM or Mercurial, where an upgrade needs a multisig.
 
-## What the allowlist does not give you
+## Recommendation
 
-All three venue programs are **upgradeable**, so the allowlist pins a program *address*, not the
-code behind it. "Reviewed" therefore means reviewed as of a date. Last redeploys, relative to the
-canary at slot 439037345:
-
-| venue | last deployed | age at canary |
-| --- | --- | --- |
-| Whirlpool | slot 398059635 | ~190 days |
-| Raydium CLMM | slot 436167935 | ~13 days |
-| GoonFi V2 | slot 438563879 | **~2 days** |
-
-The reassuring part: every upgrade authority is **off-curve**, so it is a PDA and upgrades are
-controlled by a program (multisig or governance) rather than by one private key. Verified by testing
-each authority against the ed25519 curve equation:
-
-```
-BBvfpKqYovhzEjS4Ch1xZXFdxkaoUiXsujR9kgN1t8iR   GoonFi V2       off-curve (PDA)
-FytDrVzDybM1TwFQPGb8qaxZR7dBCzNeqT3vtQsceZQK   Raydium CLMM    off-curve (PDA)
-GwH3Hiv5mACLX3ufTw1pFsrhSPon5tdw252DBs4Rx4PV   Whirlpool       off-curve (PDA)
-```
-
-Worth knowing rather than worth solving now: GoonFi V2 already carries most of your sell flow and
-had been redeployed two days before the canary, so it is the least settled thing in the path and it
-is already inside the gate.
+- **USDC:** add Raydium CLMM. Small, well-understood, closes the only measured gap on the live pair.
+- **USDT/USDG:** adding the thirteen does not reopen these safely, because the set is still growing
+  under the narrowest routing mode and five members are single-key mutable. If they are to reopen,
+  the gate needs to change shape rather than lengthen: scope the block to programs that touch the
+  taker's accounts, so the multi-hop middle of a route stops mattering. Failing that, pin a small
+  venue set and accept the quotes that dead-end.
+- Either way, `route_not_reviewed` in the admin failure ranking is now the meter that says how often
+  the gate actually bites.
