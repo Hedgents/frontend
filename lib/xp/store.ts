@@ -100,6 +100,11 @@ async function mutateIndex<T>(mutation: (index: XpIndex) => T): Promise<T> {
   let lastError: unknown;
   for (let attempt = 0; attempt < 3; attempt += 1) {
     const { index, etag } = await readIndex();
+    // Snapshot what is about to be replaced, before replacing it. A schedule would be wrong in both
+    // directions here: it runs on days nothing changed, and it still misses whatever happened
+    // between two runs. There is nothing to preserve when etag is null, because no stored object
+    // exists yet.
+    if (etag) await snapshotBeforeWrite(index);
     const result = mutation(index);
     try {
       await writeIndex(index, etag);
@@ -150,46 +155,33 @@ export async function readXpIndexForAnalytics() {
 const BACKUP_PREFIX = "xp/backups/index-";
 
 /**
- * Write today's immutable snapshot of the index.
+ * Preserve the current index before a mutation replaces it, at most once a day.
  *
- * The live index is a single object overwritten in place, so there is no version history to fall
- * back on. Wallet links are the one thing here that cannot be recomputed from chain: lose them and
- * every tester has to sign again, which is a cost that grows with every person who joins.
+ * The live index is a single object overwritten in place, with no version history to fall back on.
+ * Wallet links are the one thing here that cannot be recomputed from chain: lose them and every
+ * tester has to sign again, a cost that grows with each person who joins.
  *
- * Each day is a separate object written with `allowOverwrite: false`, so a snapshot can never be
- * altered once taken, and a second run on the same day is a no-op rather than a rewrite. That is
- * what makes the backup useful against the failure this guards: a bad write is only recoverable if
- * the copy predates it.
+ * `allowOverwrite: false` does the work. The first mutation of a day writes that day's snapshot and
+ * every later one silently fails the write, which is the intended outcome rather than an error. So
+ * the snapshot always holds the state as it was before the day's changes, and the object count
+ * grows with days-on-which-something-happened rather than with days.
  *
- * Returns the link and award counts so a caller can alarm on a shrink. Links and awards are only
- * ever appended, so a count that falls is evidence of damage rather than of normal operation.
- * Consumed nonces are excluded from that check because they are pruned by age on purpose.
+ * Best effort on purpose. Refusing to link a wallet because a backup could not be written would
+ * trade a certain failure for an unlikely one, and the mutation it guards can only append.
  */
-export async function backupXpIndex(now = new Date()) {
+async function snapshotBeforeWrite(index: XpIndex, now = new Date()) {
+  if (!storageConfigured()) return;
   const day = now.toISOString().slice(0, 10);
-  const path = `${BACKUP_PREFIX}${day}.json`;
-  // Deliberately the raw read, so a corrupt index raises rather than being snapshotted as empty.
-  const { index } = await readIndex();
-  const counts = { links: index.links.length, awards: index.awards.length };
-  if (!storageConfigured()) {
-    if (process.env.NODE_ENV === "production") {
-      throw new ApiSecurityError("Private XP storage is not configured.", 503);
-    }
-    return { path, written: false, reason: "storage-not-configured" as const, ...counts };
-  }
   try {
-    await put(path, JSON.stringify(index), {
+    await put(`${BACKUP_PREFIX}${day}.json`, JSON.stringify(index), {
       access: "private",
       contentType: "application/json",
       cacheControlMaxAge: 0,
       addRandomSuffix: false,
       allowOverwrite: false,
     });
-    return { path, written: true, reason: null, ...counts };
   } catch {
-    // Almost always "already exists", which is the intended outcome of running twice in a day. It
-    // is reported rather than thrown so a cron retry does not look like a failure.
-    return { path, written: false, reason: "already-exists-or-unwritable" as const, ...counts };
+    // Already written today, or transiently unwritable. Neither should block the mutation.
   }
 }
 

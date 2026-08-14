@@ -3,10 +3,6 @@
     {
       "path": "/api/cron/scarcity-detector",
       "schedule": "17 4 * * *"
-    },
-    {
-      "path": "/api/cron/xp-backup",
-      "schedule": "42 3 * * *"
     }
   ]
 }
