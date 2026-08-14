@@ -70,9 +70,43 @@ address, not code. BisonFi's bytes changed roughly **eleven hours** before this 
 
 That is a different risk from Raydium CLMM or Mercurial, where an upgrade needs a multisig.
 
+## Correction: on the live pair, allowlist breadth is not the constraint
+
+The candidate analysis above sampled Jupiter **without** passing `dexes`. Production passes it,
+derived from the allowlist, so the router never sees the venues the allowlist excludes. Re-measured
+with the real constraint in place, against the actual production allowlist:
+
+```
+dexes now   : GoonFi V2,Whirlpool,ZeroFi
+dexes after : GoonFi V2,Raydium CLMM,Whirlpool,ZeroFi
+```
+
+| size | current set | +Raydium | unconstrained (all 103 venues) |
+| --- | --- | --- | --- |
+| $10 buy | 2294 | same | same |
+| $25 buy | 5736 | same | same |
+| $50 buy | 11473 | same | same |
+| $100 buy | 22946 | same | same |
+| $10-$100 sell | routes | same to 0.0bps | same to 0.0bps |
+
+**Adding Raydium CLMM gains nothing measurable.** No coverage (every size already routed), no price
+(identical output), and unconstrained routing across every venue Jupiter knows produces the same
+result. GoonFi V2 is the best execution at every beta size in both directions, so no allowlist can
+improve on what the current one already achieves. Raydium CLMM was added anyway as a spare, but it
+is not a fix for anything currently broken.
+
+The real exposure this surfaced is **concentration, not breadth**: 100% of live flow goes through
+GoonFi V2, whose bytes were redeployed about two days before the canary. Whirlpool and ZeroFi are
+already allowlisted as alternates, so the fallback exists; Jupiter simply never needs it. Note also
+that ZeroFi, already in the allowlist, is one of the single-keypair-upgradeable venues below.
+
+Seven of the eleven allowlist entries have no Jupiter label (System, ComputeBudget, ATA, SPL Token,
+Token-2022, Memo, Jupiter v6), so they constrain nothing at the routing layer and act only as the
+post-hoc guard's vocabulary. Only the four venue programs shape `dexes`.
+
 ## Recommendation
 
-- **USDC:** add Raydium CLMM. Small, well-understood, closes the only measured gap on the live pair.
+- **USDC:** nothing needed. Raydium CLMM is applied but measures as a no-op; do not deploy for it.
 - **USDT/USDG:** adding the thirteen does not reopen these safely, because the set is still growing
   under the narrowest routing mode and five members are single-key mutable. If they are to reopen,
   the gate needs to change shape rather than lengthen: scope the block to programs that touch the
