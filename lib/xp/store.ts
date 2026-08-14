@@ -6,7 +6,7 @@ import {
   applyAward,
   applyWalletLink,
   emptyXpIndex,
-  validateXpIndex,
+  readXpIndex,
   type XpIndex,
 } from "./index-ops";
 import type { XpCluster } from "./rules";
@@ -40,9 +40,30 @@ async function readIndex(): Promise<{ index: XpIndex; etag: string | null }> {
   }
   try {
     const result = await get(INDEX_PATH, { access: "private", useCache: false });
+    // No object yet. An empty index with a null etag is correct here, and writeIndex will refuse to
+    // overwrite if one appears in the meantime.
     if (!result || result.statusCode !== 200) return { index: emptyXpIndex(), etag: null };
     const value = await new Response(result.stream).json().catch(() => null);
-    return { index: validateXpIndex(value), etag: result.blob.etag };
+    const report = readXpIndex(value);
+    // An object EXISTS and we could not read it. Returning an empty index with its live etag would
+    // hand the caller a valid write token for state it never saw: the next wallet link would apply
+    // to nothing, ifMatch would succeed, and every link and award would be replaced by that single
+    // entry. One unparseable byte would silently destroy the whole index. Refuse instead. Recovery
+    // is a human restoring from xp/backups/, not a write that papers over the damage.
+    if (report.unreadable) {
+      throw new ApiSecurityError(
+        "The stored XP index could not be read. Refusing to write over it; restore from a backup.",
+        503,
+      );
+    }
+    if (report.dropped > 0) {
+      throw new ApiSecurityError(
+        `The stored XP index has ${report.dropped} unreadable entr${report.dropped === 1 ? "y" : "ies"}.`
+          + " Refusing to write, which would drop them permanently.",
+        503,
+      );
+    }
+    return { index: report.index, etag: result.blob.etag };
   } catch (error) {
     if (error instanceof ApiSecurityError) throw error;
     throw new ApiSecurityError("Private XP storage is temporarily unavailable.", 503);
@@ -124,6 +145,52 @@ export async function recordAward(input: {
 export async function readXpIndexForAnalytics() {
   const { index } = await readIndex();
   return index;
+}
+
+const BACKUP_PREFIX = "xp/backups/index-";
+
+/**
+ * Write today's immutable snapshot of the index.
+ *
+ * The live index is a single object overwritten in place, so there is no version history to fall
+ * back on. Wallet links are the one thing here that cannot be recomputed from chain: lose them and
+ * every tester has to sign again, which is a cost that grows with every person who joins.
+ *
+ * Each day is a separate object written with `allowOverwrite: false`, so a snapshot can never be
+ * altered once taken, and a second run on the same day is a no-op rather than a rewrite. That is
+ * what makes the backup useful against the failure this guards: a bad write is only recoverable if
+ * the copy predates it.
+ *
+ * Returns the link and award counts so a caller can alarm on a shrink. Links and awards are only
+ * ever appended, so a count that falls is evidence of damage rather than of normal operation.
+ * Consumed nonces are excluded from that check because they are pruned by age on purpose.
+ */
+export async function backupXpIndex(now = new Date()) {
+  const day = now.toISOString().slice(0, 10);
+  const path = `${BACKUP_PREFIX}${day}.json`;
+  // Deliberately the raw read, so a corrupt index raises rather than being snapshotted as empty.
+  const { index } = await readIndex();
+  const counts = { links: index.links.length, awards: index.awards.length };
+  if (!storageConfigured()) {
+    if (process.env.NODE_ENV === "production") {
+      throw new ApiSecurityError("Private XP storage is not configured.", 503);
+    }
+    return { path, written: false, reason: "storage-not-configured" as const, ...counts };
+  }
+  try {
+    await put(path, JSON.stringify(index), {
+      access: "private",
+      contentType: "application/json",
+      cacheControlMaxAge: 0,
+      addRandomSuffix: false,
+      allowOverwrite: false,
+    });
+    return { path, written: true, reason: null, ...counts };
+  } catch {
+    // Almost always "already exists", which is the intended outcome of running twice in a day. It
+    // is reported rather than thrown so a cron retry does not look like a failure.
+    return { path, written: false, reason: "already-exists-or-unwritable" as const, ...counts };
+  }
 }
 
 export function resetXpStoreForTests() {

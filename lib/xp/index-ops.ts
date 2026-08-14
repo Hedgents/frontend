@@ -54,6 +54,42 @@ export function validateXpIndex(value: unknown): XpIndex {
   };
 }
 
+export interface XpIndexReadReport {
+  index: XpIndex;
+  /** Entries present in the stored object that validation refused. Non-zero means silent loss. */
+  dropped: number;
+  /** True when the stored value is not a version-1 index at all, so nothing could be recovered. */
+  unreadable: boolean;
+}
+
+/**
+ * Validate a stored index and say what it cost.
+ *
+ * `validateXpIndex` is deliberately lenient: it returns an empty index for anything it does not
+ * recognise. That is the right behaviour for a first read against a store that has no object yet,
+ * and catastrophic for a read against an object that exists but did not parse, because the caller
+ * then holds an empty index alongside a live etag and the next write persists the emptiness.
+ *
+ * This reports both failure modes so the store can refuse instead of overwriting. Counting dropped
+ * entries matters as much as the version check: a single malformed link would otherwise vanish on
+ * the next successful write, with no error anywhere.
+ */
+export function readXpIndex(value: unknown): XpIndexReadReport {
+  const index = validateXpIndex(value);
+  const candidate = value && typeof value === "object" && !Array.isArray(value)
+    ? (value as Partial<XpIndex>)
+    : null;
+  if (!candidate || candidate.version !== 1) {
+    return { index, dropped: 0, unreadable: true };
+  }
+  const storedCount = (field: keyof XpIndex) =>
+    Array.isArray(candidate[field]) ? (candidate[field] as unknown[]).length : 0;
+  const dropped = (storedCount("links") - index.links.length)
+    + (storedCount("consumedNonces") - index.consumedNonces.length)
+    + (storedCount("awards") - index.awards.length);
+  return { index, dropped: Math.max(0, dropped), unreadable: false };
+}
+
 export function pruneConsumedNonces(index: XpIndex, now: Date) {
   const cutoff = now.getTime() - NONCE_RETENTION_HOURS * 3_600_000;
   index.consumedNonces = index.consumedNonces.filter((entry) => Date.parse(entry.consumedAt) >= cutoff);

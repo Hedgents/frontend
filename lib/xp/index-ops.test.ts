@@ -6,6 +6,7 @@ import {
   emptyXpIndex,
   MAX_WALLETS_PER_GRANT,
   pruneConsumedNonces,
+  readXpIndex,
   validateXpIndex,
 } from "./index-ops";
 import { WalletLinkError, type VerifiedWalletLink } from "./wallet-link";
@@ -108,4 +109,43 @@ test("a corrupt or unknown-version index reads as empty rather than throwing", (
   assert.deepEqual(validateXpIndex([1, 2, 3]), emptyXpIndex());
   const partial = validateXpIndex({ version: 1, links: [{ wallet: "A" }, { wallet: "B", granteeId: "i", linkedAt: "t" }] });
   assert.equal(partial.links.length, 1);
+});
+
+test("a stored index that is not version 1 is reported unreadable, not empty", () => {
+  // The bug this guards: validateXpIndex returns an empty index for anything it does not
+  // recognise. Paired with the live etag of an object that DOES exist, that empty index becomes a
+  // valid write token for state the caller never saw, and the next write erases every link.
+  for (const value of [null, undefined, "nope", [], {}, { version: 2, links: [] }]) {
+    const report = readXpIndex(value);
+    assert.equal(report.unreadable, true, `${JSON.stringify(value)} should be unreadable`);
+  }
+});
+
+test("a readable index reports no loss", () => {
+  const stored = {
+    version: 1,
+    links: [{ wallet: "W1", granteeId: "G1", linkedAt: "2026-08-01T00:00:00.000Z" }],
+    consumedNonces: [{ nonce: "n1", consumedAt: "2026-08-01T00:00:00.000Z" }],
+    awards: [],
+  };
+  const report = readXpIndex(stored);
+  assert.equal(report.unreadable, false);
+  assert.equal(report.dropped, 0);
+  assert.equal(report.index.links.length, 1);
+});
+
+test("individually malformed entries are counted rather than silently dropped", () => {
+  // Without a count, one bad link disappears on the next successful write and nothing reports it.
+  const report = readXpIndex({
+    version: 1,
+    links: [
+      { wallet: "W1", granteeId: "G1", linkedAt: "2026-08-01T00:00:00.000Z" },
+      { wallet: "W2" },
+    ],
+    consumedNonces: [{ nonce: 1 }],
+    awards: [{ id: "a1", granteeId: "G1", points: Number.NaN }],
+  });
+  assert.equal(report.unreadable, false);
+  assert.equal(report.dropped, 3);
+  assert.equal(report.index.links.length, 1);
 });
