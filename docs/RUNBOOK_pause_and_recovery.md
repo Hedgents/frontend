@@ -70,15 +70,19 @@ Production builds here take about 1 minute, so that is a 1-2 minute pause once y
 terminal. Restore by writing `true` and deploying again. Note that `vercel env add --force` silently
 no-ops on an existing key: you must `rm` then `add`, and you cannot read the value back to confirm.
 
-### The weakness, and the lever that fixes it
+### Known limit: the pause depends on a build
 
-That path makes the emergency stop depend on a **build succeeding**. A registry hiccup, a yanked
-transitive dependency, or a type error that slipped into the tree all block the pause at the moment
-you need it most.
+That path makes the emergency stop depend on a **build succeeding**. If Vercel's build infra is
+down, or a dependency fails to resolve, you cannot pause even though routing still works.
 
-The fix costs one extra deployment and no new infrastructure: keep a **paused twin**, a production
-build of the same commit with the flag off, that holds no domain. Pausing is then an alias switch,
-seconds, with nothing to compile.
+**At closed-beta scale this is accepted, not fixed.** With a $100 cap and an invite list, the
+exposure across a 1-2 minute pause is at most a couple of orders, and the mitigation below costs a
+permanent maintenance step and carries a rollback hazard. Revisit when the cap rises materially, the
+invite list opens up, or more than one person can deploy.
+
+The mitigation, when it becomes worth it: keep a **paused twin**, a production build of the same
+commit with the flag off, that holds no domain. Pausing is then an alias switch, seconds, with
+nothing to compile.
 
 ```
 # build the twin (does not take traffic; live deployment is untouched throughout)
@@ -96,11 +100,12 @@ vercel promote <live-url>
 ```
 
 The twin is only a *pure* pause for the commit it was built from. Rebuild it whenever production
-ships new code, or promoting it silently rolls the code back too. Record both URLs here:
+ships new code, or promoting it silently rolls the code back too. That standing obligation is the
+reason it is not worth carrying yet.
 
 - live: `https://terminal-ooz1vzfjs-tobiasds-projects.vercel.app` (dpl_8iLUyHUdbDyttfGFEJER9hNioY1Q,
   aliased to terminal.hedgents.com, built from `da12c35`)
-- paused twin: **not yet built**
+- paused twin: **not built, deliberately.** Pause via the env-var path above.
 
 ## The other two switches
 
