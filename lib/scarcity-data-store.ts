@@ -12,6 +12,7 @@ import {
 } from "@/lib/scarcity/types";
 import { validateScarcityObservation, validateScarcitySource } from "@/lib/scarcity/validation";
 import { ApiSecurityError } from "@/lib/api-security";
+import { strongEtag } from "./blob-etag";
 
 const DATASET_PATH = "scarcity/data/production-v1.json";
 const MAX_ARTIFACT_CHARACTERS = 5_000_000;
@@ -127,7 +128,7 @@ export async function loadProductionScarcityDataset(): Promise<ScarcityDataset> 
   }
   const result = await get(DATASET_PATH, { access: "private", useCache: false });
   if (!result || result.statusCode !== 200) return withDatasetRevision(withBundledBaseline(), null);
-  return withDatasetRevision(withBundledBaseline(parseProductionDataset(await new Response(result.stream).text())), result.blob.etag);
+  return withDatasetRevision(withBundledBaseline(parseProductionDataset(await new Response(result.stream).text())), strongEtag(result.blob.etag));
 }
 
 function validateBatch(batch: ScarcityObservationBatch) {

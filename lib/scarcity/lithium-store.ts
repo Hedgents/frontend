@@ -15,6 +15,7 @@ import {
   type LithiumSeries,
   type LithiumSeriesDay,
 } from "./lithium-series";
+import { strongEtag } from "@/lib/blob-etag";
 
 /**
  * Durable storage for the GFEX lithium series.
@@ -63,7 +64,7 @@ async function readSeries(): Promise<{ series: LithiumSeries; etag: string | nul
         503,
       );
     }
-    return { series, etag: result.blob.etag };
+    return { series, etag: strongEtag(result.blob.etag) };
   } catch (error) {
     if (error instanceof ApiSecurityError) throw error;
     throw new ApiSecurityError("Lithium series storage is temporarily unavailable.", 503);

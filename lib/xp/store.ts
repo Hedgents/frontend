@@ -10,6 +10,7 @@ import {
   type XpIndex,
 } from "./index-ops";
 import type { XpCluster } from "./rules";
+import { strongEtag } from "@/lib/blob-etag";
 
 /**
  * Durable state for tester XP, and deliberately only the parts that cannot be derived.
@@ -63,7 +64,7 @@ async function readIndex(): Promise<{ index: XpIndex; etag: string | null }> {
         503,
       );
     }
-    return { index: report.index, etag: result.blob.etag };
+    return { index: report.index, etag: strongEtag(result.blob.etag) };
   } catch (error) {
     if (error instanceof ApiSecurityError) throw error;
     throw new ApiSecurityError("Private XP storage is temporarily unavailable.", 503);

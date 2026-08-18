@@ -7,6 +7,7 @@ import {
   type OnlineDetectorState,
   type OnlineEvidenceStatus,
 } from "@/lib/scarcity/online-detector";
+import { strongEtag } from "./blob-etag";
 
 const STATE_PATH = "scarcity/detector/state-v1.json";
 const MAX_STATE_ITEMS = 2_000;
@@ -69,7 +70,7 @@ export async function loadOnlineDetectorState(): Promise<OnlineDetectorState> {
   }
   const result = await get(STATE_PATH, { access: "private", useCache: false });
   if (!result || result.statusCode !== 200) return withRevision(cloneEmptyState(), null);
-  return withRevision(parseState(await new Response(result.stream).text()), result.blob.etag);
+  return withRevision(parseState(await new Response(result.stream).text()), strongEtag(result.blob.etag));
 }
 
 export async function saveOnlineDetectorState(state: OnlineDetectorState) {

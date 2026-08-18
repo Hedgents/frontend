@@ -10,6 +10,7 @@ import {
   type ScarcityQuestionDocument,
   type ScarcityRulesDocument,
 } from "@/lib/scarcity-markets";
+import { strongEtag } from "./blob-etag";
 
 const STORE_PATH = "scarcity/markets/reviewed-specifications-v1.json";
 const MAX_REVIEWED_MARKETS = 1_000;
@@ -86,7 +87,7 @@ async function loadReviewedMarketStore(): Promise<{ markets: ReviewedMarketSpeci
   }
   const result = await get(STORE_PATH, { access: "private", useCache: false });
   if (!result || result.statusCode !== 200) return { markets: [], etag: null };
-  return { markets: parseStore(await new Response(result.stream).text()), etag: result.blob.etag };
+  return { markets: parseStore(await new Response(result.stream).text()), etag: strongEtag(result.blob.etag) };
 }
 
 export async function loadReviewedMarketSpecifications() {

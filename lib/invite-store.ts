@@ -17,6 +17,7 @@ import {
   type InviteIndex,
   type StoredInvite,
 } from "@/lib/invite-registry";
+import { strongEtag } from "./blob-etag";
 
 const INDEX_PATH = "invites/index.json";
 
@@ -49,7 +50,7 @@ async function readIndex(options: { useCache?: boolean } = {}): Promise<InviteIn
     const result = await get(INDEX_PATH, { access: "private", useCache: options.useCache ?? false });
     if (!result || result.statusCode !== 200) return { index: emptyIndex(), etag: null };
     const value = await new Response(result.stream).json().catch(() => null);
-    return { index: validateInviteIndex(value), etag: result.blob.etag };
+    return { index: validateInviteIndex(value), etag: strongEtag(result.blob.etag) };
   } catch (error) {
     if (error instanceof ApiSecurityError) throw error;
     throw new ApiSecurityError("Private invite storage is temporarily unavailable.", 503);
