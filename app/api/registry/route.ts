@@ -3,7 +3,7 @@ import { getAddressDecoder } from "@solana/kit";
 import type { RegistryHealth } from "@/lib/execution-types";
 import { apiSecurityError, enforceRateLimit } from "@/lib/api-security";
 import { requireInviteAccess } from "@/lib/access-auth";
-import { getJupiterOrder, hasJupiterApiKey } from "@/lib/jupiter-server";
+import { getJupiterOrder } from "@/lib/jupiter-server";
 import {
   getSolanaExecutionProduct,
   solanaExecutionProducts,
@@ -110,7 +110,7 @@ async function buildHealth(
     probeInputUsd: product.execution.probeUsd,
     probeOutputAmount: null,
     impliedUnitPriceUsd: null,
-    note: "Set JUPITER_API_KEY to run the live $100 route probe.",
+    note: "Select this product to run a live $100 route probe. A Jupiter API key raises throughput.",
   };
 
   if (!options.probeLiquidity) {
@@ -119,7 +119,7 @@ async function buildHealth(
       status: "unavailable",
       note: "Select this product to run its live Jupiter route probe.",
     };
-  } else if (hasJupiterApiKey()) {
+  } else {
     try {
       const params = new URLSearchParams({
         inputMint: product.execution.inputMint,

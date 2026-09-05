@@ -53,7 +53,10 @@ type SolanaProductDefinition = Omit<
   | "route"
 >;
 
-function solanaProduct(definition: SolanaProductDefinition): MetalProduct {
+function solanaProduct(
+  definition: SolanaProductDefinition,
+  verifiedAt = "2026-08-03",
+): MetalProduct {
   return {
     ...definition,
     availability: "Executable",
@@ -62,7 +65,7 @@ function solanaProduct(definition: SolanaProductDefinition): MetalProduct {
     venue: "Jupiter Swap V2",
     allInFeeBps: 0,
     liquidity: "Live $100 route gate; exact size is re-quoted and simulated before signing",
-    verified: "Issuer + Jupiter directory + on-chain mint · 2026-08-03",
+    verified: `Issuer + Jupiter directory + on-chain mint · ${verifiedAt}`,
     route: ["Solana USDC", "Jupiter Swap V2", definition.ticker],
   };
 }
@@ -101,7 +104,7 @@ export const metalMarkets: MetalMarket[] = [
     referencePrice: 2381.2,
     unit: "oz",
     change24h: 0.84,
-    liquidity: "Five Solana products",
+    liquidity: "Six Solana products",
     availability: "Executable",
     products: [
       solanaProduct({
@@ -119,6 +122,21 @@ export const metalMarkets: MetalMarket[] = [
         hedgeMarket: "xyz:GOLD · Hyperliquid",
         hedgeDepth: "Live depth and basis check required",
       }),
+      solanaProduct({
+        id: "gold-xaut0",
+        name: "Tether Gold (XAUt0)",
+        ticker: "XAUt0",
+        lane: "Own",
+        issuer: "TG Commodities / USDT0 Network",
+        structure: "Omnichain representation of issuer-backed physical gold",
+        backing: "One XAUt0 corresponds to one XAUt and one fine troy ounce of physical gold",
+        custody: "Tether Gold's Swiss physical-gold custody arrangement",
+        redemption: "Tether Gold onboarding, whole-bar minimums, fees, and delivery rules apply",
+        eligibility: "Tether Gold and USDT0 sanctions, wallet, and jurisdiction restrictions apply",
+        risk: "Issuer, custodian, active SPL mint/freeze authority, bridge, liquidity, and redemption risks remain.",
+        hedgeMarket: "xyz:GOLD · Hyperliquid",
+        hedgeDepth: "Live depth and basis check required",
+      }, "2026-08-27"),
       solanaProduct({
         id: "gold-oro",
         name: "Oro GOLD",
@@ -190,9 +208,24 @@ export const metalMarkets: MetalMarket[] = [
     referencePrice: 31.42,
     unit: "oz",
     change24h: 1.36,
-    liquidity: "One executable and one indicative Solana product",
+    liquidity: "One physical silver token and two ETF products",
     availability: "Executable",
     products: [
+      solanaProduct({
+        id: "silver-silv",
+        name: "Dominion Silver",
+        ticker: "SILV",
+        lane: "Own",
+        issuer: "Dominion Market",
+        structure: "Issuer-backed physical silver token",
+        backing: "Issuer states one SILV is backed by one troy ounce of vaulted physical silver",
+        custody: "Allocated US vault custody disclosed by Dominion",
+        redemption: "Cash redemption is available under issuer terms; physical redemption is not yet live",
+        eligibility: "Dominion eligibility, restricted-jurisdiction, mint, and redemption rules apply",
+        risk: "Issuer, reserve, audit, liquidity, Token-2022 freeze, and permanent-delegate risks remain.",
+        hedgeMarket: "xyz:SILVER · Hyperliquid",
+        hedgeDepth: "Live depth and basis check required",
+      }, "2026-08-27"),
       solanaProduct({
         id: "silver-slvx",
         name: "xStocks iShares Silver Trust",

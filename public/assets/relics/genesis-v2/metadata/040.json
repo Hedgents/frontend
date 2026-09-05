@@ -1,0 +1,60 @@
+{
+  "name": "Hedgents Relic #040 — Gold Signet",
+  "symbol": "RELIC",
+  "description": "A Common Gold Signet from the fixed 100-piece Hedgents Genesis collection. Its engraving, stones, patina, and metal grain are baked into the artwork. Burn redemption transfers the ticket's exact onchain PAXG amount. No physical artefact delivery.",
+  "image": "../final/040-common-gold-signet.webp",
+  "attributes": [
+    {
+      "trait_type": "Edition",
+      "value": 40
+    },
+    {
+      "trait_type": "Tier",
+      "value": "Common"
+    },
+    {
+      "trait_type": "Artefact",
+      "value": "Gold Signet"
+    },
+    {
+      "trait_type": "Master design",
+      "value": "moonstone-hammered"
+    },
+    {
+      "trait_type": "Mineral",
+      "value": "Moonstone"
+    },
+    {
+      "trait_type": "Metalwork",
+      "value": "Hammered gold"
+    },
+    {
+      "trait_type": "Patina grade",
+      "value": "deep-recess"
+    },
+    {
+      "trait_type": "Artwork construction",
+      "value": "Fully baked material render"
+    },
+    {
+      "trait_type": "Redemption target at funding snapshot (USD)",
+      "value": 15
+    }
+  ],
+  "properties": {
+    "category": "image",
+    "files": [
+      {
+        "uri": "../final/040-common-gold-signet.webp",
+        "type": "image/webp"
+      }
+    ],
+    "collection": "Hedgents Relics — Genesis",
+    "artworkPipeline": "baked-material-master-v2",
+    "noPhysicalDelivery": true,
+    "metadataStatus": "template-until-campaign-funding",
+    "authoritativeRedemption": "Exact atomic PAXG amount recorded in the campaign ticket account",
+    "recipeSha256": "1f1c0de057a1c9f42f5c6e36f07560407e4e55cec6b985986b448521bdfd1292",
+    "imageSha256": "80dd253462826aa85720bca052260d698c373e38aeed72a2e6089235dc1f9981"
+  }
+}

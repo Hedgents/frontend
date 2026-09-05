@@ -22,10 +22,30 @@ const SANCTIONS_BLOCKED = new Set([
 const XSTOCKS_BLOCKED = new Set(["US", "GB", "CA", "AU"]);
 const ONDO_BLOCKED = new Set(["US"]);
 
+export function productCountryRestriction(
+  policyId: EligibilityPolicyId,
+  countryCode: unknown,
+): string | null {
+  const country = normalizeCountryCode(countryCode);
+  if (!country) return null;
+  if (SANCTIONS_BLOCKED.has(country)) {
+    return "This jurisdiction is blocked by the closed-beta sanctions policy.";
+  }
+  if (policyId === "xstocks" && XSTOCKS_BLOCKED.has(country)) {
+    return "xStocks is not available in this jurisdiction.";
+  }
+  if (policyId === "ondo" && ONDO_BLOCKED.has(country)) {
+    return "Ondo Stocks is not available to US persons or US-based clients.";
+  }
+  return null;
+}
+
 const policySources: Record<EligibilityPolicyId, string> = {
   paxos: "https://support.paxos.com/articles/8914207545-prohibited-locations",
   oro: "https://www.oro.finance/transparency",
   matrixdock: "https://matrixdock.gitbook.io/matrixdock-docs/english/gold-token-xaum/token-features",
+  usdt0: "https://usdt0.to/ecosystem/solana",
+  dominion: "https://dominion.investments/",
   xstocks: "https://xstocks.com/partner",
   ondo: "https://ondo.finance/ondo-stocks",
 };
@@ -94,17 +114,20 @@ export function evaluateProductEligibility(
   if (observed && observed !== declared) {
     return fail("The declared residence does not match the request location. Manual review is required.");
   }
-  if (SANCTIONS_BLOCKED.has(declared)) {
-    return fail("This jurisdiction is blocked by the conservative closed-beta sanctions policy.");
-  }
-  if (policyId === "xstocks" && XSTOCKS_BLOCKED.has(declared)) {
-    return fail("xStocks is not available in the declared jurisdiction.");
-  }
-  if (policyId === "ondo" && ONDO_BLOCKED.has(declared)) {
-    return fail("Ondo Stocks is not available to US persons or US-based clients.");
-  }
+  const countryRestriction = productCountryRestriction(policyId, declared);
+  if (countryRestriction) return fail(countryRestriction);
 
-  if (policyId === "xstocks" || policyId === "ondo") {
+  if (policyId === "xstocks") {
+    const allowlist = options.securityCountryAllowlist ?? configuredSecurityCountryAllowlist();
+    // xStocks publishes a current public restriction set. An operator allowlist, when present,
+    // narrows that scope further; an empty list does not turn the public policy into a global ban.
+    if (production && allowlist.size > 0 && !allowlist.has(declared)) {
+      return fail(
+        "xStocks execution is not enabled for this country in the deployment allowlist.",
+      );
+    }
+  }
+  if (policyId === "ondo") {
     const allowlist = options.securityCountryAllowlist ?? configuredSecurityCountryAllowlist();
     if (production && !allowlist.has(declared)) {
       return fail(

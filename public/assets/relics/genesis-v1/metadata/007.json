@@ -1,0 +1,59 @@
+{
+  "name": "Hedgents Relic #007 — Gold Signet",
+  "symbol": "RELIC",
+  "description": "A Common Gold Signet from the fixed 100-piece Hedgents Genesis collection. Burn redemption transfers the ticket's exact onchain PAXG amount. No physical artefact delivery.",
+  "image": "../final/007-common-gold-signet.webp",
+  "attributes": [
+    {
+      "trait_type": "Edition",
+      "value": 7
+    },
+    {
+      "trait_type": "Tier",
+      "value": "Common"
+    },
+    {
+      "trait_type": "Artefact",
+      "value": "Gold Signet"
+    },
+    {
+      "trait_type": "field",
+      "value": "eclipse"
+    },
+    {
+      "trait_type": "aura",
+      "value": "none"
+    },
+    {
+      "trait_type": "finish",
+      "value": "blackened-recess"
+    },
+    {
+      "trait_type": "engraving",
+      "value": "stepped-grid"
+    },
+    {
+      "trait_type": "inset",
+      "value": "moonstone"
+    },
+    {
+      "trait_type": "Redemption target at funding snapshot (USD)",
+      "value": 15
+    }
+  ],
+  "properties": {
+    "category": "image",
+    "files": [
+      {
+        "uri": "../final/007-common-gold-signet.webp",
+        "type": "image/webp"
+      }
+    ],
+    "collection": "Hedgents Relics — Genesis",
+    "noPhysicalDelivery": true,
+    "metadataStatus": "template-until-campaign-funding",
+    "authoritativeRedemption": "Exact atomic PAXG amount recorded in the campaign ticket account",
+    "recipeSha256": "f71ceba0a4480a385ef09ccaea8398cc41e4da4ebe0089b544f3b63ea8d8cf49",
+    "imageSha256": "beee57d5f8ac7d68c7d2c873612a4ede2238e9dcf8d1f59b8f150cb35d043d9c"
+  }
+}

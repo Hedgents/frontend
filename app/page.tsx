@@ -8,7 +8,7 @@ import { compileCurveMarket } from "@/lib/scarcity-curves";
 import { compileLithiumRound, LITHIUM_ROUNDS } from "@/lib/scarcity/lithium-market";
 import { loadScarcityDeployment } from "@/lib/scarcity-deployment";
 
-const terminalViews = new Set<TerminalView>(["markets", "scarcity", "portfolio", "orders"]);
+const terminalViews = new Set<TerminalView>(["markets", "relics", "scarcity", "portfolio", "standing", "orders"]);
 
 export default async function Page({
   searchParams,

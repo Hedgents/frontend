@@ -1,0 +1,1644 @@
+{
+  "schemaVersion": 2,
+  "collection": "Hedgents Relics — Genesis",
+  "seedDomain": "hedgents-genesis-v2-baked-materials",
+  "artworkPipeline": "baked-material-master-v2",
+  "canvas": {
+    "width": 1254,
+    "height": 1254
+  },
+  "supply": {
+    "Common": 55,
+    "Uncommon": 25,
+    "Rare": 14,
+    "Epic": 5,
+    "Legendary": 1
+  },
+  "masterCount": {
+    "Common": 18,
+    "Uncommon": 12,
+    "Rare": 12,
+    "Epic": 5,
+    "Legendary": 1
+  },
+  "sourceAtlases": [
+    "source-atlases/common-atlas-01.png",
+    "source-atlases/common-atlas-02.png",
+    "source-atlases/common-atlas-03.png",
+    "source-atlases/uncommon-atlas-01.png",
+    "source-atlases/uncommon-atlas-02.png",
+    "source-atlases/rare-atlas-01.png",
+    "source-atlases/rare-atlas-02.png"
+  ],
+  "pullPriceUsdc": 35,
+  "redemptionTargetsUsdAtFundingSnapshot": {
+    "Common": 15,
+    "Uncommon": 24,
+    "Rare": 45,
+    "Epic": 110,
+    "Legendary": 370
+  },
+  "warning": "USD figures are design targets only. Exact atomic PAXG amounts committed by the deployed campaign are authoritative. No physical artefact delivery.",
+  "verification": {
+    "counts": {
+      "Common": 55,
+      "Uncommon": 25,
+      "Rare": 14,
+      "Epic": 5,
+      "Legendary": 1
+    },
+    "uniqueRecipeHashes": 100,
+    "uniqueImageHashes": 100,
+    "dimensions": "1254x1254"
+  },
+  "relics": [
+    {
+      "edition": 1,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "Master design": "oxblood-garnet-ribs",
+        "Mineral": "Oxblood garnet",
+        "Metalwork": "Ribbed shoulders",
+        "Patina grade": "museum-satin",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "17710b95c0b0d7cc11e3c27e223760ae62840bdeb964a6fc2ad489768eea4db4",
+      "image": "final/001-common-gold-signet.webp",
+      "imageSha256": "cd27dfc1e1a87bf578b8516def259d9d53e873542cd968ae2bb2fce453199a2d"
+    },
+    {
+      "edition": 2,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "Master design": "emerald-orbital-relief",
+        "Mineral": "Emerald",
+        "Metalwork": "Structural orbital rail",
+        "Patina grade": "museum-satin",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "cdf7437c830635f4d2ebb96e64784792032ebc43bfc64e4990c291fd8c3017af",
+      "image": "final/002-common-gold-signet.webp",
+      "imageSha256": "3c80839968cd6492e24ccfc727002f1c3dc9f9ad2d4c87af66035bb7c0110e02"
+    },
+    {
+      "edition": 3,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "Master design": "sapphire-labyrinth",
+        "Mineral": "Midnight sapphire",
+        "Metalwork": "Blackened labyrinth",
+        "Patina grade": "museum-satin",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "bc800ef62f0f3d277f490881e810b2a7ca6b2271a61a378bc6600de144eb5c84",
+      "image": "final/003-common-gold-signet.webp",
+      "imageSha256": "899c3df2de8b8c59537f910c75b3e37e2ab783e6342820b212573d261ba00a68"
+    },
+    {
+      "edition": 4,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "Master design": "moonstone-hammered",
+        "Mineral": "Moonstone",
+        "Metalwork": "Hammered gold",
+        "Patina grade": "museum-satin",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "fea692d91ee24e1368554e04d2882d91d37d76495f5bd0aa39af1f3922555c5c",
+      "image": "final/004-common-gold-signet.webp",
+      "imageSha256": "568b9004d2ed91528db456849bdecc1b072593e61c9c3c9694823f93d3b27fc5"
+    },
+    {
+      "edition": 5,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "Master design": "diamond-constellation",
+        "Mineral": "Diamond",
+        "Metalwork": "Constellation settings",
+        "Patina grade": "museum-satin",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "7188dcf792612dfca7d290f695b66b733d0ec692803338f3eaa5b2f50ff9b3d0",
+      "image": "final/005-common-gold-signet.webp",
+      "imageSha256": "ca87a6d63c78a84bd01f424fe91ea5c15d202de4fc932042ca5cba958c25b90e"
+    },
+    {
+      "edition": 6,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "Master design": "onyx-chevrons",
+        "Mineral": "Black onyx",
+        "Metalwork": "Architectural chevrons",
+        "Patina grade": "museum-satin",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "260b3128d0d5c81c0e3c46b1da2f24b1133670e1ad078f1d5000f1bb95e0d6d8",
+      "image": "final/006-common-gold-signet.webp",
+      "imageSha256": "8f80ab9788a6c5b965edf2306d86823ccc9ce26d80a5a586066a5bad584807ba"
+    },
+    {
+      "edition": 7,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "Master design": "smoky-quartz-braid",
+        "Mineral": "Smoky quartz",
+        "Metalwork": "Braided rope relief",
+        "Patina grade": "museum-satin",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "2f7db49d12e503ae60522062bd0c9b3174456cd639179b2484012c06c30189f3",
+      "image": "final/007-common-gold-signet.webp",
+      "imageSha256": "3096cf60ef769c6d22f70344853efe829211544928d773eb80bf9acd858520a6"
+    },
+    {
+      "edition": 8,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "Master design": "amber-sunburst",
+        "Mineral": "Amber",
+        "Metalwork": "Granulated sunburst",
+        "Patina grade": "museum-satin",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "81dbbeeefedef1a05dce3a02afc480cf8ad6412bc033d5389c4c70c753fc03ef",
+      "image": "final/008-common-gold-signet.webp",
+      "imageSha256": "d5ba5652697dea0b3a277b873b587fdb133ccaec170313188a0a6a3109ff9469"
+    },
+    {
+      "edition": 9,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "Master design": "amethyst-fan",
+        "Mineral": "Amethyst",
+        "Metalwork": "Stepped fan channels",
+        "Patina grade": "museum-satin",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "4929a967948d08a4f0aceac71c37626594fa5592e42fd29b92e190f209726b7e",
+      "image": "final/009-common-gold-signet.webp",
+      "imageSha256": "a68ba068de1695f7faeb801e419e87826b40361a65deb3556d6a6096a5f57f3b"
+    },
+    {
+      "edition": 10,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "Master design": "turquoise-scarab",
+        "Mineral": "Turquoise",
+        "Metalwork": "Scarab and hammered field",
+        "Patina grade": "museum-satin",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "b9bcd78b353f9baf0536eedb64c5c31e5b5a34437179e55b7da59b6f26dd904d",
+      "image": "final/010-common-gold-signet.webp",
+      "imageSha256": "9db5360eb174f124a04b01edc39b70b3d3d85b04fe258478eba6cead3f9d1b0e"
+    },
+    {
+      "edition": 11,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "Master design": "citrine-colonnade",
+        "Mineral": "Citrine",
+        "Metalwork": "Fluted colonnade",
+        "Patina grade": "museum-satin",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "068b9788e60925798dead911cfbfeca84cc07064dffad79a483c1b105bffcf57",
+      "image": "final/011-common-gold-signet.webp",
+      "imageSha256": "93cebe07ddb6815f5898a6e78b34842205501c541318e52d68b7a7a9d1cfd6c3"
+    },
+    {
+      "edition": 12,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "Master design": "jade-knot",
+        "Mineral": "Dark jade",
+        "Metalwork": "Interlocking knot relief",
+        "Patina grade": "museum-satin",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "c83d35ac609c2f5b8074bc5e90ae4ee184e1654a05bd823fe06fd925243fe78f",
+      "image": "final/012-common-gold-signet.webp",
+      "imageSha256": "ead908e239733205579247db338df139bd310b8bdeb3b91615e00d4d56bbbad4"
+    },
+    {
+      "edition": 13,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "Master design": "spinel-scale",
+        "Mineral": "Red spinel",
+        "Metalwork": "Scale-chased shoulders",
+        "Patina grade": "museum-satin",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "36515a29f9139eac61e9488612cc2077ab5e1bdbb508a5b743e7a447f8de84dd",
+      "image": "final/013-common-gold-signet.webp",
+      "imageSha256": "ebac4aea54ca41ce1027d0e09de30783ef8d19320ab4c1712554d5f6b6e57bcf"
+    },
+    {
+      "edition": 14,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "Master design": "lapis-celestial",
+        "Mineral": "Lapis lazuli",
+        "Metalwork": "Inset gold stars",
+        "Patina grade": "museum-satin",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "173e6bbd412c3f5e6e5541c019f28bfd06e4cc1c987a26db3a5bdbe1d61a08a6",
+      "image": "final/014-common-gold-signet.webp",
+      "imageSha256": "8e5fdd2268fac36669b2084b951991a001e9f5405064159004042d86cfeacdd6"
+    },
+    {
+      "edition": 15,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "Master design": "moss-agate-vine",
+        "Mineral": "Moss agate",
+        "Metalwork": "Raised vine relief",
+        "Patina grade": "museum-satin",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "99a83dab43161749b6de3dce6ab1fede68d8b426f2b2bc969ac778d66814e89a",
+      "image": "final/015-common-gold-signet.webp",
+      "imageSha256": "6e55763aeac342b23c578795d57a11368f0f39f256be71dcae6686c5d642ebd7"
+    },
+    {
+      "edition": 16,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "Master design": "pearl-tide",
+        "Mineral": "Pearl",
+        "Metalwork": "Wave-chased shoulders",
+        "Patina grade": "museum-satin",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "ebd7db2d7ffa61a654ff36785abf2df8ff27b8fa96b99e1f2f675afbf08519cd",
+      "image": "final/016-common-gold-signet.webp",
+      "imageSha256": "6da7b717a46c54d1c43a8c762adf8f61ebfb5964d4aaf0d130e9d4d1f5b8e062"
+    },
+    {
+      "edition": 17,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "Master design": "fire-opal-sunburst",
+        "Mineral": "Fire opal",
+        "Metalwork": "Fluted sunburst bezel",
+        "Patina grade": "museum-satin",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "0092f12b881dacd6db419c141a7f55f9cfe725644d45b569f4bf477ee0bc2107",
+      "image": "final/017-common-gold-signet.webp",
+      "imageSha256": "5f4549e9fe0451287096dfe90ab17a031ee557672b789ae3084c67e6b383d4c1"
+    },
+    {
+      "edition": 18,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "Master design": "obsidian-brutalist",
+        "Mineral": "Obsidian",
+        "Metalwork": "Brutalist stepped ridges",
+        "Patina grade": "museum-satin",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "78691c40e4ee599e63a2c5463ac12afbfbc0bb9a20f5b7dde601129c835884ef",
+      "image": "final/018-common-gold-signet.webp",
+      "imageSha256": "2a44f58851615388464911ab3541cb810fbe5b26ec4fed5782fdd2f819835ff3"
+    },
+    {
+      "edition": 19,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "Master design": "oxblood-garnet-ribs",
+        "Mineral": "Oxblood garnet",
+        "Metalwork": "Ribbed shoulders",
+        "Patina grade": "warm-heirloom",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "503f0a11322c77631de2650cd46df07ef48c1cd2c5325e11f44c143c877184a0",
+      "image": "final/019-common-gold-signet.webp",
+      "imageSha256": "68325c6ef17367707a81ffe6a310d896c774c1861decf36d85e216c283301b3c"
+    },
+    {
+      "edition": 20,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "Master design": "emerald-orbital-relief",
+        "Mineral": "Emerald",
+        "Metalwork": "Structural orbital rail",
+        "Patina grade": "warm-heirloom",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "40ecbccb54b7d8d7451932a412c48374a55d98c911cacfcc9c64c3affd2fdc3d",
+      "image": "final/020-common-gold-signet.webp",
+      "imageSha256": "e55a7269ff5d7742c1d2b23406e02c2043c67afeb0e7ea8edb1ade8e6afc577e"
+    },
+    {
+      "edition": 21,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "Master design": "sapphire-labyrinth",
+        "Mineral": "Midnight sapphire",
+        "Metalwork": "Blackened labyrinth",
+        "Patina grade": "warm-heirloom",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "7b312ed117d653a5e120efd555ffb27ae0cba74715b8011d31ccdd4bf9f37b3e",
+      "image": "final/021-common-gold-signet.webp",
+      "imageSha256": "f072b5dc4323c2613cc4052d27722b39dab33ea44fcd44816a6027ac45d9fdbb"
+    },
+    {
+      "edition": 22,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "Master design": "moonstone-hammered",
+        "Mineral": "Moonstone",
+        "Metalwork": "Hammered gold",
+        "Patina grade": "warm-heirloom",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "fcbe5dcbe8fe01edb58f833461ff6b406e02d8e48a7932d23274ed682d54de82",
+      "image": "final/022-common-gold-signet.webp",
+      "imageSha256": "043201c77c956dd66bd9237313b28bec543039f95959d29f1c39f66b660b35b3"
+    },
+    {
+      "edition": 23,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "Master design": "diamond-constellation",
+        "Mineral": "Diamond",
+        "Metalwork": "Constellation settings",
+        "Patina grade": "warm-heirloom",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "6ff300c08def0d94cc940625ed5374b4156f65504db6145460b187be4c512f07",
+      "image": "final/023-common-gold-signet.webp",
+      "imageSha256": "916932a26b423cb6718e61e27dd174a695d207d1a4dbcfd1d61abb610e95d67b"
+    },
+    {
+      "edition": 24,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "Master design": "onyx-chevrons",
+        "Mineral": "Black onyx",
+        "Metalwork": "Architectural chevrons",
+        "Patina grade": "warm-heirloom",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "ae4a93c991eab93d41ce78d4477d2fe530fa3aab1fcb4827c56efac915a33df8",
+      "image": "final/024-common-gold-signet.webp",
+      "imageSha256": "bcd0cc5a91202770c72cfc4867c24f4196c0c9972aef088386c68963c5b90519"
+    },
+    {
+      "edition": 25,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "Master design": "smoky-quartz-braid",
+        "Mineral": "Smoky quartz",
+        "Metalwork": "Braided rope relief",
+        "Patina grade": "warm-heirloom",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "4746d867bf3927ad3da23b535dfc39daa75009d68f5e64ad6a58dc681c5db5cc",
+      "image": "final/025-common-gold-signet.webp",
+      "imageSha256": "9d6bf141699bb322753817c084c9dcad43f033ec656d47ec2c486431012ad420"
+    },
+    {
+      "edition": 26,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "Master design": "amber-sunburst",
+        "Mineral": "Amber",
+        "Metalwork": "Granulated sunburst",
+        "Patina grade": "warm-heirloom",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "82033d3b3a770420087cfebf13b375c26352cbdb757db2c92309ee649b00acef",
+      "image": "final/026-common-gold-signet.webp",
+      "imageSha256": "5b0ba62ee36d0bb6c13dd90ca9ebea320c6fb09e39b30f442725e69b91bc5ae0"
+    },
+    {
+      "edition": 27,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "Master design": "amethyst-fan",
+        "Mineral": "Amethyst",
+        "Metalwork": "Stepped fan channels",
+        "Patina grade": "warm-heirloom",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "a8b33dacb21ef88b2b4612b7ae28c4b814696cbbff454c301747425a1379e443",
+      "image": "final/027-common-gold-signet.webp",
+      "imageSha256": "21210310a9572d015720769c18a82e894be93c2a0cb7f9ca37a50d969c14b23a"
+    },
+    {
+      "edition": 28,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "Master design": "turquoise-scarab",
+        "Mineral": "Turquoise",
+        "Metalwork": "Scarab and hammered field",
+        "Patina grade": "warm-heirloom",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "f8e1df0b794d340900f30c8ab76b7de43d3dee53ca579413d3ce8d7f8ab38742",
+      "image": "final/028-common-gold-signet.webp",
+      "imageSha256": "4df52a67d8d4721e988c8f611272e130cdfde6bbca1a4b5ef5f157a27eb54c9d"
+    },
+    {
+      "edition": 29,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "Master design": "citrine-colonnade",
+        "Mineral": "Citrine",
+        "Metalwork": "Fluted colonnade",
+        "Patina grade": "warm-heirloom",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "91110d287581f480a4ae88f49df2feb80c52d6c03e230e0b4d531d2eb9a840b7",
+      "image": "final/029-common-gold-signet.webp",
+      "imageSha256": "d89601604d0b774b081925c0f97f311a2392b1037cbee98c52f03ad41beb6b59"
+    },
+    {
+      "edition": 30,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "Master design": "jade-knot",
+        "Mineral": "Dark jade",
+        "Metalwork": "Interlocking knot relief",
+        "Patina grade": "warm-heirloom",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "c62733375edd1c700fdefa5ee3846b3f67833240ca231fa17f85c03e99d41c71",
+      "image": "final/030-common-gold-signet.webp",
+      "imageSha256": "1955a64334ca55b51cdae4636400d396c09c230621953d919ee42471b56a98e0"
+    },
+    {
+      "edition": 31,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "Master design": "spinel-scale",
+        "Mineral": "Red spinel",
+        "Metalwork": "Scale-chased shoulders",
+        "Patina grade": "warm-heirloom",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "6194a68e567c9ebf7c7c81ad67f383afa757a870271633951d12f170dc620d02",
+      "image": "final/031-common-gold-signet.webp",
+      "imageSha256": "4269cab30dee7c74f45c9e7a2112baee4d982be24bee2e8369bc98e7fb5edde2"
+    },
+    {
+      "edition": 32,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "Master design": "lapis-celestial",
+        "Mineral": "Lapis lazuli",
+        "Metalwork": "Inset gold stars",
+        "Patina grade": "warm-heirloom",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "3a7ee79b568ba80e2c6680ac0e08ea42a295a91c7b1c264cdd400417e24ddaff",
+      "image": "final/032-common-gold-signet.webp",
+      "imageSha256": "3f7e01a1ab2dac8853961632855c47adcd05f8ab5bebc0775b00c8ee6b6934e6"
+    },
+    {
+      "edition": 33,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "Master design": "moss-agate-vine",
+        "Mineral": "Moss agate",
+        "Metalwork": "Raised vine relief",
+        "Patina grade": "warm-heirloom",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "08b7bb9ba93d944d817f88a204840b5b6f3a3bf28ae89bf121feff3cf85c1bf1",
+      "image": "final/033-common-gold-signet.webp",
+      "imageSha256": "33355ad633cca238ff82e8437db23302ff16153821722d5329be41b5a80b310c"
+    },
+    {
+      "edition": 34,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "Master design": "pearl-tide",
+        "Mineral": "Pearl",
+        "Metalwork": "Wave-chased shoulders",
+        "Patina grade": "warm-heirloom",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "4c0979d87fffada3b5484c3f6890fd3f61cfebd5366e8154c7643430bbb61560",
+      "image": "final/034-common-gold-signet.webp",
+      "imageSha256": "fcc4be289c9abecb0217eb77a9c37f787861e0dc5d6f435df11d8bdb8e36a7b9"
+    },
+    {
+      "edition": 35,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "Master design": "fire-opal-sunburst",
+        "Mineral": "Fire opal",
+        "Metalwork": "Fluted sunburst bezel",
+        "Patina grade": "warm-heirloom",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "4bc8a503caf9b3ed77d97c65696d3945a3b9ef54e00e4f0e45b2ed718cc80d3b",
+      "image": "final/035-common-gold-signet.webp",
+      "imageSha256": "582b48d871d6852ea762746533d3eab01c7ae991f06d628329685bd5c4cad18c"
+    },
+    {
+      "edition": 36,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "Master design": "obsidian-brutalist",
+        "Mineral": "Obsidian",
+        "Metalwork": "Brutalist stepped ridges",
+        "Patina grade": "warm-heirloom",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "8e4dd1c92b0d661dd08a00812c72d1afc0bccb24c166498373ebf563a0755835",
+      "image": "final/036-common-gold-signet.webp",
+      "imageSha256": "30152f9855eeb60a264b95ed6cec026752f6a7478c0b16e768a6951a8c00f53e"
+    },
+    {
+      "edition": 37,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "Master design": "oxblood-garnet-ribs",
+        "Mineral": "Oxblood garnet",
+        "Metalwork": "Ribbed shoulders",
+        "Patina grade": "deep-recess",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "a9b53763859cc40f32495b63e967541cfdba4a489d8383981131ba931142c830",
+      "image": "final/037-common-gold-signet.webp",
+      "imageSha256": "95cf1ab915adafc9e68679ffa62c1a750a82ce09c1086b62972c291d14deca78"
+    },
+    {
+      "edition": 38,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "Master design": "emerald-orbital-relief",
+        "Mineral": "Emerald",
+        "Metalwork": "Structural orbital rail",
+        "Patina grade": "deep-recess",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "437378800cc128dd5edbce744d4d94d24e731c8939755f86f96b8ef9f36608af",
+      "image": "final/038-common-gold-signet.webp",
+      "imageSha256": "2122516c0e6276d4d9bf88b22607c4d20bbcaa74bdbe8aa2cbf1a0a93fb4e894"
+    },
+    {
+      "edition": 39,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "Master design": "sapphire-labyrinth",
+        "Mineral": "Midnight sapphire",
+        "Metalwork": "Blackened labyrinth",
+        "Patina grade": "deep-recess",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "8b2f4904147b0d0667e5c1402d4f66034ae66b1778a9b7046c9fe8948849792d",
+      "image": "final/039-common-gold-signet.webp",
+      "imageSha256": "99e8f8e66592acb7daa1ec65ed16fdc61645f0d63c4b297f573a33e824425f0e"
+    },
+    {
+      "edition": 40,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "Master design": "moonstone-hammered",
+        "Mineral": "Moonstone",
+        "Metalwork": "Hammered gold",
+        "Patina grade": "deep-recess",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "1f1c0de057a1c9f42f5c6e36f07560407e4e55cec6b985986b448521bdfd1292",
+      "image": "final/040-common-gold-signet.webp",
+      "imageSha256": "80dd253462826aa85720bca052260d698c373e38aeed72a2e6089235dc1f9981"
+    },
+    {
+      "edition": 41,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "Master design": "diamond-constellation",
+        "Mineral": "Diamond",
+        "Metalwork": "Constellation settings",
+        "Patina grade": "deep-recess",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "3915689a377541c929ff070d9a1f538138308849134bc19e1b79cc937f8f5329",
+      "image": "final/041-common-gold-signet.webp",
+      "imageSha256": "926ea4e26806f534c7622d109534a20e52dd5ba015e92cfce214ac1e832046a3"
+    },
+    {
+      "edition": 42,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "Master design": "onyx-chevrons",
+        "Mineral": "Black onyx",
+        "Metalwork": "Architectural chevrons",
+        "Patina grade": "deep-recess",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "e45b3dece2a8c97e3b9e177cc5e687b62d0af945bb44244970b3d12837ca85ed",
+      "image": "final/042-common-gold-signet.webp",
+      "imageSha256": "f357a544ed19783725bfec6cbc07c45616e15573d9cf4a195f4ac715dd048656"
+    },
+    {
+      "edition": 43,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "Master design": "smoky-quartz-braid",
+        "Mineral": "Smoky quartz",
+        "Metalwork": "Braided rope relief",
+        "Patina grade": "deep-recess",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "00ac948e589eeac5083f52ea29d1d727c6f493ecb03462c79a23960c336b6eba",
+      "image": "final/043-common-gold-signet.webp",
+      "imageSha256": "b0190dd74bfc9e6574b03fa9d8603c7e47e7a994fb329810d0548b40a8d281c1"
+    },
+    {
+      "edition": 44,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "Master design": "amber-sunburst",
+        "Mineral": "Amber",
+        "Metalwork": "Granulated sunburst",
+        "Patina grade": "deep-recess",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "5129c8192c1559ce97096d6685c7347ae0ec40339a7dbb3d2c62fc1b0aaa7569",
+      "image": "final/044-common-gold-signet.webp",
+      "imageSha256": "0d33d0485db71fa4f720cb34e9f2ea67351f2815bcb448c745117ad65fa638ef"
+    },
+    {
+      "edition": 45,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "Master design": "amethyst-fan",
+        "Mineral": "Amethyst",
+        "Metalwork": "Stepped fan channels",
+        "Patina grade": "deep-recess",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "1db71e177dba6d2b07fde2fcb30a0f9bf0bff7c6b66cb141cf1dd6e8f7d92000",
+      "image": "final/045-common-gold-signet.webp",
+      "imageSha256": "962b1df7900bd23fd2463bfef6abab30c3a829f5736566bf0c2da737f7436214"
+    },
+    {
+      "edition": 46,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "Master design": "turquoise-scarab",
+        "Mineral": "Turquoise",
+        "Metalwork": "Scarab and hammered field",
+        "Patina grade": "deep-recess",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "a5787613069b203d4ca1579e2af328032ea7209b63ccf9f384f5b0f3286f2954",
+      "image": "final/046-common-gold-signet.webp",
+      "imageSha256": "3209f0a0cba55689368f359c29f6ca8a8fb57b8f6bec2b352da3217cbe0839e7"
+    },
+    {
+      "edition": 47,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "Master design": "citrine-colonnade",
+        "Mineral": "Citrine",
+        "Metalwork": "Fluted colonnade",
+        "Patina grade": "deep-recess",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "5644b03ac0801da61116a587175a18255acf6b5dd2446c37c143bb7cb5d901f5",
+      "image": "final/047-common-gold-signet.webp",
+      "imageSha256": "655019a169338717f386c5df2e53a172788120aa6953e1757baee91a8adbe249"
+    },
+    {
+      "edition": 48,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "Master design": "jade-knot",
+        "Mineral": "Dark jade",
+        "Metalwork": "Interlocking knot relief",
+        "Patina grade": "deep-recess",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "610cc4e128eba13fc661d4d63e4d7c0ee553b7b020a92fc5af92a1150060de01",
+      "image": "final/048-common-gold-signet.webp",
+      "imageSha256": "9ea769f9a55f94bee6345aa8831fce19779041c975c9703cdb8707de4cceec35"
+    },
+    {
+      "edition": 49,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "Master design": "spinel-scale",
+        "Mineral": "Red spinel",
+        "Metalwork": "Scale-chased shoulders",
+        "Patina grade": "deep-recess",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "dde3d40ba1cfbd5932ff5fd393b607215b7f4504a7f1a1dcc0040d2fa53a67c9",
+      "image": "final/049-common-gold-signet.webp",
+      "imageSha256": "91b2f1cb7ff759bec50c58eade9fc152c8bab90e3343882f619f847869a8ed21"
+    },
+    {
+      "edition": 50,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "Master design": "lapis-celestial",
+        "Mineral": "Lapis lazuli",
+        "Metalwork": "Inset gold stars",
+        "Patina grade": "deep-recess",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "60a5c79668647af968986ff9563ffb8da8eb8e32100acd935b90c48a58ab433f",
+      "image": "final/050-common-gold-signet.webp",
+      "imageSha256": "65486c4393bca35f8efa3e3bbca0381b1dc5b2c7c63521792b78c45cd917b87f"
+    },
+    {
+      "edition": 51,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "Master design": "moss-agate-vine",
+        "Mineral": "Moss agate",
+        "Metalwork": "Raised vine relief",
+        "Patina grade": "deep-recess",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "4863288a46bb347f04560e82f1a2741aaaa9d14bba591030946867de720f1762",
+      "image": "final/051-common-gold-signet.webp",
+      "imageSha256": "3197dbed894dc7b6a319023a510cb1fc146734fad1d3f815b377d8f04397140c"
+    },
+    {
+      "edition": 52,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "Master design": "pearl-tide",
+        "Mineral": "Pearl",
+        "Metalwork": "Wave-chased shoulders",
+        "Patina grade": "deep-recess",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "0a500ece17255856fc135122b8cdbfd539424510f360a08a5761a9299fde1ded",
+      "image": "final/052-common-gold-signet.webp",
+      "imageSha256": "b1b72b991d569aef5ae3ffa7d97e8a69fa4bdcbff9085fe8ecbd6d3357a7c260"
+    },
+    {
+      "edition": 53,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "Master design": "fire-opal-sunburst",
+        "Mineral": "Fire opal",
+        "Metalwork": "Fluted sunburst bezel",
+        "Patina grade": "deep-recess",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "dbf4fc78917d030c9246996a6e6981e644bff4a7f25e179a3d0237a3b936cae0",
+      "image": "final/053-common-gold-signet.webp",
+      "imageSha256": "3b22a7c355ba48322cf1a52fc079a095ed93ec056a76780a2fd7c39f9c2459c2"
+    },
+    {
+      "edition": 54,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "Master design": "obsidian-brutalist",
+        "Mineral": "Obsidian",
+        "Metalwork": "Brutalist stepped ridges",
+        "Patina grade": "deep-recess",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "e5d33ac3e156bdf1811da521dfd7f2d7fcd45b527ee3dd1a57c4b3e389c64ba2",
+      "image": "final/054-common-gold-signet.webp",
+      "imageSha256": "1644419d498defea24b2a09b60223b5419a3e73ca1dd4fc5b5be7f2e1d11f907"
+    },
+    {
+      "edition": 55,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "Master design": "oxblood-garnet-ribs",
+        "Mineral": "Oxblood garnet",
+        "Metalwork": "Ribbed shoulders",
+        "Patina grade": "lightly-worn",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "796264852a2faa7f5c2dc058e715b6ee1ce6434d96edb4b39c09cf6ef2207573",
+      "image": "final/055-common-gold-signet.webp",
+      "imageSha256": "6c7d08a51e56e1f5d5988dcefaad2defdcad6d0b871a1a2c1389da50f8fd8420"
+    },
+    {
+      "edition": 56,
+      "tier": "Uncommon",
+      "artefact": "Orbit Bracelet",
+      "redemptionTargetUsd": 24,
+      "traits": {
+        "Master design": "garnet-ribbed-cuff",
+        "Mineral": "Oxblood garnet",
+        "Metalwork": "Ribbed cuff",
+        "Patina grade": "museum-satin",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "3195bf2ce19e8c918bd353b9e27340587244b97f17c4e417fb9258d4989c7ebf",
+      "image": "final/056-uncommon-orbit-bracelet.webp",
+      "imageSha256": "466f378b00533aea18fd131f154e143bb86b86350de3079b1423b39238226971"
+    },
+    {
+      "edition": 57,
+      "tier": "Uncommon",
+      "artefact": "Orbit Bracelet",
+      "redemptionTargetUsd": 24,
+      "traits": {
+        "Master design": "emerald-rail-bracelet",
+        "Mineral": "Emerald",
+        "Metalwork": "Structural orbital rail",
+        "Patina grade": "museum-satin",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "cb177545489c6ed32d2e5335d40280881670cf4041341afa6101e5a4f8a8f425",
+      "image": "final/057-uncommon-orbit-bracelet.webp",
+      "imageSha256": "acf954b69f7d06a3db3a1baaad379e773ecf8ae59bd379d2cbf590eb5a321765"
+    },
+    {
+      "edition": 58,
+      "tier": "Uncommon",
+      "artefact": "Orbit Bracelet",
+      "redemptionTargetUsd": 24,
+      "traits": {
+        "Master design": "sapphire-labyrinth-cuff",
+        "Mineral": "Midnight sapphire",
+        "Metalwork": "Labyrinth cuff",
+        "Patina grade": "museum-satin",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "4a5e13fc5fb1fd324a8c9bc2bea471743613f17472db0d10cce0d5d3b29b7d53",
+      "image": "final/058-uncommon-orbit-bracelet.webp",
+      "imageSha256": "bb90fce150ed52ee765fb19e93cec92c1b60de7e21cb71b8ad23cbbbdccca614"
+    },
+    {
+      "edition": 59,
+      "tier": "Uncommon",
+      "artefact": "Orbit Bracelet",
+      "redemptionTargetUsd": 24,
+      "traits": {
+        "Master design": "moonstone-hammered-cuff",
+        "Mineral": "Moonstone",
+        "Metalwork": "Hammered open cuff",
+        "Patina grade": "museum-satin",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "21c8e1cdc180f4b7dbe7a7f7968c398c70ef1e0ea4b32977a9d69a1a041fadee",
+      "image": "final/059-uncommon-orbit-bracelet.webp",
+      "imageSha256": "0ee33b9a7d3fb9fa655b056853f7ad5f7c62a129f4f99979b1a24df9822d1e8c"
+    },
+    {
+      "edition": 60,
+      "tier": "Uncommon",
+      "artefact": "Orbit Bracelet",
+      "redemptionTargetUsd": 24,
+      "traits": {
+        "Master design": "diamond-constellation-bracelet",
+        "Mineral": "Diamond",
+        "Metalwork": "Articulated constellation plates",
+        "Patina grade": "museum-satin",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "fefd8734688979b3097f0b470b8cc01e627d20c4285d89e7e646540802227385",
+      "image": "final/060-uncommon-orbit-bracelet.webp",
+      "imageSha256": "cb03aa3de22893518972e02832849a502b8b02206ef78c0fbd08b124f7ffa050"
+    },
+    {
+      "edition": 61,
+      "tier": "Uncommon",
+      "artefact": "Orbit Bracelet",
+      "redemptionTargetUsd": 24,
+      "traits": {
+        "Master design": "onyx-chevron-cuff",
+        "Mineral": "Black onyx",
+        "Metalwork": "Architectural chevrons",
+        "Patina grade": "museum-satin",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "44e9a466d35d82c4c1ebc630b2109930c867b763d0c58c7c23557596fcf6c8d8",
+      "image": "final/061-uncommon-orbit-bracelet.webp",
+      "imageSha256": "610ecf4cfe9fa20dfd80dc5e5a2cc164f7e3a0a0ab920aba24f56dd9fba902a4"
+    },
+    {
+      "edition": 62,
+      "tier": "Uncommon",
+      "artefact": "Orbit Bracelet",
+      "redemptionTargetUsd": 24,
+      "traits": {
+        "Master design": "ruby-scale-links",
+        "Mineral": "Ruby",
+        "Metalwork": "Articulated scale links",
+        "Patina grade": "museum-satin",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "7a0b33c2310f2b60e2ea174c6f3eb1a77bdc1608860f4cbc009e978416361318",
+      "image": "final/062-uncommon-orbit-bracelet.webp",
+      "imageSha256": "b10287ab7ecfd40b0c7c395a24d07e97965edad790ecef53f2a9f548df7008c2"
+    },
+    {
+      "edition": 63,
+      "tier": "Uncommon",
+      "artefact": "Orbit Bracelet",
+      "redemptionTargetUsd": 24,
+      "traits": {
+        "Master design": "lapis-celestial-cuff",
+        "Mineral": "Lapis lazuli",
+        "Metalwork": "Celestial seal cuff",
+        "Patina grade": "museum-satin",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "090e62f010224a47dde6b90124f34d1f34e83afd4bb0b27d17891f41f23c8e7c",
+      "image": "final/063-uncommon-orbit-bracelet.webp",
+      "imageSha256": "9091a21e1c7cbd993c95b9fc1c7cd7810f420a14ff512137b3add7afa365cd0e"
+    },
+    {
+      "edition": 64,
+      "tier": "Uncommon",
+      "artefact": "Orbit Bracelet",
+      "redemptionTargetUsd": 24,
+      "traits": {
+        "Master design": "moss-agate-vine-cuff",
+        "Mineral": "Moss agate",
+        "Metalwork": "Wrapped vine relief",
+        "Patina grade": "museum-satin",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "a89a75e05ba73de33f5129a6ce4825460f303a18ed670153e37b8f8870982ad8",
+      "image": "final/064-uncommon-orbit-bracelet.webp",
+      "imageSha256": "c001dbe147b8b7738f660c2b7d91505519cf98273da6316207d3df5b2b2c4cd5"
+    },
+    {
+      "edition": 65,
+      "tier": "Uncommon",
+      "artefact": "Orbit Bracelet",
+      "redemptionTargetUsd": 24,
+      "traits": {
+        "Master design": "pearl-wave-cuff",
+        "Mineral": "Pearl",
+        "Metalwork": "Wave-chased open cuff",
+        "Patina grade": "museum-satin",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "e11a16921d73af6d4e34669b13ab0bd1a74c225e247867618f4d6e4418681e69",
+      "image": "final/065-uncommon-orbit-bracelet.webp",
+      "imageSha256": "769fe0068c1d5139282992784d894d5ba8b3aa666a98f00c080201228ca756a5"
+    },
+    {
+      "edition": 66,
+      "tier": "Uncommon",
+      "artefact": "Orbit Bracelet",
+      "redemptionTargetUsd": 24,
+      "traits": {
+        "Master design": "fire-opal-segmented-bracelet",
+        "Mineral": "Fire opal",
+        "Metalwork": "Segmented sunburst band",
+        "Patina grade": "museum-satin",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "10dea7b8cf7598a1c87132f45cf2bcfa4f59535b878a685af7e89fd3aa8505c5",
+      "image": "final/066-uncommon-orbit-bracelet.webp",
+      "imageSha256": "dcd5308d4b29e9c0ddd88bf3e292d3cb6629fb91f437ff771793a0db9bd91d78"
+    },
+    {
+      "edition": 67,
+      "tier": "Uncommon",
+      "artefact": "Orbit Bracelet",
+      "redemptionTargetUsd": 24,
+      "traits": {
+        "Master design": "obsidian-brutalist-cuff",
+        "Mineral": "Obsidian",
+        "Metalwork": "Blackened stepped ribs",
+        "Patina grade": "museum-satin",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "b3f78f23362941e6d11330204c2f11782df68b7483bc0aea39924c469ae4bae3",
+      "image": "final/067-uncommon-orbit-bracelet.webp",
+      "imageSha256": "a61b1a39b67f26349b252ca25ce56d5bf5c6d680ec4231d70fde5f632b412860"
+    },
+    {
+      "edition": 68,
+      "tier": "Uncommon",
+      "artefact": "Orbit Bracelet",
+      "redemptionTargetUsd": 24,
+      "traits": {
+        "Master design": "garnet-ribbed-cuff",
+        "Mineral": "Oxblood garnet",
+        "Metalwork": "Ribbed cuff",
+        "Patina grade": "warm-heirloom",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "0692041032699be9198f578a21082c328d6b5a841476d78a750e0b5bb8564389",
+      "image": "final/068-uncommon-orbit-bracelet.webp",
+      "imageSha256": "308157964bacaa7d2d5ceb67c7c03a919c17c36711f33735e13e40b88f0f79a6"
+    },
+    {
+      "edition": 69,
+      "tier": "Uncommon",
+      "artefact": "Orbit Bracelet",
+      "redemptionTargetUsd": 24,
+      "traits": {
+        "Master design": "emerald-rail-bracelet",
+        "Mineral": "Emerald",
+        "Metalwork": "Structural orbital rail",
+        "Patina grade": "warm-heirloom",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "6a2bc94bf9ff8d49278676e2e7d9b601f5abe4dc2411b240fe2d30d27c6a688b",
+      "image": "final/069-uncommon-orbit-bracelet.webp",
+      "imageSha256": "c28da0156537f0a0f76533e63846750374102535bffe9b811bf4db34388a9305"
+    },
+    {
+      "edition": 70,
+      "tier": "Uncommon",
+      "artefact": "Orbit Bracelet",
+      "redemptionTargetUsd": 24,
+      "traits": {
+        "Master design": "sapphire-labyrinth-cuff",
+        "Mineral": "Midnight sapphire",
+        "Metalwork": "Labyrinth cuff",
+        "Patina grade": "warm-heirloom",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "cc21f86dd497ab82741da5ec81e1ca7151dbfbfa797bb5a7813369bf26a11ee8",
+      "image": "final/070-uncommon-orbit-bracelet.webp",
+      "imageSha256": "9251dd1c5f02cd1fa230158dc4ee0cd59ac352efd4cb12fc50360631c1df11ec"
+    },
+    {
+      "edition": 71,
+      "tier": "Uncommon",
+      "artefact": "Orbit Bracelet",
+      "redemptionTargetUsd": 24,
+      "traits": {
+        "Master design": "moonstone-hammered-cuff",
+        "Mineral": "Moonstone",
+        "Metalwork": "Hammered open cuff",
+        "Patina grade": "warm-heirloom",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "32aa3ef4af85c4e14ef427894bc1cfb9d8d45a813d7ff8d3dac954ec174db48a",
+      "image": "final/071-uncommon-orbit-bracelet.webp",
+      "imageSha256": "b8f518b04424fb50894f48dd1fac05df75e2bf449d20a9d6e14af59b589a0623"
+    },
+    {
+      "edition": 72,
+      "tier": "Uncommon",
+      "artefact": "Orbit Bracelet",
+      "redemptionTargetUsd": 24,
+      "traits": {
+        "Master design": "diamond-constellation-bracelet",
+        "Mineral": "Diamond",
+        "Metalwork": "Articulated constellation plates",
+        "Patina grade": "warm-heirloom",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "0d84a729a156878f5fda44bfbd91b342f87141567829d51f813c7e03466d28bf",
+      "image": "final/072-uncommon-orbit-bracelet.webp",
+      "imageSha256": "7f04f9f8b208bd99651af4c244cefff1b831429ff1300cf481315011b98fcbc7"
+    },
+    {
+      "edition": 73,
+      "tier": "Uncommon",
+      "artefact": "Orbit Bracelet",
+      "redemptionTargetUsd": 24,
+      "traits": {
+        "Master design": "onyx-chevron-cuff",
+        "Mineral": "Black onyx",
+        "Metalwork": "Architectural chevrons",
+        "Patina grade": "warm-heirloom",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "c8868ff7f5dd0f44c5ac37eff63ab699b9ae26b23615252f9fbc70a659045496",
+      "image": "final/073-uncommon-orbit-bracelet.webp",
+      "imageSha256": "5ddeed909f79c2675e8dda73c32f1504d182eb2fd52d047b401e7833f4febc21"
+    },
+    {
+      "edition": 74,
+      "tier": "Uncommon",
+      "artefact": "Orbit Bracelet",
+      "redemptionTargetUsd": 24,
+      "traits": {
+        "Master design": "ruby-scale-links",
+        "Mineral": "Ruby",
+        "Metalwork": "Articulated scale links",
+        "Patina grade": "warm-heirloom",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "54ee658b1b20be472f80c331d9d0c4c79cf753b988ea7431aa1de3e3d82c1f4a",
+      "image": "final/074-uncommon-orbit-bracelet.webp",
+      "imageSha256": "1feedf8bf2c491e1cf1f1834fff177042aac72bfec2f284968ca291a16351d97"
+    },
+    {
+      "edition": 75,
+      "tier": "Uncommon",
+      "artefact": "Orbit Bracelet",
+      "redemptionTargetUsd": 24,
+      "traits": {
+        "Master design": "lapis-celestial-cuff",
+        "Mineral": "Lapis lazuli",
+        "Metalwork": "Celestial seal cuff",
+        "Patina grade": "warm-heirloom",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "91a466da47df44e3deca5ce71bb69b28ca00cfd7d864fe6c6fdd2c1a12b2441d",
+      "image": "final/075-uncommon-orbit-bracelet.webp",
+      "imageSha256": "1b63d83a2a2a57d0face42e07e8512ca632947bd564360d07ff7fad3404d2195"
+    },
+    {
+      "edition": 76,
+      "tier": "Uncommon",
+      "artefact": "Orbit Bracelet",
+      "redemptionTargetUsd": 24,
+      "traits": {
+        "Master design": "moss-agate-vine-cuff",
+        "Mineral": "Moss agate",
+        "Metalwork": "Wrapped vine relief",
+        "Patina grade": "warm-heirloom",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "5ea341e5a4a4667a2404ce347de7f2c0ce7e489ce6efb3813b505611ee565cc1",
+      "image": "final/076-uncommon-orbit-bracelet.webp",
+      "imageSha256": "51f6e110a21abf093ca49617771395ec05c4cf89b6de038877c46beb84347574"
+    },
+    {
+      "edition": 77,
+      "tier": "Uncommon",
+      "artefact": "Orbit Bracelet",
+      "redemptionTargetUsd": 24,
+      "traits": {
+        "Master design": "pearl-wave-cuff",
+        "Mineral": "Pearl",
+        "Metalwork": "Wave-chased open cuff",
+        "Patina grade": "warm-heirloom",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "d71491ceb3d0327e14ec177574f871821c19dd97abc0912640fe81225ce6cbc4",
+      "image": "final/077-uncommon-orbit-bracelet.webp",
+      "imageSha256": "1079355559cc143fe7b15151964b92420777bc6ab054e58aaeb485dd280fc1a1"
+    },
+    {
+      "edition": 78,
+      "tier": "Uncommon",
+      "artefact": "Orbit Bracelet",
+      "redemptionTargetUsd": 24,
+      "traits": {
+        "Master design": "fire-opal-segmented-bracelet",
+        "Mineral": "Fire opal",
+        "Metalwork": "Segmented sunburst band",
+        "Patina grade": "warm-heirloom",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "d7bbcd653cbd51632a5e2e451f221ec005cea88361181a7cb7a4d87570de8c21",
+      "image": "final/078-uncommon-orbit-bracelet.webp",
+      "imageSha256": "435efb00ded1334a46aa5df57c7fd738ad07c218005e067f67f4f6f283492e76"
+    },
+    {
+      "edition": 79,
+      "tier": "Uncommon",
+      "artefact": "Orbit Bracelet",
+      "redemptionTargetUsd": 24,
+      "traits": {
+        "Master design": "obsidian-brutalist-cuff",
+        "Mineral": "Obsidian",
+        "Metalwork": "Blackened stepped ribs",
+        "Patina grade": "warm-heirloom",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "16c8ede66ee52d1c83ca31adae4af458f537fc39ddb296d1a619a1ecdf8f80d6",
+      "image": "final/079-uncommon-orbit-bracelet.webp",
+      "imageSha256": "522fc2fd2dec0e8f93558143789ac78c8f4f88ffdf21dba0f3cc8a48832c4fe0"
+    },
+    {
+      "edition": 80,
+      "tier": "Uncommon",
+      "artefact": "Orbit Bracelet",
+      "redemptionTargetUsd": 24,
+      "traits": {
+        "Master design": "garnet-ribbed-cuff",
+        "Mineral": "Oxblood garnet",
+        "Metalwork": "Ribbed cuff",
+        "Patina grade": "deep-recess",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "be274ba7c72fc3141563463a5537d86cac6ec6354c86acab292f506ddf4e972f",
+      "image": "final/080-uncommon-orbit-bracelet.webp",
+      "imageSha256": "ca820572fc42ce4fce4b8adc47bbfc30f569fffab2b1359889ccb5f03761c438"
+    },
+    {
+      "edition": 81,
+      "tier": "Rare",
+      "artefact": "Royal Torque",
+      "redemptionTargetUsd": 45,
+      "traits": {
+        "Master design": "garnet-heraldic-torque",
+        "Mineral": "Garnet",
+        "Metalwork": "Heraldic stepped ribs",
+        "Patina grade": "museum-satin",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "0deb1f361be037cca7acf758a88d4c131f93a3cfb8e1c3bcd0bc63e9ab59b84d",
+      "image": "final/081-rare-royal-torque.webp",
+      "imageSha256": "e1a5b0dc108581e36bb306860e7265f3e372f174f96ce13737e2b61f182c55be"
+    },
+    {
+      "edition": 82,
+      "tier": "Rare",
+      "artefact": "Royal Torque",
+      "redemptionTargetUsd": 45,
+      "traits": {
+        "Master design": "emerald-orbital-collar",
+        "Mineral": "Emerald",
+        "Metalwork": "Structural orbital rails",
+        "Patina grade": "museum-satin",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "85b9fd6797c7f6b3f1c235a734635daa131436fd3ddfcdc95461df96cb5871f5",
+      "image": "final/082-rare-royal-torque.webp",
+      "imageSha256": "b3dd4cf7dadea4846612586f1b68d58c631a570c41225d9079bfe0145f73e1c1"
+    },
+    {
+      "edition": 83,
+      "tier": "Rare",
+      "artefact": "Royal Torque",
+      "redemptionTargetUsd": 45,
+      "traits": {
+        "Master design": "sapphire-labyrinth-gorget",
+        "Mineral": "Sapphire",
+        "Metalwork": "Blackened labyrinth panels",
+        "Patina grade": "museum-satin",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "8ed86a599cd13f80cd07fcc45030d89b13bbbf8745cae3a19c3db5c3dd6e36b0",
+      "image": "final/083-rare-royal-torque.webp",
+      "imageSha256": "2144eac3995c361321490a73181163430230bbb0d52afd0b39a6ad5cb85c8e8d"
+    },
+    {
+      "edition": 84,
+      "tier": "Rare",
+      "artefact": "Royal Torque",
+      "redemptionTargetUsd": 45,
+      "traits": {
+        "Master design": "moonstone-hammered-torque",
+        "Mineral": "Moonstone",
+        "Metalwork": "Hammered open torque",
+        "Patina grade": "museum-satin",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "86c54d388921d91a914d9849091e9be47cfff5a66f37fd7a1aad12af0f8fa727",
+      "image": "final/084-rare-royal-torque.webp",
+      "imageSha256": "4a6cf16a47d69cc71b40f8262b4d46a3b91b2bcb82a26fb332475c64aaabca83"
+    },
+    {
+      "edition": 85,
+      "tier": "Rare",
+      "artefact": "Royal Torque",
+      "redemptionTargetUsd": 45,
+      "traits": {
+        "Master design": "diamond-constellation-collar",
+        "Mineral": "Diamond",
+        "Metalwork": "Articulated constellation settings",
+        "Patina grade": "museum-satin",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "50064c7566ad4dc500a4c07906d78ed962f52e5360dc47dd5d1ec3b1eb27045b",
+      "image": "final/085-rare-royal-torque.webp",
+      "imageSha256": "dcdb5d6da7bb9d374f2fa44b5afa356c353dcbf97ce6e0fba38cdae2bfeb6ace"
+    },
+    {
+      "edition": 86,
+      "tier": "Rare",
+      "artefact": "Royal Torque",
+      "redemptionTargetUsd": 45,
+      "traits": {
+        "Master design": "onyx-chevron-necklace",
+        "Mineral": "Black onyx",
+        "Metalwork": "Architectural chevrons",
+        "Patina grade": "museum-satin",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "25d95b3cd72e8f6abde066eb6afa6064691694b0cbe2453a31fe23d91ba07c20",
+      "image": "final/086-rare-royal-torque.webp",
+      "imageSha256": "5659455a03d9567fee47e1411760ac2e54f75cfa5dd60bdbb15acbdaae423c86"
+    },
+    {
+      "edition": 87,
+      "tier": "Rare",
+      "artefact": "Royal Torque",
+      "redemptionTargetUsd": 45,
+      "traits": {
+        "Master design": "ruby-scale-collar",
+        "Mineral": "Ruby",
+        "Metalwork": "Heraldic scale links",
+        "Patina grade": "museum-satin",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "3f313fafa96defeff33447e7b42348657ca32e67fbbc48bef6dd69fd11835070",
+      "image": "final/087-rare-royal-torque.webp",
+      "imageSha256": "a1e76a1f9b8ace275919fcc6f4ea87525fc1a670377b6ed5afbf135ca79a3884"
+    },
+    {
+      "edition": 88,
+      "tier": "Rare",
+      "artefact": "Royal Torque",
+      "redemptionTargetUsd": 45,
+      "traits": {
+        "Master design": "lapis-celestial-gorget",
+        "Mineral": "Lapis lazuli",
+        "Metalwork": "Inset celestial plates",
+        "Patina grade": "museum-satin",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "f996060c8ed4c60267b2d2e1b1e8590847a6da733f18e5b5b7c963864e9acdc6",
+      "image": "final/088-rare-royal-torque.webp",
+      "imageSha256": "594dc0f76d5963d91cad4834138b1e8b314728f58021f944b2f3b591288161ea"
+    },
+    {
+      "edition": 89,
+      "tier": "Rare",
+      "artefact": "Royal Torque",
+      "redemptionTargetUsd": 45,
+      "traits": {
+        "Master design": "moss-agate-vine-torque",
+        "Mineral": "Moss agate",
+        "Metalwork": "Wrapped botanical relief",
+        "Patina grade": "museum-satin",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "c86fc622273c6586102c43d5bd9446d8c09751c171bb1f898355b26824016ddc",
+      "image": "final/089-rare-royal-torque.webp",
+      "imageSha256": "88d952a3baf72d8e8784ea7d81bbb7227cc976252e563ef2bcc4df2f4ae771da"
+    },
+    {
+      "edition": 90,
+      "tier": "Rare",
+      "artefact": "Royal Torque",
+      "redemptionTargetUsd": 45,
+      "traits": {
+        "Master design": "pearl-wave-collar",
+        "Mineral": "Pearl",
+        "Metalwork": "Wave-chased ridges",
+        "Patina grade": "museum-satin",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "f9fb18b1d032350b5a85f007575ae57e6d6b01794c5f9e729674348a8dffd204",
+      "image": "final/090-rare-royal-torque.webp",
+      "imageSha256": "3e5c7f14d95d3a6675f52399abdcd962c653a755970eae825e8edb4a16054eb3"
+    },
+    {
+      "edition": 91,
+      "tier": "Rare",
+      "artefact": "Royal Torque",
+      "redemptionTargetUsd": 45,
+      "traits": {
+        "Master design": "fire-opal-sunburst-necklace",
+        "Mineral": "Fire opal",
+        "Metalwork": "Stepped sunburst panels",
+        "Patina grade": "museum-satin",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "9b4b01a8868a243a2553eb19d2eff7c1faa05c1ff7e590515b6aa6effac70fe4",
+      "image": "final/091-rare-royal-torque.webp",
+      "imageSha256": "36c2ee0a02c69d187cd0c2159ad83cfcd86cf09bf8f13e9e980d17365ed5de7b"
+    },
+    {
+      "edition": 92,
+      "tier": "Rare",
+      "artefact": "Royal Torque",
+      "redemptionTargetUsd": 45,
+      "traits": {
+        "Master design": "obsidian-brutalist-torque",
+        "Mineral": "Obsidian",
+        "Metalwork": "Layered architectural ribs",
+        "Patina grade": "museum-satin",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "61dbf335e0ec2341dbdf8bdb36f233a8afad5b1154b3cc22d0b40af280fe6b0c",
+      "image": "final/092-rare-royal-torque.webp",
+      "imageSha256": "a37130e877b3ae6639beb436b8c536b0e24e8d972826a683996dbc11329d56ad"
+    },
+    {
+      "edition": 93,
+      "tier": "Rare",
+      "artefact": "Royal Torque",
+      "redemptionTargetUsd": 45,
+      "traits": {
+        "Master design": "garnet-heraldic-torque",
+        "Mineral": "Garnet",
+        "Metalwork": "Heraldic stepped ribs",
+        "Patina grade": "warm-heirloom",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "60799c8bad3f0f3d2e85cd63f67799ac09d7a7c1b95c9d768f35d2f1621ebcb1",
+      "image": "final/093-rare-royal-torque.webp",
+      "imageSha256": "d56d8d7c21b325392cad3f981407388a74b4b13ccb0506d73d98399b08f48b7c"
+    },
+    {
+      "edition": 94,
+      "tier": "Rare",
+      "artefact": "Royal Torque",
+      "redemptionTargetUsd": 45,
+      "traits": {
+        "Master design": "emerald-orbital-collar",
+        "Mineral": "Emerald",
+        "Metalwork": "Structural orbital rails",
+        "Patina grade": "warm-heirloom",
+        "Artwork construction": "Fully baked material render"
+      },
+      "recipeHash": "412d3fe2c0d5e1f5f23a51729f6422f7979894c373f63bce5635ebc0d1a032a5",
+      "image": "final/094-rare-royal-torque.webp",
+      "imageSha256": "a8f1d5e328b1f2bee54c5eca52735092f2a66d491c813d7d2f3a08833c5b1e1b"
+    },
+    {
+      "edition": 95,
+      "tier": "Epic",
+      "artefact": "Imperial Ovoid",
+      "redemptionTargetUsd": 110,
+      "traits": {
+        "Master design": "ember-lattice",
+        "Artwork construction": "Fully baked material render",
+        "Edition": "One of five"
+      },
+      "recipeHash": "37fd77bb9fa3576c54af07d021809a7a7942f0250074414953003e8b53474306",
+      "image": "final/095-epic-imperial-ovoid.webp",
+      "imageSha256": "f99cee745ed9bef202e34e99d6702f68aee63b3f12ca07f67d71f2dc8544d3fd"
+    },
+    {
+      "edition": 96,
+      "tier": "Epic",
+      "artefact": "Imperial Ovoid",
+      "redemptionTargetUsd": 110,
+      "traits": {
+        "Master design": "midnight-observatory",
+        "Artwork construction": "Fully baked material render",
+        "Edition": "One of five"
+      },
+      "recipeHash": "635e7170c8ddd24974a2b94c6bfe5d31553e7b3d3694e244df95d9c9634967b4",
+      "image": "final/096-epic-imperial-ovoid.webp",
+      "imageSha256": "1a38238143b0a9a63cac7feef6435871d63bad031f5a3709bad5372feda984d2"
+    },
+    {
+      "edition": 97,
+      "tier": "Epic",
+      "artefact": "Imperial Ovoid",
+      "redemptionTargetUsd": 110,
+      "traits": {
+        "Master design": "verdant-engine",
+        "Artwork construction": "Fully baked material render",
+        "Edition": "One of five"
+      },
+      "recipeHash": "d1d33321423451966a3eb31d1fa10d8fbd5b30cd03410b1180219aea62b446c5",
+      "image": "final/097-epic-imperial-ovoid.webp",
+      "imageSha256": "7029b7ff17e38db80ebceeee4c131b98157cdc2b7ead263801f84a4713e3dd7e"
+    },
+    {
+      "edition": 98,
+      "tier": "Epic",
+      "artefact": "Imperial Ovoid",
+      "redemptionTargetUsd": 110,
+      "traits": {
+        "Master design": "lunar-frost",
+        "Artwork construction": "Fully baked material render",
+        "Edition": "One of five"
+      },
+      "recipeHash": "8fc21bd318fadc2c6a3892fd0d95ce3d4585ba54cfec5c971beb05318eda7391",
+      "image": "final/098-epic-imperial-ovoid.webp",
+      "imageSha256": "6e0519d9199370be7255325f2cfc273f090997c47d04e1036ab3f43d1bd6526b"
+    },
+    {
+      "edition": 99,
+      "tier": "Epic",
+      "artefact": "Imperial Ovoid",
+      "redemptionTargetUsd": 110,
+      "traits": {
+        "Master design": "obsidian-eclipse",
+        "Artwork construction": "Fully baked material render",
+        "Edition": "One of five"
+      },
+      "recipeHash": "a84a2a7d76b07ac79751cdc7c1426e0e069289417e9251e5ec9420cd38bafa08",
+      "image": "final/099-epic-imperial-ovoid.webp",
+      "imageSha256": "e12552450c34f8b446d21493eaad31d29089500b1c49b124e95641d88b06d46e"
+    },
+    {
+      "edition": 100,
+      "tier": "Legendary",
+      "artefact": "Crown Jewel",
+      "redemptionTargetUsd": 370,
+      "traits": {
+        "Master design": "sovereign-crown-jewel",
+        "Artwork construction": "Fully baked material render",
+        "Edition": "One of one"
+      },
+      "recipeHash": "531fb2e046bed49e3c75aaa0f9728baa22ed368d4c05b0c18ae15b2853a108d9",
+      "image": "final/100-legendary-crown-jewel.webp",
+      "imageSha256": "0e860f1ee63d9c932d88a7f0870a81659e02e673e9f63488513308d3af9e6504"
+    }
+  ]
+}

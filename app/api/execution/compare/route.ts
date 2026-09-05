@@ -102,11 +102,18 @@ async function compareProduct(
           effectiveBuyMaximumUsd(product.execution.maximumUsd, executionControls.maxUsd),
         )
       : parseTokenAmountToBaseUnits(amount, product.decimals, product.symbol);
-    const raw = await getJupiterOrder(new URLSearchParams({
+    const params = new URLSearchParams({
       inputMint,
       outputMint,
       amount: inputAmount,
-    }));
+      // RFQ routes cannot supply the signable transaction used by the order endpoint, so showing
+      // one as "best" here would advertise a result the protected execution path cannot deliver.
+      excludeRouters: "jupiterz,okx,dflow",
+    });
+    if (product.execution.excludedDexes.length > 0) {
+      params.set("excludeDexes", product.execution.excludedDexes.join(","));
+    }
+    const raw = await getJupiterOrder(params);
     const outputAmount = nullableString(raw.outAmount);
     const minimumOutputAmount = nullableString(raw.otherAmountThreshold) ?? outputAmount;
     if (

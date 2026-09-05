@@ -170,7 +170,7 @@ export function ScarcityOracle(props: {
       <header className={styles.oracleHero}>
         <div>
           <span className={styles.kicker}>Hedgents Metal State Oracle / v1</span>
-          <h1>Every metal has<br /><em>a future to predict.</em></h1>
+          <h1>Every metal has<br /><em>a state to verify.</em></h1>
           <p>Prices · supply · policy · projects · science. Numerical signals and named future events enter separate paths, then converge on the same frozen evidence rules.</p>
         </div>
         <div className={styles.oracleStats}>

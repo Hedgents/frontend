@@ -1,0 +1,59 @@
+{
+  "name": "Hedgents Relic #084 — Royal Torque",
+  "symbol": "RELIC",
+  "description": "A Rare Royal Torque from the fixed 100-piece Hedgents Genesis collection. Burn redemption transfers the ticket's exact onchain PAXG amount. No physical artefact delivery.",
+  "image": "../final/084-rare-royal-torque.webp",
+  "attributes": [
+    {
+      "trait_type": "Edition",
+      "value": 84
+    },
+    {
+      "trait_type": "Tier",
+      "value": "Rare"
+    },
+    {
+      "trait_type": "Artefact",
+      "value": "Royal Torque"
+    },
+    {
+      "trait_type": "field",
+      "value": "vault-grid"
+    },
+    {
+      "trait_type": "aura",
+      "value": "orbital-trail"
+    },
+    {
+      "trait_type": "finish",
+      "value": "blackened-recess"
+    },
+    {
+      "trait_type": "seal",
+      "value": "labyrinth"
+    },
+    {
+      "trait_type": "mineral",
+      "value": "garnet-pair"
+    },
+    {
+      "trait_type": "Redemption target at funding snapshot (USD)",
+      "value": 45
+    }
+  ],
+  "properties": {
+    "category": "image",
+    "files": [
+      {
+        "uri": "../final/084-rare-royal-torque.webp",
+        "type": "image/webp"
+      }
+    ],
+    "collection": "Hedgents Relics — Genesis",
+    "noPhysicalDelivery": true,
+    "metadataStatus": "template-until-campaign-funding",
+    "authoritativeRedemption": "Exact atomic PAXG amount recorded in the campaign ticket account",
+    "recipeSha256": "404c1a8188f153a695658074a035418b95e81ed6e07d23aa83bfc2ef8863fe77",
+    "imageSha256": "5847b1c50767f8b4752c73a7a7969dc91a23c4f89e1550b31a7ec4030c422786"
+  }
+}

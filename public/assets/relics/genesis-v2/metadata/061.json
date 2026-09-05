@@ -1,0 +1,60 @@
+{
+  "name": "Hedgents Relic #061 — Orbit Bracelet",
+  "symbol": "RELIC",
+  "description": "A Uncommon Orbit Bracelet from the fixed 100-piece Hedgents Genesis collection. Its engraving, stones, patina, and metal grain are baked into the artwork. Burn redemption transfers the ticket's exact onchain PAXG amount. No physical artefact delivery.",
+  "image": "../final/061-uncommon-orbit-bracelet.webp",
+  "attributes": [
+    {
+      "trait_type": "Edition",
+      "value": 61
+    },
+    {
+      "trait_type": "Tier",
+      "value": "Uncommon"
+    },
+    {
+      "trait_type": "Artefact",
+      "value": "Orbit Bracelet"
+    },
+    {
+      "trait_type": "Master design",
+      "value": "onyx-chevron-cuff"
+    },
+    {
+      "trait_type": "Mineral",
+      "value": "Black onyx"
+    },
+    {
+      "trait_type": "Metalwork",
+      "value": "Architectural chevrons"
+    },
+    {
+      "trait_type": "Patina grade",
+      "value": "museum-satin"
+    },
+    {
+      "trait_type": "Artwork construction",
+      "value": "Fully baked material render"
+    },
+    {
+      "trait_type": "Redemption target at funding snapshot (USD)",
+      "value": 24
+    }
+  ],
+  "properties": {
+    "category": "image",
+    "files": [
+      {
+        "uri": "../final/061-uncommon-orbit-bracelet.webp",
+        "type": "image/webp"
+      }
+    ],
+    "collection": "Hedgents Relics — Genesis",
+    "artworkPipeline": "baked-material-master-v2",
+    "noPhysicalDelivery": true,
+    "metadataStatus": "template-until-campaign-funding",
+    "authoritativeRedemption": "Exact atomic PAXG amount recorded in the campaign ticket account",
+    "recipeSha256": "44e9a466d35d82c4c1ebc630b2109930c867b763d0c58c7c23557596fcf6c8d8",
+    "imageSha256": "610ecf4cfe9fa20dfd80dc5e5a2cc164f7e3a0a0ab920aba24f56dd9fba902a4"
+  }
+}

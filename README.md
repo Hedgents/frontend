@@ -6,7 +6,7 @@ Cross-chain stablecoin transport is supplied by the external Rail SDK. Hedgents 
 
 ## Current scope
 
-- 15 registered Solana execution adapters across gold, silver, uranium, platinum, copper, and palladium; live liquidity is checked separately and may leave an adapter unavailable
+- 17 registered Solana execution adapters across gold, silver, uranium, platinum, copper, and palladium; live liquidity is checked separately and may leave an adapter unavailable
 - Live Pyth metal or underlying-security references where an institutional feed exists
 - Exact-size Jupiter health checks across every registered product for the selected metal
 - Like-for-like route ranking without treating physical metal, ETF shares, futures funds, and miners funds as interchangeable

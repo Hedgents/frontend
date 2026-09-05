@@ -11,6 +11,7 @@ import {
   configuredProgramFingerprintAllowlist,
 } from "@/lib/solana-transaction-guard";
 import { executionAuditConfigurationStatus } from "@/lib/execution-audit-store";
+import { getSolanaExecutionProduct } from "@/lib/product-registry";
 
 export type ReadinessStatus = "ready" | "blocked" | "external";
 
@@ -61,6 +62,9 @@ export async function getBetaReadiness() {
   }
 
   const executionControls = getExecutionControls();
+  const requiresOperatorCountryAllowlist = executionControls.allowedProductIds.some(
+    (productId) => getSolanaExecutionProduct(productId)?.eligibilityPolicyId === "ondo",
+  );
   const terminalFeatures = getPublicTerminalFeatures();
   const executionRpcCount = configuredExecutionRpcCount();
   let walletDebitConfigured = false;
@@ -130,7 +134,15 @@ export async function getBetaReadiness() {
     ),
     check("storage", "Durable evidence", onlineDetectorStorageConfigured(), "Private durable storage is configured for evidence, reviewed markets, analytics, and detector state."),
     check("origins", "Mutation origins", present("HEDGENTS_ALLOWED_ORIGINS"), "Explicit production browser origins are allowlisted."),
-    check("eligibility", "Security eligibility policy", present("HEDGENTS_SECURITY_COUNTRY_ALLOWLIST"), "A legally reviewed country allowlist is required before tokenized-security routes can leave fail-closed mode.", "external"),
+    check(
+      "eligibility",
+      "Security eligibility policy",
+      !requiresOperatorCountryAllowlist || present("HEDGENTS_SECURITY_COUNTRY_ALLOWLIST"),
+      requiresOperatorCountryAllowlist
+        ? "An operator country allowlist is required while an Ondo security route is enabled."
+        : "xStocks routes mirror the issuer's published restricted-country policy in the browser and at the server boundary; an operator allowlist can narrow it further.",
+      "external",
+    ),
     check("pyth", "Pyth metal pulse", present("PYTH_API_KEY"), "A server-only Hermes credential is required for authenticated real-time observations.", "external"),
     check(
       "rpc",

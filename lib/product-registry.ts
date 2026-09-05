@@ -123,10 +123,18 @@ export interface SolanaExecutionProduct {
     maximumUsd: number;
     maximumPriceImpactPct: number;
     probeUsd: number;
+    excludedDexes: readonly string[];
   };
 }
 
-export type EligibilityPolicyId = "paxos" | "oro" | "matrixdock" | "xstocks" | "ondo";
+export type EligibilityPolicyId =
+  | "paxos"
+  | "oro"
+  | "matrixdock"
+  | "usdt0"
+  | "dominion"
+  | "xstocks"
+  | "ondo";
 
 interface ProductDefinition {
   productId: string;
@@ -141,7 +149,10 @@ interface ProductDefinition {
   eligibilityNote: string;
   controlNote: string;
   comparisonGroup: string;
+  verifiedAt?: string;
   maximumUsd?: number;
+  maximumPriceImpactPct?: number;
+  excludedDexes?: readonly string[];
 }
 
 function defineProduct(definition: ProductDefinition): SolanaExecutionProduct {
@@ -158,7 +169,7 @@ function defineProduct(definition: ProductDefinition): SolanaExecutionProduct {
     tokenProgram,
     tokenProgramAddress:
       tokenProgram === "Token-2022" ? TOKEN_2022_PROGRAM_ID : SPL_TOKEN_PROGRAM_ID,
-    verifiedAt: "2026-08-03",
+    verifiedAt: definition.verifiedAt ?? "2026-08-03",
     eligibilityPolicyId: definition.eligibilityPolicyId,
     eligibilityNote: definition.eligibilityNote,
     controlNote: definition.controlNote,
@@ -182,8 +193,9 @@ function defineProduct(definition: ProductDefinition): SolanaExecutionProduct {
       inputDecimals: 6,
       minimumUsd: 10,
       maximumUsd: definition.maximumUsd ?? 2_500,
-      maximumPriceImpactPct: 1,
+      maximumPriceImpactPct: definition.maximumPriceImpactPct ?? 1,
       probeUsd: 100,
+      excludedDexes: definition.excludedDexes ?? [],
     },
   };
 }
@@ -220,6 +232,27 @@ export const solanaExecutionProducts = {
     controlNote:
       "PAXG is a controlled Token-2022 asset. Mint, freeze, and permanent-delegate controls remain product risk after settlement.",
     comparisonGroup: "gold-physical-ounce",
+    maximumUsd: 10_000,
+  }),
+  "gold-xaut0": defineProduct({
+    productId: "gold-xaut0",
+    symbol: "XAUt0",
+    displayName: "Tether Gold (XAUt0)",
+    issuer: "TG Commodities / USDT0 Network",
+    mint: "AymATz4TCL9sWNEEV9Kvyz45CHVhDZ6kUgjTJPzLpU9P",
+    decimals: 6,
+    tokenProgram: "SPL Token",
+    issuerSource: {
+      label: "USDT0 · XAUt0 on Solana",
+      url: "https://usdt0.to/ecosystem/solana",
+    },
+    eligibilityPolicyId: "usdt0",
+    eligibilityNote:
+      "Tether Gold acquisition, redemption, sanctions, and jurisdiction rules apply; cross-chain transfers also depend on USDT0 terms.",
+    controlNote:
+      "XAUt0 uses the classic SPL Token program with active mint and freeze authorities. Tether Gold issuer/custody controls and the USDT0 omnichain mint-and-burn system remain product risk.",
+    comparisonGroup: "gold-physical-ounce",
+    verifiedAt: "2026-08-27",
     maximumUsd: 10_000,
   }),
   "gold-oro": defineProduct({
@@ -271,6 +304,12 @@ export const solanaExecutionProducts = {
     eligibilityNote: XSTOCKS_ELIGIBILITY,
     controlNote: SECURITY_CONTROL_NOTE,
     comparisonGroup: "gld-share",
+    // GLDx's current executable Solana route sits around 1.10–1.13% at beta sizes. Keep a narrow,
+    // explicit product ceiling rather than weakening every metal route or hiding the exception.
+    maximumPriceImpactPct: 1.25,
+    // The small-size Meteora intermediate currently introduces a burn instruction. The direct
+    // Raydium CLMM path avoids that instruction and still provides two-way quotes.
+    excludedDexes: ["Meteora DLMM"],
   }),
   "gold-gldon": defineProduct({
     productId: "gold-gldon",
@@ -297,6 +336,26 @@ export const solanaExecutionProducts = {
     eligibilityNote: XSTOCKS_ELIGIBILITY,
     controlNote: SECURITY_CONTROL_NOTE,
     comparisonGroup: "slv-share",
+  }),
+  "silver-silv": defineProduct({
+    productId: "silver-silv",
+    symbol: "SILV",
+    displayName: "Dominion Silver",
+    issuer: "Dominion Market",
+    mint: "SiLVFMgD3eD2rgK628NbTBq9MnuJF5FW2CRaVyTB35L",
+    decimals: 6,
+    issuerSource: {
+      label: "Dominion · SILV physical silver",
+      url: "https://dominion.investments/",
+    },
+    eligibilityPolicyId: "dominion",
+    eligibilityNote:
+      "Dominion eligibility, restricted-jurisdiction, mint, and redemption requirements apply.",
+    controlNote:
+      "SILV is a controlled Token-2022 asset with active mint and freeze authorities plus a permanent delegate. The issuer can freeze, transfer, or burn holder balances without the holder signature.",
+    comparisonGroup: "silver-physical-ounce",
+    verifiedAt: "2026-08-27",
+    maximumUsd: 2_500,
   }),
   "silver-slvon": defineProduct({
     productId: "silver-slvon",

@@ -1,0 +1,63 @@
+{
+  "name": "Hedgents Relic #063 — Orbit Bracelet",
+  "symbol": "RELIC",
+  "description": "A Uncommon Orbit Bracelet from the fixed 100-piece Hedgents Genesis collection. Burn redemption transfers the ticket's exact onchain PAXG amount. No physical artefact delivery.",
+  "image": "../final/063-uncommon-orbit-bracelet.webp",
+  "attributes": [
+    {
+      "trait_type": "Edition",
+      "value": 63
+    },
+    {
+      "trait_type": "Tier",
+      "value": "Uncommon"
+    },
+    {
+      "trait_type": "Artefact",
+      "value": "Orbit Bracelet"
+    },
+    {
+      "trait_type": "field",
+      "value": "eclipse"
+    },
+    {
+      "trait_type": "aura",
+      "value": "assay-dust"
+    },
+    {
+      "trait_type": "finish",
+      "value": "blackened-recess"
+    },
+    {
+      "trait_type": "clasp",
+      "value": "garnet-assay"
+    },
+    {
+      "trait_type": "charm",
+      "value": "garnet-drop"
+    },
+    {
+      "trait_type": "orbit",
+      "value": "twin-orbit"
+    },
+    {
+      "trait_type": "Redemption target at funding snapshot (USD)",
+      "value": 24
+    }
+  ],
+  "properties": {
+    "category": "image",
+    "files": [
+      {
+        "uri": "../final/063-uncommon-orbit-bracelet.webp",
+        "type": "image/webp"
+      }
+    ],
+    "collection": "Hedgents Relics — Genesis",
+    "noPhysicalDelivery": true,
+    "metadataStatus": "template-until-campaign-funding",
+    "authoritativeRedemption": "Exact atomic PAXG amount recorded in the campaign ticket account",
+    "recipeSha256": "f8c1b9aac2b16c1fdbdac4bbf765ccf88fcbed306da6c0752e91e9b4afe4bf8d",
+    "imageSha256": "f4b9629e7a65c4d003fe7cd10e8f35cea7abe4040db8d2e1bebf2e21fa473472"
+  }
+}

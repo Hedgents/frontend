@@ -1,0 +1,60 @@
+{
+  "name": "Hedgents Relic #081 — Royal Torque",
+  "symbol": "RELIC",
+  "description": "A Rare Royal Torque from the fixed 100-piece Hedgents Genesis collection. Its engraving, stones, patina, and metal grain are baked into the artwork. Burn redemption transfers the ticket's exact onchain PAXG amount. No physical artefact delivery.",
+  "image": "../final/081-rare-royal-torque.webp",
+  "attributes": [
+    {
+      "trait_type": "Edition",
+      "value": 81
+    },
+    {
+      "trait_type": "Tier",
+      "value": "Rare"
+    },
+    {
+      "trait_type": "Artefact",
+      "value": "Royal Torque"
+    },
+    {
+      "trait_type": "Master design",
+      "value": "garnet-heraldic-torque"
+    },
+    {
+      "trait_type": "Mineral",
+      "value": "Garnet"
+    },
+    {
+      "trait_type": "Metalwork",
+      "value": "Heraldic stepped ribs"
+    },
+    {
+      "trait_type": "Patina grade",
+      "value": "museum-satin"
+    },
+    {
+      "trait_type": "Artwork construction",
+      "value": "Fully baked material render"
+    },
+    {
+      "trait_type": "Redemption target at funding snapshot (USD)",
+      "value": 45
+    }
+  ],
+  "properties": {
+    "category": "image",
+    "files": [
+      {
+        "uri": "../final/081-rare-royal-torque.webp",
+        "type": "image/webp"
+      }
+    ],
+    "collection": "Hedgents Relics — Genesis",
+    "artworkPipeline": "baked-material-master-v2",
+    "noPhysicalDelivery": true,
+    "metadataStatus": "template-until-campaign-funding",
+    "authoritativeRedemption": "Exact atomic PAXG amount recorded in the campaign ticket account",
+    "recipeSha256": "0deb1f361be037cca7acf758a88d4c131f93a3cfb8e1c3bcd0bc63e9ab59b84d",
+    "imageSha256": "e1a5b0dc108581e36bb306860e7265f3e372f174f96ce13737e2b61f182c55be"
+  }
+}

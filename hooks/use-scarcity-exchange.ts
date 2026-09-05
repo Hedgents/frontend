@@ -108,6 +108,8 @@ export interface ScarcityCurvePortfolio {
     winningBucket: number;
     normalizedOutcome: number;
     bucketCount: number;
+    superseded?: boolean;
+    note?: string;
   }>;
   totals: { totalStaked: string; claimable: string };
   asOf: string;

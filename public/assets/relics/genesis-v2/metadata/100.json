@@ -1,0 +1,52 @@
+{
+  "name": "Hedgents Relic #100 — Crown Jewel",
+  "symbol": "RELIC",
+  "description": "A Legendary Crown Jewel from the fixed 100-piece Hedgents Genesis collection. Its engraving, stones, patina, and metal grain are baked into the artwork. Burn redemption transfers the ticket's exact onchain PAXG amount. No physical artefact delivery.",
+  "image": "../final/100-legendary-crown-jewel.webp",
+  "attributes": [
+    {
+      "trait_type": "Edition",
+      "value": 100
+    },
+    {
+      "trait_type": "Tier",
+      "value": "Legendary"
+    },
+    {
+      "trait_type": "Artefact",
+      "value": "Crown Jewel"
+    },
+    {
+      "trait_type": "Master design",
+      "value": "sovereign-crown-jewel"
+    },
+    {
+      "trait_type": "Artwork construction",
+      "value": "Fully baked material render"
+    },
+    {
+      "trait_type": "Edition",
+      "value": "One of one"
+    },
+    {
+      "trait_type": "Redemption target at funding snapshot (USD)",
+      "value": 370
+    }
+  ],
+  "properties": {
+    "category": "image",
+    "files": [
+      {
+        "uri": "../final/100-legendary-crown-jewel.webp",
+        "type": "image/webp"
+      }
+    ],
+    "collection": "Hedgents Relics — Genesis",
+    "artworkPipeline": "baked-material-master-v2",
+    "noPhysicalDelivery": true,
+    "metadataStatus": "template-until-campaign-funding",
+    "authoritativeRedemption": "Exact atomic PAXG amount recorded in the campaign ticket account",
+    "recipeSha256": "531fb2e046bed49e3c75aaa0f9728baa22ed368d4c05b0c18ae15b2853a108d9",
+    "imageSha256": "0e860f1ee63d9c932d88a7f0870a81659e02e673e9f63488513308d3af9e6504"
+  }
+}

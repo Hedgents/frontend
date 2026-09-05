@@ -98,6 +98,10 @@ export interface ScarcityCurvePortfolio {
     winningBucket: number;
     normalizedOutcome: number;
     bucketCount: number;
+    /** Set for positions in markets retired via the manifest's supersededMarkets. */
+    superseded?: boolean;
+    /** The manifest-recorded retirement reason, shown to the holder. */
+    note?: string;
   }>;
   totals: { totalStaked: string; claimable: string };
   asOf: string;
@@ -270,6 +274,32 @@ async function fetchDecodedCurveMarket(
   return decoded;
 }
 
+/**
+ * Decode a superseded (retired) curve market account by address. Deliberately
+ * skips verifyCurveCommitments: the committed rules are exactly why these
+ * markets were retired, so a mismatch is expected, not an error. Used only by
+ * the portfolio so holders see "superseded · refund pending" instead of their
+ * position silently disappearing.
+ */
+async function fetchSupersededCurveMarket(
+  deployment: ResolvedScarcityDeployment,
+  key: string,
+): Promise<DecodedCurveMarket | null> {
+  const entry = deployment.supersededMarkets[key];
+  if (!entry) return null;
+  const response = await solanaRpcRequestFrom<{ value: RpcAccountData | null }>(
+    scarcityRpcUrls(deployment.cluster),
+    "getAccountInfo",
+    [entry.market, { encoding: "base64", commitment: "confirmed" }],
+    { id: `scarcity-curve-superseded-${key}` },
+  );
+  if (!response.value) return null;
+  assertProgramOwnedAccount(response.value, `Superseded curve market account ${entry.market}`);
+  const decoded = decodeCurveMarketAccount(decodeRpcData(response.value, CURVE_MARKET_ACCOUNT_SIZE, `Superseded curve market ${entry.market}`));
+  if (decoded.version !== 1) throw new Error(`Superseded curve market account ${entry.market} uses an unsupported version.`);
+  return decoded;
+}
+
 function curveMarketToPublic(market: DecodedCurveMarket): ScarcityCurveChainState["market"] {
   return {
     status: market.status,
@@ -339,7 +369,13 @@ export async function getScarcityCurvePortfolio(ownerValue: string): Promise<Sca
   const marketEntries = await Promise.all(
     Object.keys(deployment.curveMarkets).map(async (slug) => [slug, await fetchDecodedCurveMarket(deployment, slug)] as const),
   );
-  if (marketEntries.length === 0) {
+  const supersededEntries = await Promise.all(
+    Object.keys(deployment.supersededMarkets).map(async (key) => {
+      const decoded = await fetchSupersededCurveMarket(deployment, key);
+      return decoded ? [key, decoded] as const : null;
+    }),
+  );
+  if (marketEntries.length === 0 && supersededEntries.length === 0) {
     return {
       deployment: {
         cluster: deployment.cluster,
@@ -370,6 +406,12 @@ export async function getScarcityCurvePortfolio(ownerValue: string): Promise<Sca
   for (const [slug, market] of marketEntries) {
     if (market) marketByAddress.set(deployment.curveMarkets[slug].market, { slug, market });
   }
+  const supersededByAddress = new Map<string, { key: string; market: DecodedCurveMarket; reason: string }>();
+  for (const entry of supersededEntries) {
+    if (!entry) continue;
+    const address = deployment.supersededMarkets[entry[0]].market;
+    supersededByAddress.set(address, { key: entry[0], market: entry[1], reason: deployment.supersededMarkets[entry[0]].reason });
+  }
   const positions: ScarcityCurvePortfolio["positions"] = [];
   for (const candidate of positionAccounts) {
     assertProgramOwnedAccount(candidate.account, `Curve position ${candidate.pubkey}`);
@@ -377,8 +419,11 @@ export async function getScarcityCurvePortfolio(ownerValue: string): Promise<Sca
     if (position.version !== 1) throw new Error(`Curve position ${candidate.pubkey} uses an unsupported version.`);
     if (String(position.owner) !== String(owner)) throw new Error(`Curve position ${candidate.pubkey} belongs to another owner.`);
     const entry = marketByAddress.get(String(position.market));
-    if (!entry) continue;
-    if (position.bucket >= entry.market.bucketCount) throw new Error(`Curve position ${candidate.pubkey} uses an invalid bucket.`);
+    const superseded = !entry ? supersededByAddress.get(String(position.market)) : undefined;
+    if (!entry && !superseded) continue;
+    const activeMarket = entry?.market ?? superseded!.market;
+    const activeSlug = entry?.slug ?? superseded!.key;
+    if (position.bucket >= activeMarket.bucketCount) throw new Error(`Curve position ${candidate.pubkey} uses an invalid bucket.`);
     const [expectedPosition] = await deriveCurvePositionAddress({
       market: position.market,
       owner: position.owner,
@@ -389,17 +434,18 @@ export async function getScarcityCurvePortfolio(ownerValue: string): Promise<Sca
     }
     if (position.stake === 0n && position.payout === 0n) continue;
     positions.push({
-      slug: entry.slug,
+      slug: activeSlug,
       market: String(position.market),
       bucket: position.bucket,
       stake: position.stake.toString(),
       payout: position.payout.toString(),
-      claimable: calculateCurvePositionClaimable(entry.market, position).toString(),
+      claimable: calculateCurvePositionClaimable(activeMarket, position).toString(),
       claimed: position.claimed,
-      status: entry.market.status,
-      winningBucket: entry.market.winningBucket,
-      normalizedOutcome: entry.market.normalizedOutcome,
-      bucketCount: entry.market.bucketCount,
+      status: activeMarket.status,
+      winningBucket: activeMarket.winningBucket,
+      normalizedOutcome: activeMarket.normalizedOutcome,
+      bucketCount: activeMarket.bucketCount,
+      ...(superseded ? { superseded: true, note: superseded.reason } : {}),
     });
   }
   positions.sort((left, right) => left.slug.localeCompare(right.slug) || left.bucket - right.bucket);

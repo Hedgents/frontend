@@ -24,10 +24,10 @@ const CACHE_TTL_MS = 6 * 60 * 60 * 1000;
 
 let cache: { labels: Map<string, string>; fetchedAt: number } | null = null;
 
-async function programLabels(apiKey: string): Promise<Map<string, string>> {
+async function programLabels(apiKey: string | null): Promise<Map<string, string>> {
   if (cache && Date.now() - cache.fetchedAt < CACHE_TTL_MS) return cache.labels;
   const response = await fetch(PROGRAM_LABEL_ENDPOINT, {
-    headers: { "x-api-key": apiKey },
+    headers: apiKey ? { "x-api-key": apiKey } : {},
     cache: "no-store",
     signal: AbortSignal.timeout(8_000),
   });
@@ -51,7 +51,7 @@ async function programLabels(apiKey: string): Promise<Map<string, string>> {
  * terminal that cannot quote.
  */
 export async function reviewedJupiterVenues(input: {
-  apiKey: string;
+  apiKey: string | null;
   allowlist: ReadonlySet<string> | null;
 }): Promise<string | null> {
   const { apiKey, allowlist } = input;

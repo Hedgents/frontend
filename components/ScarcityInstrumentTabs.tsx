@@ -14,12 +14,12 @@ const instruments = [
   {
     id: "curve" as const,
     label: "Curve forecasts",
-    description: "Predict the final number",
+    description: "Forecast the settled score",
   },
   {
     id: "event" as const,
     label: "Event markets",
-    description: "Predict whether it happens",
+    description: "Trade the named outcome",
   },
 ];
 

@@ -50,6 +50,26 @@ test("the venue list is derived from the reviewed programs, so the two cannot dr
   }
 });
 
+test("the public label map works without sending an empty API-key header", async () => {
+  resetJupiterVenueCacheForTests();
+  const restoreEnv = withAllowlist(GOONFI);
+  const original = globalThis.fetch;
+  let observedHeaders: Headers | null = null;
+  globalThis.fetch = (async (_input, init) => {
+    observedHeaders = new Headers(init?.headers);
+    return new Response(JSON.stringify({ [GOONFI]: "GoonFi V2" }), {
+      status: 200, headers: { "content-type": "application/json" },
+    });
+  }) as typeof globalThis.fetch;
+  try {
+    assert.equal(await reviewedJupiterVenues({ apiKey: null, allowlist: currentAllowlist() }), "GoonFi V2");
+    assert.equal(observedHeaders?.has("x-api-key"), false);
+  } finally {
+    globalThis.fetch = original;
+    restoreEnv();
+  }
+});
+
 test("a reviewed program with no Jupiter label contributes no venue", async () => {
   resetJupiterVenueCacheForTests();
   const restoreEnv = withAllowlist(`${GOONFI},SomeProgramJupiterHasNoNameFor11111111111`);

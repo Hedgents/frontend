@@ -1,0 +1,12 @@
+{
+  "counts": {
+    "Common": 55,
+    "Uncommon": 25,
+    "Rare": 14,
+    "Epic": 5,
+    "Legendary": 1
+  },
+  "uniqueRecipeHashes": 100,
+  "uniqueImageHashes": 100,
+  "dimensions": "1254x1254"
+}

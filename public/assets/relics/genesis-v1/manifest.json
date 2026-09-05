@@ -1,0 +1,1671 @@
+{
+  "schemaVersion": 1,
+  "collection": "Hedgents Relics — Genesis",
+  "seedDomain": "hedgents-genesis-v1",
+  "canvas": {
+    "width": 1254,
+    "height": 1254
+  },
+  "supply": {
+    "Common": 55,
+    "Uncommon": 25,
+    "Rare": 14,
+    "Epic": 5,
+    "Legendary": 1
+  },
+  "pullPriceUsdc": 35,
+  "redemptionTargetsUsdAtFundingSnapshot": {
+    "Common": 15,
+    "Uncommon": 24,
+    "Rare": 45,
+    "Epic": 110,
+    "Legendary": 370
+  },
+  "warning": "USD figures are design targets only. Exact atomic PAXG amounts committed by the deployed campaign are authoritative. No physical artefact delivery.",
+  "verification": {
+    "counts": {
+      "Common": 55,
+      "Uncommon": 25,
+      "Rare": 14,
+      "Epic": 5,
+      "Legendary": 1
+    },
+    "uniqueRecipeHashes": 100,
+    "uniqueImageHashes": 100,
+    "transparentLayers": 55,
+    "dimensions": "1254x1254"
+  },
+  "relics": [
+    {
+      "edition": 1,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "field": "eclipse",
+        "aura": "assay-dust",
+        "finish": "hammered-field",
+        "engraving": "assay-bars",
+        "inset": "obsidian"
+      },
+      "recipeHash": "5fd742cf35980254d019f2b5404a438637b43088113087b9b956befbbeba8793",
+      "image": "final/001-common-gold-signet.webp",
+      "imageSha256": "ec846105ab3332a6ba8d8285e22268fb3f44895103447efbf0bbb1bbc7816a4e"
+    },
+    {
+      "edition": 2,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "field": "eclipse",
+        "aura": "none",
+        "finish": "hammered-field",
+        "engraving": "chevron",
+        "inset": "moonstone"
+      },
+      "recipeHash": "f53821337afb8d0d0fd56044a9bd1eb012418a53d3dea9a3d182683c8d83114d",
+      "image": "final/002-common-gold-signet.webp",
+      "imageSha256": "bdead09709752e095a15327235c20cec573678f68e1424b9ce90d60bc763a149"
+    },
+    {
+      "edition": 3,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "field": "assay-circles",
+        "aura": "none",
+        "finish": "mirror-edge",
+        "engraving": "constellation",
+        "inset": "moonstone"
+      },
+      "recipeHash": "1dcd95e4f124e2ebba6fe7c067a988c20d3795b8390cc33254a51bb092b4b422",
+      "image": "final/003-common-gold-signet.webp",
+      "imageSha256": "0fa9e92ba884874de917e9b25d0438b90f5772e2554c63100f6947173126603f"
+    },
+    {
+      "edition": 4,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "field": "assay-circles",
+        "aura": "assay-dust",
+        "finish": "satin-assay",
+        "engraving": "constellation",
+        "inset": "moonstone"
+      },
+      "recipeHash": "884d110e9a48ddf07a1bec9e7418ad23bafd5f1685723c93668361eee7b2ea7b",
+      "image": "final/004-common-gold-signet.webp",
+      "imageSha256": "6a7b5a722dc68db511b27484cf09485295cd7cd8f13b4643d71f1fc910d52d5e"
+    },
+    {
+      "edition": 5,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "field": "assay-circles",
+        "aura": "none",
+        "finish": "satin-assay",
+        "engraving": "labyrinth",
+        "inset": "emerald"
+      },
+      "recipeHash": "8ebc8c203bf9f48d55b9d310c4eba7f7d7240b9f1503cd421b5611f6e2ab6ead",
+      "image": "final/005-common-gold-signet.webp",
+      "imageSha256": "d8e2b1e98bb45831a0b8ed176ee415258aa6037d29b7f9c3a65702e24fac9586"
+    },
+    {
+      "edition": 6,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "field": "eclipse",
+        "aura": "none",
+        "finish": "blackened-recess",
+        "engraving": "chevron",
+        "inset": "moonstone"
+      },
+      "recipeHash": "636e85eb41de51810d4295593825c2fa788ec2e851858f7f3424afc7b6705036",
+      "image": "final/006-common-gold-signet.webp",
+      "imageSha256": "1b73086b868b4ea9e8577f1935b289200e40248e647966db4f29043c7220af71"
+    },
+    {
+      "edition": 7,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "field": "eclipse",
+        "aura": "none",
+        "finish": "blackened-recess",
+        "engraving": "stepped-grid",
+        "inset": "moonstone"
+      },
+      "recipeHash": "f71ceba0a4480a385ef09ccaea8398cc41e4da4ebe0089b544f3b63ea8d8cf49",
+      "image": "final/007-common-gold-signet.webp",
+      "imageSha256": "beee57d5f8ac7d68c7d2c873612a4ede2238e9dcf8d1f59b8f150cb35d043d9c"
+    },
+    {
+      "edition": 8,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "field": "assay-circles",
+        "aura": "none",
+        "finish": "satin-assay",
+        "engraving": "orbital-groove",
+        "inset": "emerald"
+      },
+      "recipeHash": "11db8e587a8b5db5e104b2a71faf380c6cdf645bb25fee86464a8f1deb9f22b2",
+      "image": "final/008-common-gold-signet.webp",
+      "imageSha256": "b5b2041026a84ae00ff8b654429b84e6d02e6c18a0a722e313ced191b2eee90c"
+    },
+    {
+      "edition": 9,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "field": "assay-circles",
+        "aura": "assay-dust",
+        "finish": "mirror-edge",
+        "engraving": "labyrinth",
+        "inset": "emerald"
+      },
+      "recipeHash": "507ea82ea01579249f4abae36216bada53876252a52879b90b59a590b6eccc0e",
+      "image": "final/009-common-gold-signet.webp",
+      "imageSha256": "a53234002e6acc9917ad87ed26e19bd404cf07a9a7e6e39d6fd7b0fb353bc17c"
+    },
+    {
+      "edition": 10,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "field": "eclipse",
+        "aura": "none",
+        "finish": "satin-assay",
+        "engraving": "labyrinth",
+        "inset": "emerald"
+      },
+      "recipeHash": "2535141e13f4add87e7791945fded2e28a31ba1b7ab9051dc8838e48b326cb01",
+      "image": "final/010-common-gold-signet.webp",
+      "imageSha256": "294ee3379845d710160bb8cb037303a4f422a76b6a0e4abd53703cd3e558d115"
+    },
+    {
+      "edition": 11,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "field": "eclipse",
+        "aura": "assay-dust",
+        "finish": "blackened-recess",
+        "engraving": "tidal-line",
+        "inset": "obsidian"
+      },
+      "recipeHash": "bf8fc449eba9876f71e23a141c603720440d022209a40c97e0bca367986edf57",
+      "image": "final/011-common-gold-signet.webp",
+      "imageSha256": "6bd9a820ef2f0cefb8307d78e2961f808a98c04ab8f93e023b81459dbb98f39a"
+    },
+    {
+      "edition": 12,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "field": "eclipse",
+        "aura": "none",
+        "finish": "mirror-edge",
+        "engraving": "sun-ray",
+        "inset": "emerald"
+      },
+      "recipeHash": "1b6223ed3981099fb36e75f9a5074a6832d40418944150e66ece5993f839fe48",
+      "image": "final/012-common-gold-signet.webp",
+      "imageSha256": "490be8225819ce6b9fff75aa774dd8e2ace4de2f970c0d339e86d32f28b3fb3b"
+    },
+    {
+      "edition": 13,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "field": "assay-circles",
+        "aura": "assay-dust",
+        "finish": "blackened-recess",
+        "engraving": "assay-bars",
+        "inset": "obsidian"
+      },
+      "recipeHash": "97b8f102cb0213ae17313e3b8478c0c51ebdba3cb6886f5341bce20e8d07719a",
+      "image": "final/013-common-gold-signet.webp",
+      "imageSha256": "456cea781a6145f8f6b70dd06e659d0e53dafc299fb1af3e6574c9d550d81887"
+    },
+    {
+      "edition": 14,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "field": "eclipse",
+        "aura": "assay-dust",
+        "finish": "satin-assay",
+        "engraving": "tidal-line",
+        "inset": "emerald"
+      },
+      "recipeHash": "b2b274821dd5ebdf20bb37f15ea2a8b7f489b9842e2812bf78b4092ea3921adf",
+      "image": "final/014-common-gold-signet.webp",
+      "imageSha256": "823bc1c359552ab676250587363acfcd31aecb079a8396ba48a71fe10191fd8e"
+    },
+    {
+      "edition": 15,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "field": "assay-circles",
+        "aura": "assay-dust",
+        "finish": "hammered-field",
+        "engraving": "labyrinth",
+        "inset": "obsidian"
+      },
+      "recipeHash": "156e2c8fd3c4f05e2ff20065fa8d269fe97b41e95b375929a05e6a18fb4e0dbb",
+      "image": "final/015-common-gold-signet.webp",
+      "imageSha256": "ed418a36024f0d2b462f6358a2025e6649031e5f9bb5fc6261356294941f59d6"
+    },
+    {
+      "edition": 16,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "field": "assay-circles",
+        "aura": "assay-dust",
+        "finish": "hammered-field",
+        "engraving": "tidal-line",
+        "inset": "garnet"
+      },
+      "recipeHash": "380500dc734e73981df3637b419e95e09cb768de936d92041358f346d4000164",
+      "image": "final/016-common-gold-signet.webp",
+      "imageSha256": "95c395e6b71bb3a8fca2d1633dcd15e2c5cf9db25452f4eb807a194924718261"
+    },
+    {
+      "edition": 17,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "field": "assay-circles",
+        "aura": "none",
+        "finish": "satin-assay",
+        "engraving": "assay-bars",
+        "inset": "obsidian"
+      },
+      "recipeHash": "3126f68f1a73e749610ebf4b3af55088d1a4949be4f50a67a67b9ede9ab92c34",
+      "image": "final/017-common-gold-signet.webp",
+      "imageSha256": "44f8098bb2c0392c135109f284f126cce07361082dd612cf2e7120b0515168fd"
+    },
+    {
+      "edition": 18,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "field": "assay-circles",
+        "aura": "assay-dust",
+        "finish": "satin-assay",
+        "engraving": "labyrinth",
+        "inset": "obsidian"
+      },
+      "recipeHash": "8f443b36a230c970c68d73690c85cce1aee082fb02a9a7ef582f6d3481b6d7f7",
+      "image": "final/018-common-gold-signet.webp",
+      "imageSha256": "9a6a834bb36e91dca62dcab5581ee3a5a17188bc61a49f5fde2b7585eff63e1c"
+    },
+    {
+      "edition": 19,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "field": "eclipse",
+        "aura": "assay-dust",
+        "finish": "blackened-recess",
+        "engraving": "assay-bars",
+        "inset": "garnet"
+      },
+      "recipeHash": "c322418be71bdceff13c52c5e35b28b323260097e6fbef524b96bcc27fc3996b",
+      "image": "final/019-common-gold-signet.webp",
+      "imageSha256": "5e3155e2d5bb6709ce442080868dbcd73d72ee62a81ae8c1d86cc7c31c74b9ac"
+    },
+    {
+      "edition": 20,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "field": "assay-circles",
+        "aura": "assay-dust",
+        "finish": "satin-assay",
+        "engraving": "stepped-grid",
+        "inset": "obsidian"
+      },
+      "recipeHash": "849d3be5aecbc78618c152865c08f79b6705331b8961ae37ecec945aa544ba73",
+      "image": "final/020-common-gold-signet.webp",
+      "imageSha256": "a00d9f348029e11c0d3d0e1cf359d1ab11caf1492403561b4bdc1ea6c88a34da"
+    },
+    {
+      "edition": 21,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "field": "assay-circles",
+        "aura": "assay-dust",
+        "finish": "hammered-field",
+        "engraving": "labyrinth",
+        "inset": "emerald"
+      },
+      "recipeHash": "12829b4216ecec2bc266cf0fdb2ecc1ae38d1f2f62b9c5c7ea5a84afecd52f2e",
+      "image": "final/021-common-gold-signet.webp",
+      "imageSha256": "44554c0325ae1e713bff23726bef6700a7071a7e35b845e0a9c6f18b74d9edff"
+    },
+    {
+      "edition": 22,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "field": "eclipse",
+        "aura": "none",
+        "finish": "satin-assay",
+        "engraving": "chevron",
+        "inset": "garnet"
+      },
+      "recipeHash": "6debe62a3924a3dc81d2e2d4a64e53b32835aaa800a95e6508cbea9e2c91b141",
+      "image": "final/022-common-gold-signet.webp",
+      "imageSha256": "b5803732847acc4a2c26c7df789925a4b2a23b1d5a7c02341e7383c8635023cb"
+    },
+    {
+      "edition": 23,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "field": "assay-circles",
+        "aura": "assay-dust",
+        "finish": "mirror-edge",
+        "engraving": "constellation",
+        "inset": "obsidian"
+      },
+      "recipeHash": "50fbf5793cf12e081cfbff95e5e6d51a7b49c2bf022441de0e29545711eb1330",
+      "image": "final/023-common-gold-signet.webp",
+      "imageSha256": "75926df89273fccd59ae5956791683c757867fe3320ae461161364733637e887"
+    },
+    {
+      "edition": 24,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "field": "assay-circles",
+        "aura": "assay-dust",
+        "finish": "mirror-edge",
+        "engraving": "constellation",
+        "inset": "garnet"
+      },
+      "recipeHash": "545675dee12c42599308be0c86517ad832e8e4eb5a85c67ffcf812f03c68ca68",
+      "image": "final/024-common-gold-signet.webp",
+      "imageSha256": "0a79128c12457e992498c302b35738351aae5c10dad6a571877785e277a45af8"
+    },
+    {
+      "edition": 25,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "field": "eclipse",
+        "aura": "assay-dust",
+        "finish": "blackened-recess",
+        "engraving": "orbital-groove",
+        "inset": "obsidian"
+      },
+      "recipeHash": "c0e294b274cb41903c6fe4a0b2f3016837617d9d2ff5809137e1c7ce7ebd0ffa",
+      "image": "final/025-common-gold-signet.webp",
+      "imageSha256": "72217e91541373329bee4688adace9d910cb54bccbb51ad3f56a6552fb5b5da8"
+    },
+    {
+      "edition": 26,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "field": "eclipse",
+        "aura": "assay-dust",
+        "finish": "mirror-edge",
+        "engraving": "constellation",
+        "inset": "emerald"
+      },
+      "recipeHash": "624200f2374a683fcc570bf1594730bea498f773400eb15e37b54fc1998743ca",
+      "image": "final/026-common-gold-signet.webp",
+      "imageSha256": "70c2e380214b96e2deb3529ac11035390ed4fd0657948487819de54ff1e78b4f"
+    },
+    {
+      "edition": 27,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "field": "assay-circles",
+        "aura": "assay-dust",
+        "finish": "hammered-field",
+        "engraving": "labyrinth",
+        "inset": "garnet"
+      },
+      "recipeHash": "0eefca952ebb4e6067e7a88cde13fc07843e4e0536748105295f50868a3628c1",
+      "image": "final/027-common-gold-signet.webp",
+      "imageSha256": "940ec4793d7f0684287f5b69c7ce11cf75f1a1b7cd44455f0be9567d91f12b87"
+    },
+    {
+      "edition": 28,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "field": "assay-circles",
+        "aura": "assay-dust",
+        "finish": "mirror-edge",
+        "engraving": "stepped-grid",
+        "inset": "moonstone"
+      },
+      "recipeHash": "fd27845b6ebb5ea3b0d2edbe623ca91a7f2a1d477492159c170b6739f94d2038",
+      "image": "final/028-common-gold-signet.webp",
+      "imageSha256": "75d5f755d0c7e161af49f83ccf68e5cbea459675df7919e5cddb715706b83975"
+    },
+    {
+      "edition": 29,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "field": "assay-circles",
+        "aura": "assay-dust",
+        "finish": "blackened-recess",
+        "engraving": "stepped-grid",
+        "inset": "garnet"
+      },
+      "recipeHash": "05ec59208f12e9359174039c1bccbf1a686606ca07782d7df3e4bcda0110dc4f",
+      "image": "final/029-common-gold-signet.webp",
+      "imageSha256": "d7607cd85ce581e3aac60b856b4443706db4dc7584e3c58a4db4b21b44fbd70a"
+    },
+    {
+      "edition": 30,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "field": "eclipse",
+        "aura": "assay-dust",
+        "finish": "satin-assay",
+        "engraving": "stepped-grid",
+        "inset": "emerald"
+      },
+      "recipeHash": "1b3ed7c16e67464a994e1f1da5e43bb8a09030c6fdaa58d8f3a6d9e09af12518",
+      "image": "final/030-common-gold-signet.webp",
+      "imageSha256": "6ef7fb8d3d81a12489a0c5da87511741e76e5fdbb5a0befe430f02847f4f8cc5"
+    },
+    {
+      "edition": 31,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "field": "assay-circles",
+        "aura": "none",
+        "finish": "blackened-recess",
+        "engraving": "tidal-line",
+        "inset": "moonstone"
+      },
+      "recipeHash": "35928e6c7c8a9f235c18b1c7be590d71eac6095d8e0027530e0ce780e793effa",
+      "image": "final/031-common-gold-signet.webp",
+      "imageSha256": "2785bf0bc8f2a03152397646b223b29a33a9f1d3b503ebbbebf0c1c94a880ca5"
+    },
+    {
+      "edition": 32,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "field": "eclipse",
+        "aura": "assay-dust",
+        "finish": "hammered-field",
+        "engraving": "stepped-grid",
+        "inset": "emerald"
+      },
+      "recipeHash": "8db5bcbfd9779ae0c61daa4ba42f70f9e6d2b8c75c2c1a7ae3a6546fcaf81e51",
+      "image": "final/032-common-gold-signet.webp",
+      "imageSha256": "0d765d149c33abf497abb6b193171915ff8a08fc7436d563f3b2c3c48884f978"
+    },
+    {
+      "edition": 33,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "field": "assay-circles",
+        "aura": "assay-dust",
+        "finish": "hammered-field",
+        "engraving": "sun-ray",
+        "inset": "obsidian"
+      },
+      "recipeHash": "918067d045e6711538e137ee688658c9cfd20206560a934c2ffba5dad41f4f21",
+      "image": "final/033-common-gold-signet.webp",
+      "imageSha256": "dbc844e9f5a0751a22ba31a91a07c42c3eb9e49610efe14df4e695fb2b64bcab"
+    },
+    {
+      "edition": 34,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "field": "eclipse",
+        "aura": "assay-dust",
+        "finish": "hammered-field",
+        "engraving": "labyrinth",
+        "inset": "moonstone"
+      },
+      "recipeHash": "faf1706cdaae984fec438c97b5b8863febd3ba284df255c9b237235a45e3f6e5",
+      "image": "final/034-common-gold-signet.webp",
+      "imageSha256": "705abd0dc0a1983b34d88fc98dd20522cb1bc00c3edb3128f862b11e7a546a07"
+    },
+    {
+      "edition": 35,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "field": "eclipse",
+        "aura": "none",
+        "finish": "blackened-recess",
+        "engraving": "constellation",
+        "inset": "garnet"
+      },
+      "recipeHash": "549aa97d7e357b3e6bfa8b0dc0bbc63985f392ae48f6fff800b69d8e05b36240",
+      "image": "final/035-common-gold-signet.webp",
+      "imageSha256": "d00dc046741d541ee63169dfd486e2bc3baaacd14598d1d3515fe3845679d22d"
+    },
+    {
+      "edition": 36,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "field": "eclipse",
+        "aura": "none",
+        "finish": "mirror-edge",
+        "engraving": "labyrinth",
+        "inset": "garnet"
+      },
+      "recipeHash": "94a3edad607e8991ec9db992a82406462df18fe6d905ce6991c1a6b13f39c93b",
+      "image": "final/036-common-gold-signet.webp",
+      "imageSha256": "67b47855df6c032b6a6841d2adcb6be304029297561206c6292772df0d762908"
+    },
+    {
+      "edition": 37,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "field": "assay-circles",
+        "aura": "assay-dust",
+        "finish": "blackened-recess",
+        "engraving": "sun-ray",
+        "inset": "obsidian"
+      },
+      "recipeHash": "ce21d7bd2343164b44186612c13ec6897d16140518704a313380518b19789f21",
+      "image": "final/037-common-gold-signet.webp",
+      "imageSha256": "c002d6398c62f661a8adcb94944016bf9ad1f0b330d36e4f39c59d4ea75654e8"
+    },
+    {
+      "edition": 38,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "field": "assay-circles",
+        "aura": "assay-dust",
+        "finish": "satin-assay",
+        "engraving": "labyrinth",
+        "inset": "emerald"
+      },
+      "recipeHash": "c5a3f11f447af3b500a111cab01f1857bebad4e26b27e1b31163e0c68df0fd51",
+      "image": "final/038-common-gold-signet.webp",
+      "imageSha256": "e5c7799b9d858c85537aa5b691f5f772f4d3aaf40108588bebbedca4eaf2276f"
+    },
+    {
+      "edition": 39,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "field": "eclipse",
+        "aura": "none",
+        "finish": "mirror-edge",
+        "engraving": "tidal-line",
+        "inset": "obsidian"
+      },
+      "recipeHash": "a939332b0ce55817aee1e1318608673dc987b7668706b109801edd78764aa580",
+      "image": "final/039-common-gold-signet.webp",
+      "imageSha256": "27b56755d707d82e16f5c70bc58df6110df99f8a31ab2e1d700742f662b0c799"
+    },
+    {
+      "edition": 40,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "field": "eclipse",
+        "aura": "assay-dust",
+        "finish": "blackened-recess",
+        "engraving": "orbital-groove",
+        "inset": "emerald"
+      },
+      "recipeHash": "c8e1843f8fe9a1e2be0e8bb3f19eb0646a086b787ff67bd3aeff44a67145e011",
+      "image": "final/040-common-gold-signet.webp",
+      "imageSha256": "ddc50a73ea182b57e0be9c207258dc39e285d82c5740b2478d5199d5510cec67"
+    },
+    {
+      "edition": 41,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "field": "assay-circles",
+        "aura": "none",
+        "finish": "hammered-field",
+        "engraving": "constellation",
+        "inset": "emerald"
+      },
+      "recipeHash": "c2755d74e50e1caff98c1b6dc7b75191a4acaf0606d3966d5d95dbaa46cc09bc",
+      "image": "final/041-common-gold-signet.webp",
+      "imageSha256": "142eb9aafcc9a9578735c4c45f5d8c6ea82b4492590a2239b8b1d1f2bd4b7a1c"
+    },
+    {
+      "edition": 42,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "field": "eclipse",
+        "aura": "assay-dust",
+        "finish": "mirror-edge",
+        "engraving": "assay-bars",
+        "inset": "moonstone"
+      },
+      "recipeHash": "02e5dff3402ed3628470b1fff4437390f7b6e41f8d940cc17ea8228ed406186f",
+      "image": "final/042-common-gold-signet.webp",
+      "imageSha256": "e670e50b8e0b2977bbd7772797f06d9e6e1fa57aa0dd7e0d2431112e09abd7a4"
+    },
+    {
+      "edition": 43,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "field": "eclipse",
+        "aura": "assay-dust",
+        "finish": "satin-assay",
+        "engraving": "constellation",
+        "inset": "garnet"
+      },
+      "recipeHash": "fbbb8f6ca580bff33f212528130ca78f3a994b8d1176e777ceabc6d7c63ad610",
+      "image": "final/043-common-gold-signet.webp",
+      "imageSha256": "76e599603baad3510353ad5bd1498ffac20b403c9a5d6bfde58fc36fd2556965"
+    },
+    {
+      "edition": 44,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "field": "eclipse",
+        "aura": "none",
+        "finish": "hammered-field",
+        "engraving": "assay-bars",
+        "inset": "moonstone"
+      },
+      "recipeHash": "5966a7bda08a484c11c7efadd844ad00158ec76ff4dbed620973f662eebffa5b",
+      "image": "final/044-common-gold-signet.webp",
+      "imageSha256": "5a2bd706d9aba1d9a6b37ad7305a41239ce6888afa7f461b805c6de9d5cff598"
+    },
+    {
+      "edition": 45,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "field": "eclipse",
+        "aura": "assay-dust",
+        "finish": "mirror-edge",
+        "engraving": "chevron",
+        "inset": "emerald"
+      },
+      "recipeHash": "d07c1b53cd2c99f96cb8d37c75394eeeabc1f811bd96014e1302ec4833647790",
+      "image": "final/045-common-gold-signet.webp",
+      "imageSha256": "16bd72b0edd9c68abd81f5a0f389a94fdb1297f3296cd132fbe8216edfbf0f58"
+    },
+    {
+      "edition": 46,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "field": "eclipse",
+        "aura": "none",
+        "finish": "blackened-recess",
+        "engraving": "chevron",
+        "inset": "emerald"
+      },
+      "recipeHash": "0b927e15621e54b75c455b62e1fbe54cf9e207bbcff31c404087928128a79d78",
+      "image": "final/046-common-gold-signet.webp",
+      "imageSha256": "bb9bc9bd038d767f6dad0df073d7e6de5d3febf412cebb0f381869ef92545fdb"
+    },
+    {
+      "edition": 47,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "field": "eclipse",
+        "aura": "assay-dust",
+        "finish": "hammered-field",
+        "engraving": "chevron",
+        "inset": "obsidian"
+      },
+      "recipeHash": "0e3709b35143dd8bcd994ae8c9a003b70e754abe9e9fdc4c725d16dcaf8b77e8",
+      "image": "final/047-common-gold-signet.webp",
+      "imageSha256": "1d1b1ecfdd5c693cf23c6ee7ea36e220e191dc85e1064cb040e90b5c7800694a"
+    },
+    {
+      "edition": 48,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "field": "eclipse",
+        "aura": "assay-dust",
+        "finish": "satin-assay",
+        "engraving": "labyrinth",
+        "inset": "garnet"
+      },
+      "recipeHash": "054e4871bd3d1197b82e1b971e1200016cd6145d3c5828da61be9b1e5f9af7da",
+      "image": "final/048-common-gold-signet.webp",
+      "imageSha256": "969edb20e22e721db446095ca43cb69c75edc5c08c57cded150b42c8047cdaf8"
+    },
+    {
+      "edition": 49,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "field": "assay-circles",
+        "aura": "none",
+        "finish": "satin-assay",
+        "engraving": "sun-ray",
+        "inset": "garnet"
+      },
+      "recipeHash": "f7e5cce548e8db512e44568c37251fe2c86cc779c18a71c10bcc468b3c68a305",
+      "image": "final/049-common-gold-signet.webp",
+      "imageSha256": "9a1ef43677b0e1d0c5ae8d29c84fcb48789f58e5bae07aea57cb19089513fa0d"
+    },
+    {
+      "edition": 50,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "field": "eclipse",
+        "aura": "assay-dust",
+        "finish": "mirror-edge",
+        "engraving": "sun-ray",
+        "inset": "moonstone"
+      },
+      "recipeHash": "79f1abc7152388dbd8504db96dd31cdeca2043cccfaf9b99fe9f46c0d856976d",
+      "image": "final/050-common-gold-signet.webp",
+      "imageSha256": "30f98cc0c96bc6253fe058bb5afb687df1b4f891f1d0ecdde7c0a70d687dcd39"
+    },
+    {
+      "edition": 51,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "field": "eclipse",
+        "aura": "assay-dust",
+        "finish": "hammered-field",
+        "engraving": "tidal-line",
+        "inset": "moonstone"
+      },
+      "recipeHash": "773e9614be592dcaf05e39ed8926597915670d9e1106b4a93912bec17d9e8c17",
+      "image": "final/051-common-gold-signet.webp",
+      "imageSha256": "678e54c84b7dc58976f8c94a053f1816fbe335235739ba36d066069d526a4620"
+    },
+    {
+      "edition": 52,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "field": "assay-circles",
+        "aura": "assay-dust",
+        "finish": "mirror-edge",
+        "engraving": "sun-ray",
+        "inset": "garnet"
+      },
+      "recipeHash": "5398c014ce3df55605f37da98bdbfb50973ba4fca4cad5a0b2d1d7b87468b724",
+      "image": "final/052-common-gold-signet.webp",
+      "imageSha256": "400c02c0495666775ed1c6a7d3ea92e84483a895e3bf0ce070d80bd1d96d670a"
+    },
+    {
+      "edition": 53,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "field": "eclipse",
+        "aura": "none",
+        "finish": "mirror-edge",
+        "engraving": "constellation",
+        "inset": "garnet"
+      },
+      "recipeHash": "e139b59c7e317484587ea5951f47656f198f9a11f8667cf45bd5bb3f32835c17",
+      "image": "final/053-common-gold-signet.webp",
+      "imageSha256": "e58916360a33e18e6c049dc18c3180af966029f6dcb1e4a962502720b28a829d"
+    },
+    {
+      "edition": 54,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "field": "eclipse",
+        "aura": "assay-dust",
+        "finish": "blackened-recess",
+        "engraving": "chevron",
+        "inset": "garnet"
+      },
+      "recipeHash": "9ffc6137310f9e44679f1b32dabce2dec41afcdadb78cb08a935c55a7b8f5ccc",
+      "image": "final/054-common-gold-signet.webp",
+      "imageSha256": "b8bf5f7f7add82689c9864939fc628895d10125743a29201ea673974f3787686"
+    },
+    {
+      "edition": 55,
+      "tier": "Common",
+      "artefact": "Gold Signet",
+      "redemptionTargetUsd": 15,
+      "traits": {
+        "field": "assay-circles",
+        "aura": "assay-dust",
+        "finish": "satin-assay",
+        "engraving": "sun-ray",
+        "inset": "emerald"
+      },
+      "recipeHash": "481878403e8d220e807e32909b8f03d5da1777e8e39e2b565c9b1a85354fe79e",
+      "image": "final/055-common-gold-signet.webp",
+      "imageSha256": "79b905440dfd8908921ee8a52617e02bb30673eb63f3bfcf72f67f739ec62732"
+    },
+    {
+      "edition": 56,
+      "tier": "Uncommon",
+      "artefact": "Orbit Bracelet",
+      "redemptionTargetUsd": 24,
+      "traits": {
+        "field": "assay-circles",
+        "aura": "orbital-trail",
+        "finish": "satin-assay",
+        "clasp": "monolith",
+        "charm": "emerald-knot",
+        "orbit": "single-orbit"
+      },
+      "recipeHash": "85994b6c1bea06de4d82c908f51fbbdbcd02c644055282b5a196269c3e1d40e7",
+      "image": "final/056-uncommon-orbit-bracelet.webp",
+      "imageSha256": "43c03be70d8e17b92c9924e741329ec9d1334f14f4b444fa725f7f29f7bbb1ea"
+    },
+    {
+      "edition": 57,
+      "tier": "Uncommon",
+      "artefact": "Orbit Bracelet",
+      "redemptionTargetUsd": 24,
+      "traits": {
+        "field": "vault-grid",
+        "aura": "assay-dust",
+        "finish": "blackened-recess",
+        "clasp": "monolith",
+        "charm": "garnet-drop",
+        "orbit": "twin-orbit"
+      },
+      "recipeHash": "5d5a1436e793e066fec12c2bbaad3ab5ae3bd8855d07a63e4265bf2d34158218",
+      "image": "final/057-uncommon-orbit-bracelet.webp",
+      "imageSha256": "eee73340a16d79e8a658591a0d25daad2ea1e281970741a7d1232273a41a9ba1"
+    },
+    {
+      "edition": 58,
+      "tier": "Uncommon",
+      "artefact": "Orbit Bracelet",
+      "redemptionTargetUsd": 24,
+      "traits": {
+        "field": "eclipse",
+        "aura": "assay-dust",
+        "finish": "mirror-edge",
+        "clasp": "twin-orbit",
+        "charm": "emerald-knot",
+        "orbit": "broken-orbit"
+      },
+      "recipeHash": "640db670d88bd38368fdf25398be0ab293698fd1a497882fc02be9887ea35e9c",
+      "image": "final/058-uncommon-orbit-bracelet.webp",
+      "imageSha256": "2c3c990bd29129ee78d6e36a8764fd715a6193416db012c4a109b30cfb9ec2e5"
+    },
+    {
+      "edition": 59,
+      "tier": "Uncommon",
+      "artefact": "Orbit Bracelet",
+      "redemptionTargetUsd": 24,
+      "traits": {
+        "field": "vault-grid",
+        "aura": "orbital-trail",
+        "finish": "satin-assay",
+        "clasp": "sapphire-lozenge",
+        "charm": "celestial-coin",
+        "orbit": "twin-orbit"
+      },
+      "recipeHash": "e31f9531ffd9ecd0dea8834795ed165bc702339698bc5ebecc79a9d1467283d1",
+      "image": "final/059-uncommon-orbit-bracelet.webp",
+      "imageSha256": "df84ae13f9c36a154dddd9a7ff88cde0301e66d17e08d6feb5b332f00ff134d8"
+    },
+    {
+      "edition": 60,
+      "tier": "Uncommon",
+      "artefact": "Orbit Bracelet",
+      "redemptionTargetUsd": 24,
+      "traits": {
+        "field": "vault-grid",
+        "aura": "orbital-trail",
+        "finish": "mirror-edge",
+        "clasp": "sapphire-lozenge",
+        "charm": "celestial-coin",
+        "orbit": "broken-orbit"
+      },
+      "recipeHash": "5131f4205454ccbcb58a0fb24c6edfdde07de0e8f47829be8615ff4e15eb861b",
+      "image": "final/060-uncommon-orbit-bracelet.webp",
+      "imageSha256": "e2f145ebd173bf21b2b321522622025013adadbc58fcbecb47fcda1ad64648fa"
+    },
+    {
+      "edition": 61,
+      "tier": "Uncommon",
+      "artefact": "Orbit Bracelet",
+      "redemptionTargetUsd": 24,
+      "traits": {
+        "field": "eclipse",
+        "aura": "none",
+        "finish": "mirror-edge",
+        "clasp": "twin-orbit",
+        "charm": "emerald-knot",
+        "orbit": "broken-orbit"
+      },
+      "recipeHash": "0f797e67514e762076ea3a0b01d87b8a234585033d37dc8e257b76dc0d062cde",
+      "image": "final/061-uncommon-orbit-bracelet.webp",
+      "imageSha256": "5e1b9b574ef1c256b6feba8119c9bc5fb84225c987158c2cc39d887fe66c87b8"
+    },
+    {
+      "edition": 62,
+      "tier": "Uncommon",
+      "artefact": "Orbit Bracelet",
+      "redemptionTargetUsd": 24,
+      "traits": {
+        "field": "assay-circles",
+        "aura": "none",
+        "finish": "satin-assay",
+        "clasp": "emerald-gate",
+        "charm": "garnet-drop",
+        "orbit": "single-orbit"
+      },
+      "recipeHash": "e62096f4f3ce8f9e879a0dac0b363c6c025f7abaf2c39933bd819082da42b6c2",
+      "image": "final/062-uncommon-orbit-bracelet.webp",
+      "imageSha256": "728eef38744dc6ba8ee9429133a50bf51474d662d87161e0af2e217bc91223ef"
+    },
+    {
+      "edition": 63,
+      "tier": "Uncommon",
+      "artefact": "Orbit Bracelet",
+      "redemptionTargetUsd": 24,
+      "traits": {
+        "field": "eclipse",
+        "aura": "assay-dust",
+        "finish": "blackened-recess",
+        "clasp": "garnet-assay",
+        "charm": "garnet-drop",
+        "orbit": "twin-orbit"
+      },
+      "recipeHash": "f8c1b9aac2b16c1fdbdac4bbf765ccf88fcbed306da6c0752e91e9b4afe4bf8d",
+      "image": "final/063-uncommon-orbit-bracelet.webp",
+      "imageSha256": "f4b9629e7a65c4d003fe7cd10e8f35cea7abe4040db8d2e1bebf2e21fa473472"
+    },
+    {
+      "edition": 64,
+      "tier": "Uncommon",
+      "artefact": "Orbit Bracelet",
+      "redemptionTargetUsd": 24,
+      "traits": {
+        "field": "vault-grid",
+        "aura": "orbital-trail",
+        "finish": "satin-assay",
+        "clasp": "emerald-gate",
+        "charm": "moonstone-claw",
+        "orbit": "single-orbit"
+      },
+      "recipeHash": "73d958a1cc6a49d1a2465bbe94355f53c2018bcc004b053403a55f13e5c62f7e",
+      "image": "final/064-uncommon-orbit-bracelet.webp",
+      "imageSha256": "c878cf70faaf96d44de0e2b5e1fd8ebe3b969b5606e05f15269d686231f9d893"
+    },
+    {
+      "edition": 65,
+      "tier": "Uncommon",
+      "artefact": "Orbit Bracelet",
+      "redemptionTargetUsd": 24,
+      "traits": {
+        "field": "assay-circles",
+        "aura": "none",
+        "finish": "satin-assay",
+        "clasp": "monolith",
+        "charm": "moonstone-claw",
+        "orbit": "twin-orbit"
+      },
+      "recipeHash": "ad957af1964900ab7df842fe3cacdfc1ec368a9052734f0f275bc5e771709980",
+      "image": "final/065-uncommon-orbit-bracelet.webp",
+      "imageSha256": "53c88cc8a54eb1abc00108eba00b0224ee256082bf7133c8aa2c019d35969f5b"
+    },
+    {
+      "edition": 66,
+      "tier": "Uncommon",
+      "artefact": "Orbit Bracelet",
+      "redemptionTargetUsd": 24,
+      "traits": {
+        "field": "vault-grid",
+        "aura": "none",
+        "finish": "satin-assay",
+        "clasp": "sapphire-lozenge",
+        "charm": "garnet-drop",
+        "orbit": "broken-orbit"
+      },
+      "recipeHash": "1d859a5a699fe6caffceecf7f2ecec4f49efe59becf006512992f56a24cc0441",
+      "image": "final/066-uncommon-orbit-bracelet.webp",
+      "imageSha256": "ca28bb93c7b101c16173de23e52b6f647f13cf119aba23b1f9788aac725c9e51"
+    },
+    {
+      "edition": 67,
+      "tier": "Uncommon",
+      "artefact": "Orbit Bracelet",
+      "redemptionTargetUsd": 24,
+      "traits": {
+        "field": "vault-grid",
+        "aura": "assay-dust",
+        "finish": "mirror-edge",
+        "clasp": "garnet-assay",
+        "charm": "moonstone-claw",
+        "orbit": "single-orbit"
+      },
+      "recipeHash": "41622cccdfdfd4cf6eb97da0b4e4fd9b4856d3c370141eb1eaa974f752415293",
+      "image": "final/067-uncommon-orbit-bracelet.webp",
+      "imageSha256": "d355818d0e84e539b7a0ce7257649189e6c4bec8870d734561cdf65c670ac36f"
+    },
+    {
+      "edition": 68,
+      "tier": "Uncommon",
+      "artefact": "Orbit Bracelet",
+      "redemptionTargetUsd": 24,
+      "traits": {
+        "field": "eclipse",
+        "aura": "none",
+        "finish": "blackened-recess",
+        "clasp": "garnet-assay",
+        "charm": "garnet-drop",
+        "orbit": "broken-orbit"
+      },
+      "recipeHash": "741537c0f011aecb247784fa9c8ad002cfaf43dc4bb31c588ea7e9868a4b1468",
+      "image": "final/068-uncommon-orbit-bracelet.webp",
+      "imageSha256": "549dcbb97bfc047deabb29e307f959aba23ad56ee68c57f8ffe0725daa0e9a76"
+    },
+    {
+      "edition": 69,
+      "tier": "Uncommon",
+      "artefact": "Orbit Bracelet",
+      "redemptionTargetUsd": 24,
+      "traits": {
+        "field": "vault-grid",
+        "aura": "none",
+        "finish": "blackened-recess",
+        "clasp": "twin-orbit",
+        "charm": "moonstone-claw",
+        "orbit": "broken-orbit"
+      },
+      "recipeHash": "a4b4281192c1900083922c4a6d1d5825039faa7aecb8f4ae259000d4f49f1ab7",
+      "image": "final/069-uncommon-orbit-bracelet.webp",
+      "imageSha256": "dfb9d8c9eda32ebb804db6bd679fc619d38c1a3782caeb73b119df6a8338c42e"
+    },
+    {
+      "edition": 70,
+      "tier": "Uncommon",
+      "artefact": "Orbit Bracelet",
+      "redemptionTargetUsd": 24,
+      "traits": {
+        "field": "assay-circles",
+        "aura": "orbital-trail",
+        "finish": "satin-assay",
+        "clasp": "monolith",
+        "charm": "moonstone-claw",
+        "orbit": "twin-orbit"
+      },
+      "recipeHash": "b5e8646652590e7eae55516c9f0d77fbec254e299ce8fb5fc0d67c871ee98bd6",
+      "image": "final/070-uncommon-orbit-bracelet.webp",
+      "imageSha256": "9e30e2a265a2bc83dba11bf6990d3955b0d45ccd1aa7ec902235b49caaf499c8"
+    },
+    {
+      "edition": 71,
+      "tier": "Uncommon",
+      "artefact": "Orbit Bracelet",
+      "redemptionTargetUsd": 24,
+      "traits": {
+        "field": "assay-circles",
+        "aura": "none",
+        "finish": "mirror-edge",
+        "clasp": "emerald-gate",
+        "charm": "emerald-knot",
+        "orbit": "broken-orbit"
+      },
+      "recipeHash": "3b93ee35f69c3b324e4602277079e76dcba3810dc2ca46993dbe486fc3dd6c95",
+      "image": "final/071-uncommon-orbit-bracelet.webp",
+      "imageSha256": "4c6521d9d0303a540447979ece987fba61791ffe6e6baac97c8cf82f4ff20013"
+    },
+    {
+      "edition": 72,
+      "tier": "Uncommon",
+      "artefact": "Orbit Bracelet",
+      "redemptionTargetUsd": 24,
+      "traits": {
+        "field": "eclipse",
+        "aura": "assay-dust",
+        "finish": "blackened-recess",
+        "clasp": "garnet-assay",
+        "charm": "celestial-coin",
+        "orbit": "single-orbit"
+      },
+      "recipeHash": "aba3ba79b25425515e68dae55176fb24e864b0a53601d422a39c4102152ee33e",
+      "image": "final/072-uncommon-orbit-bracelet.webp",
+      "imageSha256": "efad0eff1c0929471be9e20cef509ad6d974fc6c79ca401c4a556c5e1a82bcbc"
+    },
+    {
+      "edition": 73,
+      "tier": "Uncommon",
+      "artefact": "Orbit Bracelet",
+      "redemptionTargetUsd": 24,
+      "traits": {
+        "field": "assay-circles",
+        "aura": "orbital-trail",
+        "finish": "satin-assay",
+        "clasp": "emerald-gate",
+        "charm": "garnet-drop",
+        "orbit": "single-orbit"
+      },
+      "recipeHash": "06a0af385d41fc7c98ae33a447e255d05c083000bfd7fdb3fda9eb48a8e89919",
+      "image": "final/073-uncommon-orbit-bracelet.webp",
+      "imageSha256": "a665d6cf634be11069e41d47f36a2cc389d3a0de9446c1453f776560101cebab"
+    },
+    {
+      "edition": 74,
+      "tier": "Uncommon",
+      "artefact": "Orbit Bracelet",
+      "redemptionTargetUsd": 24,
+      "traits": {
+        "field": "eclipse",
+        "aura": "none",
+        "finish": "satin-assay",
+        "clasp": "twin-orbit",
+        "charm": "moonstone-claw",
+        "orbit": "broken-orbit"
+      },
+      "recipeHash": "bda0e3610dda026153fb7dc945410a4c0d665459d4f20f451fb18ef2d90ebb08",
+      "image": "final/074-uncommon-orbit-bracelet.webp",
+      "imageSha256": "ab18b99040acb4fc7604343d31de5da30a7126c48f3b941c60722c8069e8b178"
+    },
+    {
+      "edition": 75,
+      "tier": "Uncommon",
+      "artefact": "Orbit Bracelet",
+      "redemptionTargetUsd": 24,
+      "traits": {
+        "field": "eclipse",
+        "aura": "orbital-trail",
+        "finish": "blackened-recess",
+        "clasp": "twin-orbit",
+        "charm": "moonstone-claw",
+        "orbit": "broken-orbit"
+      },
+      "recipeHash": "a456c4c52ed95bce7bea091d6264005f5acd654f3c54dc14424fe965fd3d038c",
+      "image": "final/075-uncommon-orbit-bracelet.webp",
+      "imageSha256": "51867caa6368947afa24a8d53f19eb40cfc62cff277049fda507addc2cebff17"
+    },
+    {
+      "edition": 76,
+      "tier": "Uncommon",
+      "artefact": "Orbit Bracelet",
+      "redemptionTargetUsd": 24,
+      "traits": {
+        "field": "vault-grid",
+        "aura": "orbital-trail",
+        "finish": "blackened-recess",
+        "clasp": "sapphire-lozenge",
+        "charm": "celestial-coin",
+        "orbit": "twin-orbit"
+      },
+      "recipeHash": "727e31236e3d0af5889a8382f7532df447b9c1b675d8d47600283f883683a29c",
+      "image": "final/076-uncommon-orbit-bracelet.webp",
+      "imageSha256": "4eb2eced06d41222c2e1323cf1748f53ddff793c7ee2930d5b883fbc159e3c6c"
+    },
+    {
+      "edition": 77,
+      "tier": "Uncommon",
+      "artefact": "Orbit Bracelet",
+      "redemptionTargetUsd": 24,
+      "traits": {
+        "field": "vault-grid",
+        "aura": "orbital-trail",
+        "finish": "blackened-recess",
+        "clasp": "garnet-assay",
+        "charm": "moonstone-claw",
+        "orbit": "broken-orbit"
+      },
+      "recipeHash": "d135aae9b58a5281e00668c5fa6386bed8087cda970aafcf7bb798a23701057e",
+      "image": "final/077-uncommon-orbit-bracelet.webp",
+      "imageSha256": "a465eeb67cabf2dc9a977c8b075c770c96fade27c019de987aaefce1b19dcfa0"
+    },
+    {
+      "edition": 78,
+      "tier": "Uncommon",
+      "artefact": "Orbit Bracelet",
+      "redemptionTargetUsd": 24,
+      "traits": {
+        "field": "eclipse",
+        "aura": "none",
+        "finish": "mirror-edge",
+        "clasp": "sapphire-lozenge",
+        "charm": "emerald-knot",
+        "orbit": "single-orbit"
+      },
+      "recipeHash": "7240630bc7367748f7a84a0a68fdd5e3d642de978f506f3b5104834b8020b14a",
+      "image": "final/078-uncommon-orbit-bracelet.webp",
+      "imageSha256": "154a329a8785a0ec1988ed87213dbef2cf026233883f7a5c7b38565c02ff057d"
+    },
+    {
+      "edition": 79,
+      "tier": "Uncommon",
+      "artefact": "Orbit Bracelet",
+      "redemptionTargetUsd": 24,
+      "traits": {
+        "field": "vault-grid",
+        "aura": "assay-dust",
+        "finish": "satin-assay",
+        "clasp": "sapphire-lozenge",
+        "charm": "moonstone-claw",
+        "orbit": "broken-orbit"
+      },
+      "recipeHash": "b06e910e7403f79e97bf1d3acead69d3cde064bcc1eb696fb8d23dc065cffe30",
+      "image": "final/079-uncommon-orbit-bracelet.webp",
+      "imageSha256": "49e8a0696d6da49d1353ac9213c5bd085227eb8d74ceb921d5b9f57d884a9f8a"
+    },
+    {
+      "edition": 80,
+      "tier": "Uncommon",
+      "artefact": "Orbit Bracelet",
+      "redemptionTargetUsd": 24,
+      "traits": {
+        "field": "assay-circles",
+        "aura": "orbital-trail",
+        "finish": "blackened-recess",
+        "clasp": "sapphire-lozenge",
+        "charm": "emerald-knot",
+        "orbit": "single-orbit"
+      },
+      "recipeHash": "bd30d79b10fa45637bc06887e5f0a3da41bd6cf96e0ec453fbc5984aefc70722",
+      "image": "final/080-uncommon-orbit-bracelet.webp",
+      "imageSha256": "37dd153ec54254ddbe226155dc3087ac00b2a26fed0b0b6fc0620ed5fd8ea11d"
+    },
+    {
+      "edition": 81,
+      "tier": "Rare",
+      "artefact": "Royal Torque",
+      "redemptionTargetUsd": 45,
+      "traits": {
+        "field": "eclipse",
+        "aura": "emerald-seal",
+        "finish": "blackened-recess",
+        "seal": "octagonal-assay",
+        "mineral": "garnet-pair"
+      },
+      "recipeHash": "678051518d710f031ce92769c496ec553b24cea1a2ecdc662b5ab5a6a19255d8",
+      "image": "final/081-rare-royal-torque.webp",
+      "imageSha256": "832e53f24cdd943859f05e57ba17efd0e649b1cdadface34aaec645da0119fa2"
+    },
+    {
+      "edition": 82,
+      "tier": "Rare",
+      "artefact": "Royal Torque",
+      "redemptionTargetUsd": 45,
+      "traits": {
+        "field": "star-map",
+        "aura": "assay-dust",
+        "finish": "mirror-edge",
+        "seal": "lattice",
+        "mineral": "moonstone-pair"
+      },
+      "recipeHash": "c28efa1c2c77b7c7fcbfd7300c1fc519762f6cc0f54a9a87e65f40ef108f169e",
+      "image": "final/082-rare-royal-torque.webp",
+      "imageSha256": "bc80d34ae1c21688673f569c8bd5297d4e7c5b9e0d9120cdac6ae054800c0385"
+    },
+    {
+      "edition": 83,
+      "tier": "Rare",
+      "artefact": "Royal Torque",
+      "redemptionTargetUsd": 45,
+      "traits": {
+        "field": "star-map",
+        "aura": "assay-dust",
+        "finish": "blackened-recess",
+        "seal": "orbit",
+        "mineral": "emerald-pair"
+      },
+      "recipeHash": "f3b95dc15c8725d84ed3e243574cd6a251299bc40d4074081fde7e9c0c4e4616",
+      "image": "final/083-rare-royal-torque.webp",
+      "imageSha256": "115618828a67c3d5a2e993b9dc40048acef4ad3ac0d067ff51cf43e55c8b6059"
+    },
+    {
+      "edition": 84,
+      "tier": "Rare",
+      "artefact": "Royal Torque",
+      "redemptionTargetUsd": 45,
+      "traits": {
+        "field": "vault-grid",
+        "aura": "orbital-trail",
+        "finish": "blackened-recess",
+        "seal": "labyrinth",
+        "mineral": "garnet-pair"
+      },
+      "recipeHash": "404c1a8188f153a695658074a035418b95e81ed6e07d23aa83bfc2ef8863fe77",
+      "image": "final/084-rare-royal-torque.webp",
+      "imageSha256": "5847b1c50767f8b4752c73a7a7969dc91a23c4f89e1550b31a7ec4030c422786"
+    },
+    {
+      "edition": 85,
+      "tier": "Rare",
+      "artefact": "Royal Torque",
+      "redemptionTargetUsd": 45,
+      "traits": {
+        "field": "star-map",
+        "aura": "orbital-trail",
+        "finish": "mirror-edge",
+        "seal": "sun",
+        "mineral": "sapphire-pair"
+      },
+      "recipeHash": "bef75aa7692f9db8cab44f6c6d73e93299a322b4cf9fc734e1b8731a8f8fe086",
+      "image": "final/085-rare-royal-torque.webp",
+      "imageSha256": "6d40a8229c318bf948a786d4bdd534bccd1b75bf58d633ca10963996fe2f298a"
+    },
+    {
+      "edition": 86,
+      "tier": "Rare",
+      "artefact": "Royal Torque",
+      "redemptionTargetUsd": 45,
+      "traits": {
+        "field": "eclipse",
+        "aura": "orbital-trail",
+        "finish": "blackened-recess",
+        "seal": "labyrinth",
+        "mineral": "sapphire-pair"
+      },
+      "recipeHash": "bdc0d1d7eb16624e1c1b8949b596890b7976b245ff10fb05689fe3f92eeea05a",
+      "image": "final/086-rare-royal-torque.webp",
+      "imageSha256": "d234b0a3853fc551ed3d6bd20263a2db8cf5d75eddfba78706fd81be09669c84"
+    },
+    {
+      "edition": 87,
+      "tier": "Rare",
+      "artefact": "Royal Torque",
+      "redemptionTargetUsd": 45,
+      "traits": {
+        "field": "eclipse",
+        "aura": "assay-dust",
+        "finish": "satin-assay",
+        "seal": "sun",
+        "mineral": "emerald-pair"
+      },
+      "recipeHash": "9c0de616aea5c2967b18e2ef5ad0485439628bd4fffd636aa499ce33819ca38b",
+      "image": "final/087-rare-royal-torque.webp",
+      "imageSha256": "41629cad7046b63683d71b3c966d2aea20f13bbe526eccc0001dae68aab5d39b"
+    },
+    {
+      "edition": 88,
+      "tier": "Rare",
+      "artefact": "Royal Torque",
+      "redemptionTargetUsd": 45,
+      "traits": {
+        "field": "star-map",
+        "aura": "emerald-seal",
+        "finish": "satin-assay",
+        "seal": "orbit",
+        "mineral": "sapphire-pair"
+      },
+      "recipeHash": "4510db2b04d72f5513ddb6b7ab0bf24326fc20dca4fe4ac1ae713fe02d96e813",
+      "image": "final/088-rare-royal-torque.webp",
+      "imageSha256": "b2d1667c927c1be191767fd2eeda17dff1788ce2571b4880a109536bfdc131f1"
+    },
+    {
+      "edition": 89,
+      "tier": "Rare",
+      "artefact": "Royal Torque",
+      "redemptionTargetUsd": 45,
+      "traits": {
+        "field": "star-map",
+        "aura": "emerald-seal",
+        "finish": "blackened-recess",
+        "seal": "lattice",
+        "mineral": "emerald-pair"
+      },
+      "recipeHash": "1e7a9b034deeb4020392f5eb63d76d0c30ec0b58b82317111979592349b5e770",
+      "image": "final/089-rare-royal-torque.webp",
+      "imageSha256": "01356c342e66e78daf00e7d29031e8b94265143774f961375789174688e4b531"
+    },
+    {
+      "edition": 90,
+      "tier": "Rare",
+      "artefact": "Royal Torque",
+      "redemptionTargetUsd": 45,
+      "traits": {
+        "field": "eclipse",
+        "aura": "sapphire-constellation",
+        "finish": "mirror-edge",
+        "seal": "octagonal-assay",
+        "mineral": "emerald-pair"
+      },
+      "recipeHash": "7d6c320162d50843bf2ff04c9e0934e72537e19eb5f30772766dfde24f9f831a",
+      "image": "final/090-rare-royal-torque.webp",
+      "imageSha256": "35b4fa7fef5e698641c386b3abc2d2ad5a53e95027668ad3e7aa66027cb45151"
+    },
+    {
+      "edition": 91,
+      "tier": "Rare",
+      "artefact": "Royal Torque",
+      "redemptionTargetUsd": 45,
+      "traits": {
+        "field": "star-map",
+        "aura": "orbital-trail",
+        "finish": "satin-assay",
+        "seal": "eclipse",
+        "mineral": "sapphire-pair"
+      },
+      "recipeHash": "4173e17a00a849fec7dbf2cf7ec09d15b024cba079db3b126f79aea0f4a1aacc",
+      "image": "final/091-rare-royal-torque.webp",
+      "imageSha256": "3195d2e4a6259c38e6de929874a3c4c59a2393de0ee798c425b1932ca90e9804"
+    },
+    {
+      "edition": 92,
+      "tier": "Rare",
+      "artefact": "Royal Torque",
+      "redemptionTargetUsd": 45,
+      "traits": {
+        "field": "star-map",
+        "aura": "assay-dust",
+        "finish": "satin-assay",
+        "seal": "eclipse",
+        "mineral": "garnet-pair"
+      },
+      "recipeHash": "3aa78c6fe9c19beded1f401682fe6b7bd8c9efaa0570949ad329389ab7ab26cb",
+      "image": "final/092-rare-royal-torque.webp",
+      "imageSha256": "ab758295ccf6cacbbc4f99cd3f9f15dc7890ef79ac5c7594dc7972d26f8430a8"
+    },
+    {
+      "edition": 93,
+      "tier": "Rare",
+      "artefact": "Royal Torque",
+      "redemptionTargetUsd": 45,
+      "traits": {
+        "field": "star-map",
+        "aura": "assay-dust",
+        "finish": "mirror-edge",
+        "seal": "celestial-compass",
+        "mineral": "moonstone-pair"
+      },
+      "recipeHash": "bf8bbc04fd0da1e3a74e431eb17861d4b89eef278f38b0ef1156c7c8beba92cd",
+      "image": "final/093-rare-royal-torque.webp",
+      "imageSha256": "1462f2f68e47a8069a394ed556c88b92a006d24900d65ef20eb49afb3acac570"
+    },
+    {
+      "edition": 94,
+      "tier": "Rare",
+      "artefact": "Royal Torque",
+      "redemptionTargetUsd": 45,
+      "traits": {
+        "field": "eclipse",
+        "aura": "sapphire-constellation",
+        "finish": "mirror-edge",
+        "seal": "labyrinth",
+        "mineral": "emerald-pair"
+      },
+      "recipeHash": "5ab5871149884e464580358d7edbfb55f7187a4e2a2b05267cdd0905c00dd4d1",
+      "image": "final/094-rare-royal-torque.webp",
+      "imageSha256": "2a0182bd1cf50be2511b442d5f473663df58b56b05722879e640f380c636a7b1"
+    },
+    {
+      "edition": 95,
+      "tier": "Epic",
+      "artefact": "Imperial Ovoid",
+      "redemptionTargetUsd": 110,
+      "traits": {
+        "field": "assay-circles",
+        "aura": "garnet-inner-radiance",
+        "finish": "warm-polished-gold",
+        "lattice": "ember-lattice",
+        "enamel": "oxblood",
+        "mineral": "garnet"
+      },
+      "recipeHash": "25a80d3f493d07df74c352fabffb50d58544f248030aed778d5d0a7551402085",
+      "image": "final/095-epic-imperial-ovoid.webp",
+      "imageSha256": "1834f3bd7e50ecd0c5ccb36fca042b38d1ab786b7976ba19ae1d4b88f6603afa"
+    },
+    {
+      "edition": 96,
+      "tier": "Epic",
+      "artefact": "Imperial Ovoid",
+      "redemptionTargetUsd": 110,
+      "traits": {
+        "field": "star-map",
+        "aura": "sapphire-constellation",
+        "finish": "pale-celestial-gold",
+        "lattice": "observatory-lattice",
+        "enamel": "midnight-blue",
+        "mineral": "sapphire"
+      },
+      "recipeHash": "5797c755f80b41a707fbe476dee7006ce8b0cd5742203422d6b8d0fb3e4bf1f1",
+      "image": "final/096-epic-imperial-ovoid.webp",
+      "imageSha256": "3ae882a48895359d5052aa0784ed5f2f5cc4d92a228765f464fdab9293153075"
+    },
+    {
+      "edition": 97,
+      "tier": "Epic",
+      "artefact": "Imperial Ovoid",
+      "redemptionTargetUsd": 110,
+      "traits": {
+        "field": "vault-grid",
+        "aura": "emerald-seal",
+        "finish": "antique-gold",
+        "lattice": "engine-lattice",
+        "enamel": "forest-green",
+        "mineral": "emerald"
+      },
+      "recipeHash": "d24db5b20ae3b0987a87dfad5c15acfb210aea8918dbe4768eb3e7301f5fbdcf",
+      "image": "final/097-epic-imperial-ovoid.webp",
+      "imageSha256": "8b46ca0cf9a082179d3b1e50f54aa86ad337940e84f1fd6f28217eed44a3a922"
+    },
+    {
+      "edition": 98,
+      "tier": "Epic",
+      "artefact": "Imperial Ovoid",
+      "redemptionTargetUsd": 110,
+      "traits": {
+        "field": "assay-circles",
+        "aura": "lunar-frost",
+        "finish": "pale-gold",
+        "lattice": "frost-lattice",
+        "enamel": "ivory",
+        "mineral": "moonstone"
+      },
+      "recipeHash": "dd253f8c843d6325b8505e09d9625b8e387ad5121d679bee659a5539c0dea98b",
+      "image": "final/098-epic-imperial-ovoid.webp",
+      "imageSha256": "5bff13af6ce021cb40d2c473a2a2cb7d93e83b8c68d95bb48aecf24dd320542f"
+    },
+    {
+      "edition": 99,
+      "tier": "Epic",
+      "artefact": "Imperial Ovoid",
+      "redemptionTargetUsd": 110,
+      "traits": {
+        "field": "eclipse",
+        "aura": "restrained-amber",
+        "finish": "blackened-gold",
+        "lattice": "eclipse-lattice",
+        "enamel": "obsidian",
+        "mineral": "onyx"
+      },
+      "recipeHash": "10097ef9f7a1cfdaaa78b911a01fdcf75d194aef4c3358541dddb647f6c0eaa4",
+      "image": "final/099-epic-imperial-ovoid.webp",
+      "imageSha256": "25b07387c30d0ef9d08a336ab691f70dfaa95badaeaaf6e7a55d16511e274863"
+    },
+    {
+      "edition": 100,
+      "tier": "Legendary",
+      "artefact": "Crown Jewel",
+      "redemptionTargetUsd": 370,
+      "traits": {
+        "field": "sovereign-assay",
+        "aura": "solar-corona",
+        "finish": "radiant-gold",
+        "crest": "sovereign",
+        "mineral": "diamond-white-crystal-and-sapphire",
+        "edition": "one-of-one"
+      },
+      "recipeHash": "6feb5a6154fc3a95c962ddbb929ae9fd7f89b12ca4da581df8bc47af70f49287",
+      "image": "final/100-legendary-crown-jewel.webp",
+      "imageSha256": "904cd89b8e31f369a64e3182dc1adb73fac6bc5cba72b12d3f053353139cb32c"
+    }
+  ]
+}

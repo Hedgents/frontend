@@ -68,6 +68,7 @@ import { readPendingCctpFunding } from "@/lib/cctp-funding-storage";
 import { normalizeExecutionReceipt, parseExecutionReceipt } from "@/lib/execution-receipts";
 import { calculatePortfolioAccounting } from "@/lib/portfolio-accounting";
 import { routeAvailabilityLabel } from "@/lib/route-availability";
+import { productCountryRestriction } from "@/lib/eligibility";
 import type {
   ExecutionRecord,
   JupiterExecutionResult,
@@ -119,8 +120,12 @@ const ScarcityPortfolioPanel = dynamic(
   () => import("./ScarcityExchange").then((module) => module.ScarcityPortfolioPanel),
   { ssr: false },
 );
+const GenesisVault = dynamic(
+  () => import("./GenesisVault").then((module) => module.GenesisVault),
+  { ssr: false },
+);
 
-export type TerminalView = "markets" | "scarcity" | "portfolio" | "standing" | "orders";
+export type TerminalView = "markets" | "relics" | "scarcity" | "portfolio" | "standing" | "orders";
 type LaneFilter = "All" | ExposureLane;
 type FundingSourceId = "solana" | CctpSourceId;
 type ExecutionPhase =
@@ -133,6 +138,31 @@ type ExecutionPhase =
   | "failed";
 
 const laneFilters: LaneFilter[] = ["All", "Own", "Invest", "Hedge"];
+
+function openHoverDisclosure(event: React.MouseEvent<HTMLDetailsElement>) {
+  if (window.matchMedia("(hover: hover)").matches) event.currentTarget.open = true;
+}
+
+function closeHoverDisclosure(event: React.MouseEvent<HTMLDetailsElement>) {
+  if (window.matchMedia("(hover: hover)").matches) event.currentTarget.open = false;
+}
+
+function clickHoverDisclosure(event: React.MouseEvent<HTMLDetailsElement>) {
+  if (
+    window.matchMedia("(hover: hover)").matches
+    && event.target instanceof Element
+    && event.target.closest("summary")
+  ) {
+    event.preventDefault();
+    event.currentTarget.open = true;
+  }
+}
+
+const hoverDisclosureEvents = {
+  onMouseEnter: openHoverDisclosure,
+  onMouseLeave: closeHoverDisclosure,
+  onClick: clickHoverDisclosure,
+};
 const currencyFormatters = new Map<number, Intl.NumberFormat>();
 const trackedProductCount = metalMarkets.reduce(
   (total, market) => total + market.products.length,
@@ -145,12 +175,13 @@ const registeredAdapterCount = metalMarkets.reduce(
 );
 const terminalViewLabels: Record<TerminalView, string> = {
   markets: "Metal tokens",
+  relics: "Relics",
   scarcity: "Scarcity markets",
   portfolio: "Portfolio",
   standing: "Standing",
   orders: "Orders",
 };
-const terminalViews = new Set<TerminalView>(["markets", "scarcity", "portfolio", "standing", "orders"]);
+const terminalViews = new Set<TerminalView>(["markets", "relics", "scarcity", "portfolio", "standing", "orders"]);
 const buyAmountPresets = [10, 25, 50, 100] as const;
 const evmSourceNetworks = [
   { id: "ethereum", chainId: 1, label: "Ethereum", tone: "#a7b5d8", funding: "CCTP canary" },
@@ -414,6 +445,10 @@ export function MetalTerminal({
   const bestProduct = rankedProducts[0] ?? selectedMarket.products[0];
   const selectedProduct =
     selectedMarket.products.find((product) => product.id === selectedProductId) ?? bestProduct;
+  const selectedExecutionProduct = getSolanaExecutionProduct(selectedProduct.id);
+  const eligibilityCountryRestriction = selectedExecutionProduct
+    ? productCountryRestriction(selectedExecutionProduct.eligibilityPolicyId, eligibilityCountryCode)
+    : null;
   const selectedSettlementAsset = getSolanaSettlementAsset(settlementAssetId) ?? solanaSettlementAssets.usdc;
   // The router step is where USDC becomes the metal token, so it takes the
   // selected metal's tone. Input (USDC) and Settlement (your wallet) keep their
@@ -565,7 +600,8 @@ export function MetalTerminal({
     solanaWalletConnected &&
     hasEnoughMetal &&
     eligibilityAccepted &&
-    /^[A-Z]{2}$/.test(eligibilityCountryCode);
+    /^[A-Z]{2}$/.test(eligibilityCountryCode) &&
+    eligibilityCountryRestriction === null;
   const crossChainFundingSelected = tradeSide === "buy" && fundingSourceId !== "solana";
   const newRailFundingAllowed = terminalFeatures.railFundingEnabled && executionControl.enabled;
   const canStartSelectedRoute = canReview &&
@@ -1255,11 +1291,12 @@ export function MetalTerminal({
         </button>
 
         <nav className={styles.primaryNav} aria-label="Terminal navigation">
-          {(["markets", "scarcity", "portfolio", "standing", "orders"] as TerminalView[]).map((item) => (
+          {(["markets", "relics", "scarcity", "portfolio", "standing", "orders"] as TerminalView[]).map((item) => (
             <button
               type="button"
               key={item}
               className={view === item ? styles.navActive : undefined}
+              aria-current={view === item ? "page" : undefined}
               onClick={() => navigateToView(item)}
             >
               {terminalViewLabels[item]}
@@ -1268,7 +1305,7 @@ export function MetalTerminal({
         </nav>
 
         <div className={styles.topbarActions}>
-          <span className={styles.previewPill}>{view === "scarcity" ? "SCX · Curve + event markets" : view === "portfolio" ? "Metal holdings · Cost basis" : view === "standing" ? "Scarcity positions · XP" : view === "orders" ? "Verified execution history" : "M2 · Two-way Solana execution"}</span>
+          <span className={styles.previewPill}>{view === "relics" ? "Genesis · PAXG-backed relic vault" : view === "scarcity" ? "SCX · Curve + event markets" : view === "portfolio" ? "Metal holdings · Cost basis" : view === "standing" ? "Scarcity positions · XP" : view === "orders" ? "Verified execution history" : "M2 · Two-way Solana execution"}</span>
           <button
             type="button"
             className={styles.walletButton}
@@ -1315,7 +1352,7 @@ export function MetalTerminal({
         </div>
       </section> : null}
 
-      <main id="terminal-content" className={classNames(styles.main, view === "scarcity" && styles.mainScarcity)}>
+      <main id="terminal-content" className={classNames(styles.main, view === "scarcity" && styles.mainScarcity, view === "relics" && styles.mainRelics)}>
         {view === "markets" ? (
           <MarketsView
             filteredMarkets={filteredMarkets}
@@ -1373,6 +1410,8 @@ export function MetalTerminal({
             onConnectWallet={() => setWalletPanelOpen(true)}
             onRefreshQuotes={() => void liveQuotes.refresh()}
           />
+        ) : view === "relics" ? (
+          <GenesisVault embedded />
         ) : view === "scarcity" ? (
           <ScarcityExchange markets={scarcityMarkets} />
         ) : view === "standing" ? (
@@ -1422,7 +1461,7 @@ export function MetalTerminal({
 
       <footer className={styles.footer}>
         <span>Hg / Metal intelligence + execution</span>
-        <span>{view === "scarcity" ? `${scarcityMarkets.length} scarcity contracts · ${SCARCITY_TRACKED_ELEMENT_COUNT}-cell materials oracle` : `${registeredAdapterCount} registered Solana adapters · Live Jupiter execution gate`}</span>
+        <span>{view === "relics" ? "100 fixed outcomes · PAXG reserve before activation" : view === "scarcity" ? `${scarcityMarkets.length} scarcity contracts · ${SCARCITY_TRACKED_ELEMENT_COUNT}-cell materials oracle` : `${registeredAdapterCount} registered Solana adapters · Live Jupiter execution gate`}</span>
         <span className={styles.networkStatus}>
           <i /> Terminal online
         </span>
@@ -1614,11 +1653,14 @@ function MarketsView({
     <>
       <section className={styles.marketMasthead}>
         <div>
-          <p className={styles.overline}>Metal universe / live registry</p>
+          <p className={styles.overline}>Metal tokens / Solana</p>
           <h1>
-            Choose the metal.
-            <em> We find the market.</em>
+            Buy metal tokens.
+            <em> Best live route.</em>
           </h1>
+          <p className={styles.executionThesis}>
+            Choose a metal, select a token, and enter the amount.
+          </p>
         </div>
         <div className={styles.marketStats}>
           <span>
@@ -1634,6 +1676,38 @@ function MarketsView({
             <strong>{String(registeredAdapterCount).padStart(2, "0")}</strong>
           </span>
         </div>
+      </section>
+
+      <section className={styles.assuranceBar} aria-label="Hedgents protected execution">
+        <div className={styles.assuranceSignal}>
+          <ShieldCheck size={15} aria-hidden="true" />
+          <strong>Protected execution</strong>
+          <span>Compare · simulate · verify</span>
+        </div>
+        <details className={styles.hoverDisclosure} {...hoverDisclosureEvents}>
+          <summary>
+            <Info size={14} aria-hidden="true" />
+            How it works
+            <ChevronDown size={13} aria-hidden="true" />
+          </summary>
+          <div className={styles.assurancePopover}>
+            <article>
+              <span>01 / Compare</span>
+              <strong>Exact-size output</strong>
+              <p>Equivalent products are re-quoted for the amount you enter.</p>
+            </article>
+            <article>
+              <span>02 / Protect</span>
+              <strong>Checked before signing</strong>
+              <p>The route is limited to reviewed programs and simulated first.</p>
+            </article>
+            <article>
+              <span>03 / Verify</span>
+              <strong>Confirmed in your wallet</strong>
+              <p>Your balance change confirms settlement after the transaction.</p>
+            </article>
+          </div>
+        </details>
       </section>
 
       <div className={styles.workspace}>
@@ -1755,7 +1829,7 @@ function MarketsView({
               <div className={styles.productTitle}>
                 <ElementMark market={selectedMarket} />
                 <div>
-                  <p className={styles.overline}>Selected metal / product comparison</p>
+                  <p className={styles.overline}>Choose token</p>
                   <h2>{selectedMarket.name}</h2>
                   <span>
                     {selectedMarket.products.length} mapped product
@@ -1835,19 +1909,43 @@ function MarketsView({
                     ? `${routeComparison.routes.filter((route) => route.available).length}/${routeComparison.routes.length} live`
                     : "Comparison unavailable"}
               </strong>
-              <small>
-                {routeComparisonError ?? (tradeSide === "buy"
-                  ? "“Best” is shown only between tokens representing the same underlying exposure."
-                  : "USDC, USDT, and USDG exits are quoted independently; choose the settlement asset you actually want.")}
-              </small>
+              <details
+                className={classNames(styles.hoverDisclosure, styles.comparisonDisclosure)}
+                {...hoverDisclosureEvents}
+              >
+                <summary aria-label="About route comparison">
+                  <Info size={13} aria-hidden="true" />
+                  Route info
+                  <ChevronDown size={12} aria-hidden="true" />
+                </summary>
+                <div className={styles.comparisonPopover}>
+                  {routeComparisonError ?? (tradeSide === "buy"
+                    ? "Best is shown only between tokens representing the same underlying exposure."
+                    : "USDC, USDT, and USDG exits are quoted independently; choose the settlement asset you want.")}
+                </div>
+              </details>
             </div>
-          </section>
 
-        <section
-          className={classNames(styles.productPanel, styles.productDetailsPanel)}
-          aria-label={`${selectedProduct.name} product passport`}
-        >
-          <div className={styles.passport}>
+            <section className={styles.productQuickFacts} aria-label={`${selectedProduct.name} summary`}>
+              <div>
+                <span>Issuer</span>
+                <strong>{selectedProduct.issuer}</strong>
+              </div>
+              <div>
+                <span>Backing</span>
+                <strong>{selectedProduct.backing}</strong>
+              </div>
+              <details
+                className={classNames(styles.hoverDisclosure, styles.productDisclosure)}
+                {...hoverDisclosureEvents}
+              >
+                <summary>
+                  <Info size={14} aria-hidden="true" />
+                  Product details
+                  <ChevronDown size={13} aria-hidden="true" />
+                </summary>
+                <div className={styles.productPopover}>
+                  <div className={styles.passport}>
               <div className={styles.passportLead}>
                 <div className={styles.passportLeadTop}>
                   <span className={styles.laneBadge}>{selectedProduct.lane}</span>
@@ -1932,8 +2030,11 @@ function MarketsView({
                   {registryError ? <small>{registryError}</small> : null}
                 </div>
               ) : null}
-          </div>
-        </section>
+                  </div>
+                </div>
+              </details>
+            </section>
+          </section>
         </div>
 
         <OrderTicket
@@ -2077,6 +2178,10 @@ function OrderTicket({
   onRefreshQuote,
 }: OrderTicketProps) {
   const product = market.products.find((item) => item.id === productId) ?? market.products[0];
+  const executionProduct = getSolanaExecutionProduct(product.id);
+  const countryRestriction = executionProduct
+    ? productCountryRestriction(executionProduct.eligibilityPolicyId, eligibilityCountryCode)
+    : null;
   const settlementAsset = getSolanaSettlementAsset(settlementAssetId) ?? solanaSettlementAssets.usdc;
   // Only offer what the server will accept. USDT and USDG stay defined, and holdings in them stay
   // visible in the portfolio; they are simply not sellable into while their routes dead-end at the
@@ -2108,8 +2213,17 @@ function OrderTicket({
     <aside id="order-ticket" className={styles.ticket} aria-label="Order route">
       <div className={styles.ticketTopline}>
         <div>
-          <p className={styles.overline}>Order / Solana two-way execution</p>
-          <h2>{tradeSide === "buy" ? `Buy ${market.name}` : `Sell ${product.ticker}`}</h2>
+          <p className={styles.overline}>Order / Solana</p>
+          <h2>{tradeSide === "buy" ? `Buy ${product.ticker}` : `Sell ${product.ticker}`}</h2>
+          <div className={styles.ticketToplineMeta}>
+            <span>{product.name} · {product.lane}</span>
+            <StatusBadge
+              status={executionAdapterReady && (!executionServiceReady || exactRoute?.available !== true)
+                ? "Indicative"
+                : product.availability}
+              live={executionAdapterReady && executionServiceReady && exactRoute?.available === true}
+            />
+          </div>
         </div>
         <ElementMark market={market} compact />
       </div>
@@ -2129,13 +2243,21 @@ function OrderTicket({
             ? `$${executionControl.maxUsd.toLocaleString()} maximum per trade`
             : "New quotes and orders are disabled"}
         </strong>
-        <small>
-          {executionControl.rejectionOnly
-            ? "Approved transactions are discarded locally; the server submission guard remains hard-disabled as a second backstop."
-            : executionControl.enabled
-            ? "The cap is enforced again by the server at quote, order, and submission."
-            : "Pending onchain receipts remain recoverable from Orders."}
-        </small>
+        <details
+          className={classNames(styles.hoverDisclosure, styles.betaExecutionDisclosure)}
+          {...hoverDisclosureEvents}
+        >
+          <summary aria-label="About the execution limit">
+            <Info size={13} aria-hidden="true" />
+          </summary>
+          <div className={styles.betaExecutionPopover}>
+            {executionControl.rejectionOnly
+              ? "Approved transactions are discarded locally; the server submission guard remains hard-disabled as a second backstop."
+              : executionControl.enabled
+              ? "The cap is enforced again by the server at quote, order, and submission."
+              : "Pending onchain receipts remain recoverable from Orders."}
+          </div>
+        </details>
       </div>
 
       <div className={styles.tradeSidePicker} role="group" aria-label="Trade direction">
@@ -2153,34 +2275,36 @@ function OrderTicket({
       </div>
 
       {tradeSide === "buy" ? (
-        <div className={styles.fundingSourcePicker}>
-          <span>Pay USDC from</span>
-          <div role="group" aria-label="Purchase funding chain">
-            {fundingSources.filter((source) => source.id === "solana" || railFundingEnabled).map((source) => (
-              <button
-                type="button"
-                key={source.id}
-                aria-pressed={source.id === fundingSourceId}
-                onClick={() => onFundingSourceChange(source.id)}
-              >
-                <i style={{ background: source.tone }} />
-                <strong>{source.label}</strong>
-                <small>{source.note}</small>
-              </button>
-            ))}
-            {pendingFundingSourceId && pendingFundingSource ? (
-              <button
-                type="button"
-                onClick={onResumePendingFunding}
-                aria-label={`Resume pending ${pendingFundingSource.label} CCTP delivery`}
-              >
-                <i style={{ background: pendingFundingSource.tone }} />
-                <strong>Resume {pendingFundingSource.label}</strong>
-                <small>Pending delivery</small>
-              </button>
-            ) : null}
+        railFundingEnabled || pendingFundingSourceId ? (
+          <div className={styles.fundingSourcePicker}>
+            <span>Pay USDC from</span>
+            <div role="group" aria-label="Purchase funding chain">
+              {fundingSources.filter((source) => source.id === "solana" || railFundingEnabled).map((source) => (
+                <button
+                  type="button"
+                  key={source.id}
+                  aria-pressed={source.id === fundingSourceId}
+                  onClick={() => onFundingSourceChange(source.id)}
+                >
+                  <i style={{ background: source.tone }} />
+                  <strong>{source.label}</strong>
+                  <small>{source.note}</small>
+                </button>
+              ))}
+              {pendingFundingSourceId && pendingFundingSource ? (
+                <button
+                  type="button"
+                  onClick={onResumePendingFunding}
+                  aria-label={`Resume pending ${pendingFundingSource.label} CCTP delivery`}
+                >
+                  <i style={{ background: pendingFundingSource.tone }} />
+                  <strong>Resume {pendingFundingSource.label}</strong>
+                  <small>Pending delivery</small>
+                </button>
+              ) : null}
+            </div>
           </div>
-        </div>
+        ) : null
       ) : (
         <div className={styles.settlementPicker}>
           <span>Receive on Solana</span>
@@ -2200,40 +2324,19 @@ function OrderTicket({
         </div>
       )}
 
-      <div className={styles.ticketProduct}>
-        <span>{product.lane}</span>
-        <div>
-          <strong>{product.name}</strong>
-          <small>Selected product · {product.ticker} on {product.settlementChain}</small>
+      {quote?.priceUsd != null ? (
+        <div className={classNames(styles.liveQuoteStrip, styles.liveQuoteStripReady)}>
+          <span><Radio size={13} aria-hidden="true" /> {quoteLabel(quote, quoteLoading)}</span>
+          <strong>{currency(quote.priceUsd, quote.priceUsd < 10 ? 4 : 2)}</strong>
+          <button type="button" onClick={onRefreshQuote} aria-label="Refresh live quote">
+            <RefreshCw size={12} aria-hidden="true" />
+          </button>
+          <small>
+            {quote.sourceSymbol}
+            {quoteAge(quote) ? ` · ${quoteAge(quote)}` : ""}
+          </small>
         </div>
-        <StatusBadge
-          status={executionAdapterReady && (!executionServiceReady || exactRoute?.available !== true)
-            ? "Indicative"
-            : product.availability}
-          live={executionAdapterReady && executionServiceReady && exactRoute?.available === true}
-        />
-      </div>
-
-      <div
-        className={classNames(
-          styles.liveQuoteStrip,
-          quote?.priceUsd != null && styles.liveQuoteStripReady,
-        )}
-      >
-        <span><Radio size={13} aria-hidden="true" /> {quoteLabel(quote, quoteLoading)}</span>
-        <strong>
-          {quote?.priceUsd != null
-            ? currency(quote.priceUsd, quote.priceUsd < 10 ? 4 : 2)
-            : "No price"}
-        </strong>
-        <button type="button" onClick={onRefreshQuote} aria-label="Refresh live quote">
-          <RefreshCw size={12} aria-hidden="true" />
-        </button>
-        <small>
-          {quote?.sourceSymbol ?? "Provider not configured"}
-          {quoteAge(quote) ? ` · ${quoteAge(quote)}` : ""}
-        </small>
-      </div>
+      ) : null}
 
       <div className={styles.amountHeader}>
         <label className={styles.fieldLabel} htmlFor="trade-amount">
@@ -2384,7 +2487,7 @@ function OrderTicket({
       <details className={styles.ticketDetails} open>
         <summary>
           <span><ShieldCheck size={14} aria-hidden="true" /> Eligibility</span>
-          <small>{eligibilityAccepted && /^[A-Z]{2}$/.test(eligibilityCountryCode) ? "Confirmed" : "Required"} <ChevronDown size={13} aria-hidden="true" /></small>
+          <small>{countryRestriction ? "Restricted" : eligibilityAccepted && /^[A-Z]{2}$/.test(eligibilityCountryCode) ? "Confirmed" : "Required"} <ChevronDown size={13} aria-hidden="true" /></small>
         </summary>
         <div className={styles.ticketDetailsBody}>
           <div className={styles.eligibilityGate}>
@@ -2408,7 +2511,11 @@ function OrderTicket({
               />
               <span>I am of legal age, accept the issuer terms, and am not a restricted person.</span>
             </label>
-            <small>Closed beta uses this evidence to fail closed on issuer and jurisdiction restrictions.</small>
+            {countryRestriction ? (
+              <small className={styles.walletError} role="alert">{countryRestriction}</small>
+            ) : (
+              <small>Closed beta checks this evidence against the product's current country policy.</small>
+            )}
           </div>
         </div>
       </details>
@@ -2433,6 +2540,8 @@ function OrderTicket({
             ? `Insufficient ${product.ticker} balance`
           : !/^[A-Z]{2}$/.test(eligibilityCountryCode)
             ? "Enter two-letter residence code"
+          : countryRestriction
+            ? "Product unavailable in this country"
           : !eligibilityAccepted
             ? "Confirm product eligibility"
           : !canStartSelectedRoute

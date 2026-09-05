@@ -1,0 +1,63 @@
+{
+  "name": "Hedgents Relic #096 — Imperial Ovoid",
+  "symbol": "RELIC",
+  "description": "An Epic Imperial Ovoid from the fixed 100-piece Hedgents Genesis collection. Burn redemption transfers the ticket's exact onchain PAXG amount. No physical artefact delivery.",
+  "image": "../final/096-epic-imperial-ovoid.webp",
+  "attributes": [
+    {
+      "trait_type": "Edition",
+      "value": 96
+    },
+    {
+      "trait_type": "Tier",
+      "value": "Epic"
+    },
+    {
+      "trait_type": "Artefact",
+      "value": "Imperial Ovoid"
+    },
+    {
+      "trait_type": "field",
+      "value": "star-map"
+    },
+    {
+      "trait_type": "aura",
+      "value": "sapphire-constellation"
+    },
+    {
+      "trait_type": "finish",
+      "value": "pale-celestial-gold"
+    },
+    {
+      "trait_type": "lattice",
+      "value": "observatory-lattice"
+    },
+    {
+      "trait_type": "enamel",
+      "value": "midnight-blue"
+    },
+    {
+      "trait_type": "mineral",
+      "value": "sapphire"
+    },
+    {
+      "trait_type": "Redemption target at funding snapshot (USD)",
+      "value": 110
+    }
+  ],
+  "properties": {
+    "category": "image",
+    "files": [
+      {
+        "uri": "../final/096-epic-imperial-ovoid.webp",
+        "type": "image/webp"
+      }
+    ],
+    "collection": "Hedgents Relics — Genesis",
+    "noPhysicalDelivery": true,
+    "metadataStatus": "template-until-campaign-funding",
+    "authoritativeRedemption": "Exact atomic PAXG amount recorded in the campaign ticket account",
+    "recipeSha256": "5797c755f80b41a707fbe476dee7006ce8b0cd5742203422d6b8d0fb3e4bf1f1",
+    "imageSha256": "3ae882a48895359d5052aa0784ed5f2f5cc4d92a228765f464fdab9293153075"
+  }
+}

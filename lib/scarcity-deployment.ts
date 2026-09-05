@@ -30,6 +30,14 @@ export interface ScarcityDeploymentManifest {
    * scalar market ID and commitments are compiled from that stored document.
    */
   curveMarkets?: Record<string, { creationSignature: string; resolver: string }>;
+  /**
+   * Superseded curve markets: deployed on-chain, retired from the manifest's
+   * live set before third-party stake. Recorded so positions in them surface
+   * as "superseded · refund pending" instead of being silently dropped from
+   * portfolio reads. Commitment verification is skipped for these accounts
+   * (their committed rules are exactly why they were retired).
+   */
+  supersededMarkets?: Record<string, { market: string; reason: string }>;
 }
 
 export interface ResolvedScarcityDeployment {
@@ -57,6 +65,7 @@ export interface ResolvedScarcityDeployment {
     compiledSlug: string;
     sourceSlug: string;
   }>;
+  supersededMarkets: Record<string, { market: string; reason: string }>;
 }
 
 export async function resolveStoredCurveMarket(identifier: string): Promise<{
@@ -118,6 +127,21 @@ function parseManifest(): ScarcityDeploymentManifest | null {
     && (typeof manifest.curveMarkets !== "object" || manifest.curveMarkets === null || Array.isArray(manifest.curveMarkets))
   ) {
     throw new Error("Scarcity deployment curve markets must be an object.");
+  }
+  if (
+    manifest.supersededMarkets !== undefined
+    && (typeof manifest.supersededMarkets !== "object" || manifest.supersededMarkets === null || Array.isArray(manifest.supersededMarkets))
+  ) {
+    throw new Error("Scarcity deployment superseded markets must be an object.");
+  }
+  for (const [key, entry] of Object.entries(manifest.supersededMarkets ?? {})) {
+    if (!entry || typeof entry !== "object" || Array.isArray(entry)) {
+      throw new Error(`Scarcity deployment superseded market ${key} must be an object.`);
+    }
+    if (typeof entry.market !== "string" || typeof entry.reason !== "string" || !entry.reason.trim()) {
+      throw new Error(`Scarcity deployment superseded market ${key} needs a market address and a reason.`);
+    }
+    address(entry.market);
   }
   if (manifest.cluster === "mainnet-beta" && manifest.collateralMint !== String(MAINNET_USDC_MINT)) {
     throw new Error("Mainnet scarcity collateral must be canonical Solana USDC.");
@@ -181,6 +205,7 @@ export async function loadScarcityDeployment(): Promise<ResolvedScarcityDeployme
     governance: manifest.governance,
     markets,
     curveMarkets,
+    supersededMarkets: manifest.supersededMarkets ?? {},
   };
 }
 

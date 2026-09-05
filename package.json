@@ -9,13 +9,16 @@
     "test": "tsx --test lib/*.test.ts lib/**/*.test.ts",
     "test:e2e": "playwright test",
     "test:scarcity-localnet": "../scarcity-exchange/scripts/localnet-e2e.sh",
+    "scarcity:retire-superseded": "tsx scripts/retire-superseded-market.ts",
     "generate:scarcity-usgs": "node --import tsx scripts/build-usgs-scarcity-baseline.ts",
     "sync:scarcity-idl": "cp ../scarcity-exchange/target/idl/scarcity_exchange.json lib/scarcity-exchange/generated/scarcity_exchange.json && cp ../scarcity-exchange/target/types/scarcity_exchange.ts lib/scarcity-exchange/generated/scarcity_exchange.ts",
     "probe:metals": "tsx scripts/probe-metal-routes.ts",
     "probe:sells": "tsx scripts/probe-metal-sells.ts",
     "simulate:metals": "tsx scripts/simulate-metal-matrix.ts",
     "sample:envelope": "tsx scripts/sample-guard-envelope.ts",
-    "detector:run": "tsx scripts/run-online-detector.ts"
+    "detector:run": "tsx scripts/run-online-detector.ts",
+    "build:relic-art": "tsx scripts/build-relic-genesis-art-v2.ts",
+    "build:relic-art:v1": "tsx scripts/build-relic-genesis-art.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.4.1",

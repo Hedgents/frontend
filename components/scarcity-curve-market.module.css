@@ -351,6 +351,16 @@
   line-height: 1.5;
 }
 
+.metricHeader p.metricNote {
+  margin-top: 6px;
+  padding-left: 10px;
+  border-left: 2px solid color-mix(in oklch, var(--gold, #c9a84c) 45%, transparent);
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 10px;
+  letter-spacing: 0.02em;
+  opacity: 0.85;
+}
+
 .metricHeader dl {
   display: grid;
   grid-template-columns: repeat(3, minmax(82px, 1fr));

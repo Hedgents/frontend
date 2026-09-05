@@ -295,6 +295,14 @@ export function ScarcityPortfolioPanel({
         {curvePositions.length ? <div className={styles.curvePositionLedger}>
           <header><span>Curve forecasts</span><small>Nontransferable onchain positions</small></header>
           {curvePositions.map((position) => {
+            if (position.superseded) {
+              return <div key={`${position.market}-${position.bucket}`} className={styles.curvePositionSuperseded}>
+                <span><i style={{ background: "#8a8a8a" }} /><strong>Retired</strong><small>{position.slug}</small></span>
+                <span><strong>bucket {position.bucket + 1}</strong><small>superseded market</small></span>
+                <span><strong>{baseUnits(position.stake)}</strong><small>USDC staked</small></span>
+                <span><strong>{position.claimed ? "Refunded" : position.status === "invalid" ? baseUnits(position.claimable) : "Pending"}</strong><small>{position.claimed ? "One-for-one refund claimed" : position.status === "invalid" ? "USDC refundable" : "Superseded · refund pending"}</small></span>
+              </div>;
+            }
             const market = markets.find((candidate) => candidate.curve?.slug === position.slug || candidate.slug === position.slug);
             if (!market?.curve) return null;
             const normalized = -1_000_000 + Math.round(position.bucket * 2_000_000 / Math.max(1, position.bucketCount - 1));

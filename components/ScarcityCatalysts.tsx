@@ -89,7 +89,7 @@ export function ScarcityCatalysts(props: {
       <header className={styles.hero}>
         <div className={styles.heroCopy}>
           <span>Hedgents / Metal catalyst map</span>
-          <h1>Every metal has<br /><em>a future to predict.</em></h1>
+          <h1>Every metal has<br /><em>a state to verify.</em></h1>
           <p>Prices · supply · policy · projects · science. Hedgents turns objective observations and verifiable future events into binary metal markets.</p>
         </div>
         <div className={styles.coveragePlate}>

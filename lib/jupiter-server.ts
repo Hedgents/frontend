@@ -42,7 +42,7 @@ interface JupiterErrorPayload {
   code?: unknown;
 }
 
-/** The routing key, for callers that need it to read Jupiter's own metadata endpoints. */
+/** The optional routing key, for callers that need to read Jupiter's own metadata endpoints. */
 export function jupiterApiKeyForRouting() {
   return jupiterApiKey();
 }
@@ -52,14 +52,27 @@ export function hasJupiterApiKey() {
 }
 
 function jupiterApiKey() {
-  const value = process.env.JUPITER_API_KEY?.trim();
-  if (!value) {
-    throw new ExecutionValidationError(
-      "Jupiter execution is not configured on this deployment. Add the server-only JUPITER_API_KEY.",
-      503,
-    );
-  }
-  return value;
+  return process.env.JUPITER_API_KEY?.trim() || null;
+}
+
+function jupiterHeaders(base: Record<string, string> = {}) {
+  const apiKey = jupiterApiKey();
+  return apiKey ? { ...base, "x-api-key": apiKey } : base;
+}
+
+// Jupiter's keyless order tier is intentionally low-volume. Reserve starts synchronously so
+// concurrent comparisons cannot burst above the documented half-request-per-second allowance.
+// A configured API key bypasses this queue and keeps the production upgrade path straightforward.
+const KEYLESS_ORDER_INTERVAL_MS = 2_100;
+let nextKeylessOrderStartAt = 0;
+
+async function waitForKeylessOrderSlot() {
+  if (hasJupiterApiKey()) return;
+  const now = Date.now();
+  const reservedStartAt = Math.max(now, nextKeylessOrderStartAt);
+  nextKeylessOrderStartAt = reservedStartAt + KEYLESS_ORDER_INTERVAL_MS;
+  const delayMs = reservedStartAt - now;
+  if (delayMs > 0) await new Promise((resolve) => setTimeout(resolve, delayMs));
 }
 
 async function errorMessage(response: Response) {
@@ -86,11 +99,12 @@ async function errorMessage(response: Response) {
 }
 
 export async function getJupiterOrder(params: URLSearchParams) {
+  await waitForKeylessOrderSlot();
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 12_000);
   try {
     const response = await fetch(`${JUPITER_SWAP_V2}/order?${params}`, {
-      headers: { "x-api-key": jupiterApiKey() },
+      headers: jupiterHeaders(),
       cache: "no-store",
       signal: controller.signal,
     });
@@ -124,10 +138,7 @@ export async function executeJupiterOrder(input: JupiterExecuteInput) {
   try {
     const response = await fetch(`${JUPITER_SWAP_V2}/execute`, {
       method: "POST",
-      headers: {
-        "content-type": "application/json",
-        "x-api-key": jupiterApiKey(),
-      },
+      headers: jupiterHeaders({ "content-type": "application/json" }),
       cache: "no-store",
       signal: controller.signal,
       body: JSON.stringify(body),

@@ -9,7 +9,7 @@
  * It also reports each distinct program-set fingerprint, which is what the optional
  * HEDGENTS_SOLANA_PROGRAM_FINGERPRINT_ALLOWLIST pin would have to enumerate.
  *
- * No key is used, nothing is signed, and nothing is submitted.
+ * No key is required, nothing is signed, and nothing is submitted.
  *
  *   npx tsx scripts/sample-guard-envelope.ts [productId] [samplesPerSize]
  */
@@ -23,7 +23,12 @@ const ASSOCIATED_TOKEN_PROGRAM_ID = "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8kn
 const addressEncoder = getAddressEncoder();
 
 const apiKey = process.env.JUPITER_API_KEY?.trim();
-if (!apiKey) throw new Error("JUPITER_API_KEY is required.");
+const jupiterHeaders: Record<string, string> = apiKey ? { "x-api-key": apiKey } : {};
+const jupiterPauseMs = apiKey ? 900 : 2_100;
+const configuredProgramAllowlist = new Set(
+  (process.env.HEDGENTS_SOLANA_PROGRAM_ALLOWLIST ?? "")
+    .split(",").map((value) => value.trim()).filter(Boolean),
+);
 
 const rpcUrls = [...new Set((process.env.HEDGENTS_SOLANA_MAINNET_RPC_URLS ?? "")
   .split(",").map((value) => value.trim()).filter(Boolean))];
@@ -79,8 +84,12 @@ async function rpcRequest<T>(method: string, params: unknown[]) {
 }
 
 async function jupiterOrder(params: URLSearchParams) {
+  const constrainedParams = new URLSearchParams(params);
+  if (product.execution.excludedDexes.length > 0) {
+    constrainedParams.set("excludeDexes", product.execution.excludedDexes.join(","));
+  }
   for (let attempt = 0; attempt < 4; attempt += 1) {
-    const response = await fetch(`${JUPITER_ORDER_URL}?${params}`, { headers: { "x-api-key": apiKey! } });
+    const response = await fetch(`${JUPITER_ORDER_URL}?${constrainedParams}`, { headers: jupiterHeaders });
     const payload = (await response.json()) as Record<string, unknown>;
     if (response.ok) return payload;
     if (response.status !== 429 && response.status < 500) {
@@ -149,7 +158,7 @@ async function sampleOnce(
     outputMint,
     amount: inputAmount,
     taker,
-    excludeRouters: "jupiterz",
+    excludeRouters: "jupiterz,okx,dflow",
   }));
   if (payload.inputMint !== inputMint || payload.outputMint !== outputMint || payload.inAmount !== inputAmount) {
     throw new Error("Jupiter returned an unexpected asset or amount.");
@@ -184,6 +193,12 @@ async function sampleOnce(
     minimumOutputAmount,
     maximumSolDebitLamports: "1000000000",
   });
+  const unreviewedPrograms = guard.programIds.filter(
+    (programId) => !configuredProgramAllowlist.has(programId),
+  );
+  if (unreviewedPrograms.length > 0) {
+    throw new Error(`Route contains unreviewed programs: ${unreviewedPrograms.join(", ")}`);
+  }
   return {
     direction,
     sizeUsd,
@@ -206,7 +221,10 @@ async function main() {
 
   const samples: Sample[] = [];
   const failures: Array<{ direction: string; sizeUsd: number; error: string }> = [];
-  let sellTaker: string | null = null;
+  let sellTaker = process.env.HEDGENTS_SELL_SIMULATION_WALLET?.trim() || null;
+  if (sellTaker && !/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(sellTaker)) {
+    throw new Error("HEDGENTS_SELL_SIMULATION_WALLET must be a valid public Solana address.");
+  }
 
   for (const sizeUsd of sizesUsd) {
     const buyAmount = String(Math.round(sizeUsd * 10 ** settlement.decimals));
@@ -216,7 +234,7 @@ async function main() {
       } catch (error) {
         failures.push({ direction: "buy", sizeUsd, error: error instanceof Error ? error.message : String(error) });
       }
-      await wait(900);
+      await wait(jupiterPauseMs);
     }
   }
 
@@ -230,7 +248,7 @@ async function main() {
         outputMint: product.mint,
         amount: String(Math.round(sizeUsd * 10 ** settlement.decimals)),
         taker: buyTaker,
-        excludeRouters: "jupiterz",
+        excludeRouters: "jupiterz,okx,dflow",
       }));
       sellAmount = BigInt(String(order.outAmount));
     } catch {
@@ -253,7 +271,7 @@ async function main() {
       } catch (error) {
         failures.push({ direction: "sell", sizeUsd, error: error instanceof Error ? error.message : String(error) });
       }
-      await wait(900);
+      await wait(jupiterPauseMs);
     }
   }
 

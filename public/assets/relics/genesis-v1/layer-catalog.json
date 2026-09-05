@@ -1,0 +1,339 @@
+{
+  "canvas": {
+    "width": 1254,
+    "height": 1254
+  },
+  "count": 55,
+  "layers": [
+    {
+      "group": "shared",
+      "slot": "field",
+      "id": "assay-circles",
+      "file": "layers/shared/field/assay-circles.png"
+    },
+    {
+      "group": "shared",
+      "slot": "field",
+      "id": "eclipse",
+      "file": "layers/shared/field/eclipse.png"
+    },
+    {
+      "group": "shared",
+      "slot": "field",
+      "id": "vault-grid",
+      "file": "layers/shared/field/vault-grid.png"
+    },
+    {
+      "group": "shared",
+      "slot": "field",
+      "id": "star-map",
+      "file": "layers/shared/field/star-map.png"
+    },
+    {
+      "group": "shared",
+      "slot": "aura",
+      "id": "assay-dust",
+      "file": "layers/shared/aura/assay-dust.png"
+    },
+    {
+      "group": "shared",
+      "slot": "aura",
+      "id": "orbital-trail",
+      "file": "layers/shared/aura/orbital-trail.png"
+    },
+    {
+      "group": "shared",
+      "slot": "aura",
+      "id": "emerald-seal",
+      "file": "layers/shared/aura/emerald-seal.png"
+    },
+    {
+      "group": "shared",
+      "slot": "aura",
+      "id": "garnet-inner-radiance",
+      "file": "layers/shared/aura/garnet-inner-radiance.png"
+    },
+    {
+      "group": "shared",
+      "slot": "aura",
+      "id": "sapphire-constellation",
+      "file": "layers/shared/aura/sapphire-constellation.png"
+    },
+    {
+      "group": "shared",
+      "slot": "aura",
+      "id": "solar-corona",
+      "file": "layers/shared/aura/solar-corona.png"
+    },
+    {
+      "group": "common",
+      "slot": "finish",
+      "id": "satin-assay",
+      "file": "layers/common/finish/satin-assay.png"
+    },
+    {
+      "group": "common",
+      "slot": "finish",
+      "id": "mirror-edge",
+      "file": "layers/common/finish/mirror-edge.png"
+    },
+    {
+      "group": "common",
+      "slot": "finish",
+      "id": "hammered-field",
+      "file": "layers/common/finish/hammered-field.png"
+    },
+    {
+      "group": "common",
+      "slot": "finish",
+      "id": "blackened-recess",
+      "file": "layers/common/finish/blackened-recess.png"
+    },
+    {
+      "group": "common",
+      "slot": "engraving",
+      "id": "sun-ray",
+      "file": "layers/common/engraving/sun-ray.png"
+    },
+    {
+      "group": "common",
+      "slot": "engraving",
+      "id": "orbital-groove",
+      "file": "layers/common/engraving/orbital-groove.png"
+    },
+    {
+      "group": "common",
+      "slot": "engraving",
+      "id": "labyrinth",
+      "file": "layers/common/engraving/labyrinth.png"
+    },
+    {
+      "group": "common",
+      "slot": "engraving",
+      "id": "chevron",
+      "file": "layers/common/engraving/chevron.png"
+    },
+    {
+      "group": "common",
+      "slot": "engraving",
+      "id": "constellation",
+      "file": "layers/common/engraving/constellation.png"
+    },
+    {
+      "group": "common",
+      "slot": "engraving",
+      "id": "assay-bars",
+      "file": "layers/common/engraving/assay-bars.png"
+    },
+    {
+      "group": "common",
+      "slot": "engraving",
+      "id": "stepped-grid",
+      "file": "layers/common/engraving/stepped-grid.png"
+    },
+    {
+      "group": "common",
+      "slot": "engraving",
+      "id": "tidal-line",
+      "file": "layers/common/engraving/tidal-line.png"
+    },
+    {
+      "group": "common",
+      "slot": "inset",
+      "id": "obsidian",
+      "file": "layers/common/inset/obsidian.png"
+    },
+    {
+      "group": "common",
+      "slot": "inset",
+      "id": "garnet",
+      "file": "layers/common/inset/garnet.png"
+    },
+    {
+      "group": "common",
+      "slot": "inset",
+      "id": "emerald",
+      "file": "layers/common/inset/emerald.png"
+    },
+    {
+      "group": "common",
+      "slot": "inset",
+      "id": "moonstone",
+      "file": "layers/common/inset/moonstone.png"
+    },
+    {
+      "group": "uncommon",
+      "slot": "finish",
+      "id": "satin-assay",
+      "file": "layers/uncommon/finish/satin-assay.png"
+    },
+    {
+      "group": "uncommon",
+      "slot": "finish",
+      "id": "mirror-edge",
+      "file": "layers/uncommon/finish/mirror-edge.png"
+    },
+    {
+      "group": "uncommon",
+      "slot": "finish",
+      "id": "blackened-recess",
+      "file": "layers/uncommon/finish/blackened-recess.png"
+    },
+    {
+      "group": "uncommon",
+      "slot": "clasp",
+      "id": "monolith",
+      "file": "layers/uncommon/clasp/monolith.png"
+    },
+    {
+      "group": "uncommon",
+      "slot": "clasp",
+      "id": "twin-orbit",
+      "file": "layers/uncommon/clasp/twin-orbit.png"
+    },
+    {
+      "group": "uncommon",
+      "slot": "clasp",
+      "id": "garnet-assay",
+      "file": "layers/uncommon/clasp/garnet-assay.png"
+    },
+    {
+      "group": "uncommon",
+      "slot": "clasp",
+      "id": "emerald-gate",
+      "file": "layers/uncommon/clasp/emerald-gate.png"
+    },
+    {
+      "group": "uncommon",
+      "slot": "clasp",
+      "id": "sapphire-lozenge",
+      "file": "layers/uncommon/clasp/sapphire-lozenge.png"
+    },
+    {
+      "group": "uncommon",
+      "slot": "charm",
+      "id": "celestial-coin",
+      "file": "layers/uncommon/charm/celestial-coin.png"
+    },
+    {
+      "group": "uncommon",
+      "slot": "charm",
+      "id": "garnet-drop",
+      "file": "layers/uncommon/charm/garnet-drop.png"
+    },
+    {
+      "group": "uncommon",
+      "slot": "charm",
+      "id": "emerald-knot",
+      "file": "layers/uncommon/charm/emerald-knot.png"
+    },
+    {
+      "group": "uncommon",
+      "slot": "charm",
+      "id": "moonstone-claw",
+      "file": "layers/uncommon/charm/moonstone-claw.png"
+    },
+    {
+      "group": "uncommon",
+      "slot": "orbit",
+      "id": "single-orbit",
+      "file": "layers/uncommon/orbit/single-orbit.png"
+    },
+    {
+      "group": "uncommon",
+      "slot": "orbit",
+      "id": "twin-orbit",
+      "file": "layers/uncommon/orbit/twin-orbit.png"
+    },
+    {
+      "group": "uncommon",
+      "slot": "orbit",
+      "id": "broken-orbit",
+      "file": "layers/uncommon/orbit/broken-orbit.png"
+    },
+    {
+      "group": "rare",
+      "slot": "finish",
+      "id": "satin-assay",
+      "file": "layers/rare/finish/satin-assay.png"
+    },
+    {
+      "group": "rare",
+      "slot": "finish",
+      "id": "mirror-edge",
+      "file": "layers/rare/finish/mirror-edge.png"
+    },
+    {
+      "group": "rare",
+      "slot": "finish",
+      "id": "blackened-recess",
+      "file": "layers/rare/finish/blackened-recess.png"
+    },
+    {
+      "group": "rare",
+      "slot": "seal",
+      "id": "octagonal-assay",
+      "file": "layers/rare/seal/octagonal-assay.png"
+    },
+    {
+      "group": "rare",
+      "slot": "seal",
+      "id": "sun",
+      "file": "layers/rare/seal/sun.png"
+    },
+    {
+      "group": "rare",
+      "slot": "seal",
+      "id": "orbit",
+      "file": "layers/rare/seal/orbit.png"
+    },
+    {
+      "group": "rare",
+      "slot": "seal",
+      "id": "labyrinth",
+      "file": "layers/rare/seal/labyrinth.png"
+    },
+    {
+      "group": "rare",
+      "slot": "seal",
+      "id": "celestial-compass",
+      "file": "layers/rare/seal/celestial-compass.png"
+    },
+    {
+      "group": "rare",
+      "slot": "seal",
+      "id": "lattice",
+      "file": "layers/rare/seal/lattice.png"
+    },
+    {
+      "group": "rare",
+      "slot": "seal",
+      "id": "eclipse",
+      "file": "layers/rare/seal/eclipse.png"
+    },
+    {
+      "group": "rare",
+      "slot": "mineral",
+      "id": "emerald-pair",
+      "file": "layers/rare/mineral/emerald-pair.png"
+    },
+    {
+      "group": "rare",
+      "slot": "mineral",
+      "id": "garnet-pair",
+      "file": "layers/rare/mineral/garnet-pair.png"
+    },
+    {
+      "group": "rare",
+      "slot": "mineral",
+      "id": "sapphire-pair",
+      "file": "layers/rare/mineral/sapphire-pair.png"
+    },
+    {
+      "group": "rare",
+      "slot": "mineral",
+      "id": "moonstone-pair",
+      "file": "layers/rare/mineral/moonstone-pair.png"
+    }
+  ]
+}

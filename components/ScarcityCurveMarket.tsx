@@ -349,8 +349,9 @@ export function ScarcityCurveMarket({
         <header className={styles.metricHeader}>
           <div>
             <span>SCX / {curveMarket.metal.symbol} / forecast pool</span>
-            <h1 id="curve-market-title">Predict {curveMarket.metal.name}&apos;s final scarcity score.</h1>
+            <h1 id="curve-market-title">Forecast where the {curveMarket.metal.name} tightness score settles.</h1>
             <p>Pick a number from 0 (loose supply) to 100 (tight supply). Closer forecasts earn more of the shared USDC pool; payout minus stake is your profit or loss, and your stake is the most you can lose. The oracle publishes the final {curve.metric.label.toLowerCase()} at <time dateTime={curve.metric.observedAt}>{formatDateTime(curve.metric.observedAt)}</time>.</p>
+            <p className={styles.metricNote}>The score measures today&apos;s {curve.metric.label.toLowerCase()}. It is not a price forecast and has not been shown to lead {curveMarket.metal.name.toLowerCase()} price.</p>
           </div>
           <dl>
             <div><dt>Latest oracle score</dt><dd>{currentScore === null ? <span className={styles.missingValue}>Awaiting data</span> : <>{metricValue(currentScore, curve.metric.precision)} <small>{displayUnit}</small></>}</dd></div>

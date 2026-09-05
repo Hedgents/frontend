@@ -413,6 +413,12 @@
   padding-top: 18px;
 }
 
+.mainRelics {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
 @media (min-width: 861px) {
   .terminalScarcity {
     position: fixed;
@@ -467,6 +473,14 @@
   font-weight: 400;
 }
 
+.executionThesis {
+  max-width: 720px;
+  margin: 16px 0 0;
+  color: var(--paper-muted);
+  font: 500 13px/1.55 var(--font-mono), monospace;
+  letter-spacing: 0.01em;
+}
+
 .marketStats {
   display: flex;
   border-top: 1px solid var(--line-strong);
@@ -492,6 +506,173 @@
 
 .marketStats strong {
   font: 500 21px/1 var(--font-display), serif;
+}
+
+.assuranceBar {
+  position: relative;
+  z-index: 4;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: -10px 0 14px;
+  padding: 6px 8px 6px 14px;
+  border: 1px solid var(--line);
+  background:
+    linear-gradient(90deg, rgba(104, 212, 164, 0.055), transparent 42%),
+    rgba(9, 11, 9, 0.42);
+  animation: riseIn 560ms cubic-bezier(0.22, 1, 0.36, 1) 55ms both;
+}
+
+.assuranceSignal {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: var(--green);
+}
+
+.assuranceSignal strong {
+  color: var(--paper);
+  font: 600 12px/1 var(--font-mono), monospace;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.assuranceSignal span {
+  overflow: hidden;
+  color: var(--paper-faint);
+  font: 500 12px/1 var(--font-mono), monospace;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hoverDisclosure {
+  position: relative;
+}
+
+.hoverDisclosure > summary {
+  min-height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 0 9px;
+  border: 1px solid var(--line);
+  color: var(--paper-muted);
+  background: rgba(235, 230, 220, 0.025);
+  font: 600 12px/1 var(--font-mono), monospace;
+  letter-spacing: 0.08em;
+  list-style: none;
+  text-transform: uppercase;
+  cursor: help;
+  transition: color 160ms ease, border-color 160ms ease, background 160ms ease;
+}
+
+.hoverDisclosure > summary::-webkit-details-marker {
+  display: none;
+}
+
+.hoverDisclosure > summary:hover,
+.hoverDisclosure > summary:focus-visible,
+.hoverDisclosure[open] > summary {
+  outline: none;
+  border-color: rgba(207, 158, 71, 0.46);
+  color: var(--gold-bright);
+  background: rgba(207, 158, 71, 0.065);
+}
+
+.hoverDisclosure > summary svg:last-child {
+  transition: transform 160ms ease;
+}
+
+.hoverDisclosure[open] > summary svg:last-child {
+  transform: rotate(180deg);
+}
+
+.assurancePopover,
+.comparisonPopover,
+.productPopover,
+.betaExecutionPopover {
+  position: absolute;
+  top: calc(100% + 7px);
+  right: 0;
+  z-index: 40;
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-4px);
+  transition: opacity 150ms ease, transform 150ms ease, visibility 150ms ease;
+}
+
+.hoverDisclosure[open] > .assurancePopover,
+.hoverDisclosure[open] > .comparisonPopover,
+.hoverDisclosure[open] > .productPopover,
+.hoverDisclosure[open] > .betaExecutionPopover,
+.hoverDisclosure:focus-within > .assurancePopover,
+.hoverDisclosure:focus-within > .comparisonPopover,
+.hoverDisclosure:focus-within > .productPopover,
+.hoverDisclosure:focus-within > .betaExecutionPopover {
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+@media (hover: hover) {
+  .hoverDisclosure:hover > .assurancePopover,
+  .hoverDisclosure:hover > .comparisonPopover,
+  .hoverDisclosure:hover > .productPopover,
+  .hoverDisclosure:hover > .betaExecutionPopover {
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+}
+
+.assurancePopover {
+  width: min(660px, calc(100vw - 32px));
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border: 1px solid rgba(207, 158, 71, 0.34);
+  background:
+    linear-gradient(135deg, rgba(207, 158, 71, 0.09), transparent 36%),
+    #111410;
+  box-shadow: 0 22px 56px rgba(0, 0, 0, 0.55);
+}
+
+.assurancePopover article {
+  min-width: 0;
+  padding: 16px;
+  border-right: 1px solid var(--line);
+}
+
+.assurancePopover article:last-child {
+  border-right: 0;
+}
+
+.assurancePopover article > span {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--gold);
+  font: 650 12px/1 var(--font-mono), monospace;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.assurancePopover article > strong {
+  color: var(--paper);
+  font: 500 17px/1.2 var(--font-display), serif;
+}
+
+.assurancePopover article > p {
+  margin: 7px 0 0;
+  color: var(--paper-faint);
+  font: 500 12px/1.5 var(--font-mono), monospace;
 }
 
 .workspace {
@@ -1119,11 +1300,70 @@
   font: 600 12px/1 var(--font-mono), monospace;
 }
 
-.comparisonStatus > small {
+.comparisonDisclosure {
   justify-self: end;
+}
+
+.comparisonDisclosure > summary {
+  min-height: 26px;
+  border-color: transparent;
+  background: transparent;
+}
+
+.comparisonPopover {
+  width: min(360px, calc(100vw - 32px));
+  padding: 13px 14px;
+  border: 1px solid rgba(207, 158, 71, 0.3);
+  color: var(--paper-muted);
+  background: #111410;
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.5);
+  font: 500 12px/1.55 var(--font-mono), monospace;
+}
+
+.productQuickFacts {
+  position: relative;
+  z-index: 3;
+  min-height: 62px;
+  display: grid;
+  grid-template-columns: minmax(150px, 0.8fr) minmax(220px, 1.4fr) auto;
+  align-items: center;
+  gap: 10px 22px;
+  padding: 10px 13px 10px 17px;
+  background:
+    linear-gradient(90deg, rgba(207, 158, 71, 0.04), transparent 42%),
+    rgba(7, 9, 7, 0.22);
+}
+
+.productQuickFacts > div {
+  min-width: 0;
+  display: grid;
+  gap: 5px;
+}
+
+.productQuickFacts > div > span {
   color: var(--paper-faint);
-  font: 500 12px/1.35 var(--font-mono), monospace;
-  text-align: right;
+  font: 600 12px/1 var(--font-mono), monospace;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.productQuickFacts > div > strong {
+  overflow: hidden;
+  color: var(--paper-muted);
+  font: 550 12px/1.25 var(--font-mono), monospace;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.productDisclosure {
+  justify-self: end;
+}
+
+.productPopover {
+  width: min(820px, calc(100vw - 32px));
+  border: 1px solid rgba(207, 158, 71, 0.36);
+  background: #111410;
+  box-shadow: 0 28px 70px rgba(0, 0, 0, 0.62);
 }
 
 .passport {
@@ -1366,7 +1606,7 @@
   justify-content: space-between;
   align-items: flex-start;
   gap: 20px;
-  margin-bottom: 18px;
+  margin-bottom: 14px;
 }
 
 .ticketTopline h2 {
@@ -1374,10 +1614,24 @@
   font: 500 28px/1 var(--font-display), serif;
 }
 
+.ticketToplineMeta {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 8px;
+}
+
+.ticketToplineMeta > span:first-child {
+  color: var(--paper-faint);
+  font: 550 12px/1.2 var(--font-mono), monospace;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
 .betaExecutionControl {
   display: grid;
-  grid-template-columns: auto 1fr;
-  align-items: baseline;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
   gap: 5px 10px;
   margin: -4px 0 16px;
   padding: 10px 11px;
@@ -1400,10 +1654,26 @@
   font: 600 12px/1 var(--font-mono), monospace;
 }
 
-.betaExecutionControl > small {
-  grid-column: 1 / -1;
-  color: var(--paper-faint);
-  font: 500 12px/1.4 var(--font-mono), monospace;
+.betaExecutionDisclosure {
+  justify-self: end;
+}
+
+.betaExecutionDisclosure > summary {
+  width: 27px;
+  min-height: 26px;
+  padding: 0;
+  border-color: transparent;
+  background: transparent;
+}
+
+.betaExecutionPopover {
+  width: min(310px, calc(100vw - 32px));
+  padding: 12px 13px;
+  border: 1px solid rgba(207, 158, 71, 0.32);
+  color: var(--paper-muted);
+  background: #111410;
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.52);
+  font: 500 12px/1.5 var(--font-mono), monospace;
 }
 
 .betaExecutionControlPaused {
@@ -4082,6 +4352,11 @@ label.receiptButton {
     padding-top: 6px;
   }
 
+  .mainRelics {
+    width: 100%;
+    padding: 0;
+  }
+
   .marketMasthead,
   .secondaryMasthead {
     align-items: flex-start;
@@ -4109,6 +4384,70 @@ label.receiptButton {
     border-right: 0;
   }
 
+  .assuranceBar {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 5px;
+    margin-top: -4px;
+    padding: 10px;
+  }
+
+  .assuranceSignal {
+    min-height: 30px;
+  }
+
+  .assuranceBar .hoverDisclosure > summary {
+    width: 100%;
+  }
+
+  .assurancePopover,
+  .comparisonPopover,
+  .productPopover {
+    position: static;
+    width: 100%;
+    margin-top: 7px;
+    transform: none;
+  }
+
+  .assurancePopover {
+    grid-template-columns: 1fr;
+  }
+
+  .assurancePopover article {
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .assurancePopover article:last-child {
+    border-bottom: 0;
+  }
+
+  .productQuickFacts {
+    grid-template-columns: 1fr;
+    gap: 11px;
+    padding-block: 13px;
+  }
+
+  .productPanel,
+  .ticket {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .productPanel {
+    overflow: hidden;
+  }
+
+  .productDisclosure {
+    width: 100%;
+    justify-self: stretch;
+  }
+
+  .productDisclosure > summary {
+    width: 100%;
+  }
+
   .panelToolbar {
     align-items: stretch;
     flex-direction: column;
@@ -4134,22 +4473,45 @@ label.receiptButton {
     display: none;
   }
 
+  .marketPanel,
+  .marketTable {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .marketPanel {
+    overflow: hidden;
+  }
+
+  .marketRows {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    display: flex;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    scroll-snap-type: inline mandatory;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(207, 158, 71, 0.42) transparent;
+  }
+
+  .marketRows > li {
+    flex: 0 0 172px;
+    scroll-snap-align: start;
+    border-right: 1px solid var(--line);
+  }
+
   .marketRow {
-    grid-template-columns: minmax(160px, 1fr) auto;
-    gap: 10px 15px;
-    min-height: 94px;
+    width: 100%;
+    grid-template-columns: 1fr;
+    align-content: center;
+    gap: 10px;
+    min-height: 102px;
     padding: 12px 13px;
   }
 
-  .coverageCell,
   .priceCell {
-    align-items: flex-end;
-    text-align: right;
-  }
-
-  .priceCell {
-    grid-column: 2;
-    grid-row: 1;
+    display: none;
   }
 
   .coverageCell {
@@ -4160,17 +4522,30 @@ label.receiptButton {
     text-align: left;
   }
 
-  .changeCell {
-    display: none;
-  }
-
+  .changeCell,
   .routeStateCell {
-    grid-column: 2;
-    grid-row: 2;
+    display: none;
   }
 
   .productHeader {
     align-items: flex-start;
+  }
+
+  .productTabs {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    display: flex;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    scroll-snap-type: inline mandatory;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(207, 158, 71, 0.42) transparent;
+  }
+
+  .productTabs button {
+    flex: 0 0 216px;
+    scroll-snap-align: start;
   }
 
   .referenceStamp {
@@ -4318,10 +4693,11 @@ label.receiptButton {
 
   .primaryNav button,
   .primaryNav a {
-    min-width: 0;
+    min-width: 76px;
     padding: 0 4px;
-    font-size: 12px;
-    letter-spacing: 0.045em;
+    font-size: 10px;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
   }
 
   .marketMasthead h1,
@@ -4352,10 +4728,13 @@ label.receiptButton {
     padding-block: 12px;
   }
 
-  .comparisonStatus > small {
+  .comparisonDisclosure {
     grid-column: 1 / -1;
     justify-self: stretch;
-    text-align: left;
+  }
+
+  .comparisonDisclosure > summary {
+    width: 100%;
   }
 
   .passportGrid {

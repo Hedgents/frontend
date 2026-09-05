@@ -136,8 +136,11 @@ export async function POST(request: Request) {
       outputMint,
       amount: inputAmount,
       taker,
-      excludeRouters: "jupiterz",
+      excludeRouters: "jupiterz,okx,dflow",
     });
+    if (product.execution.excludedDexes.length > 0) {
+      params.set("excludeDexes", product.execution.excludedDexes.join(","));
+    }
     // Ask only for routes through venues that have passed program review. Without this the router
     // picks freely from over a hundred venues and the review gate rejects the result afterwards,
     // which reads to a user as a pair that intermittently does not work.

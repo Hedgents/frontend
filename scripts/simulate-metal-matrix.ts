@@ -285,7 +285,7 @@ for (const product of Object.values(solanaExecutionProducts)) {
       outputMint: product.mint,
       amount: inputAmount,
       taker: buyTaker,
-      excludeRouters: "jupiterz",
+      excludeRouters: "jupiterz,okx,dflow",
     }));
     const validated = validateOrder(payload, {
       inputMint: product.execution.inputMint,
@@ -361,7 +361,7 @@ for (const product of Object.values(solanaExecutionProducts)) {
         outputMint: settlement.mint,
         amount: inputAmount,
         taker: sellTaker,
-        excludeRouters: "jupiterz",
+        excludeRouters: "jupiterz,okx,dflow",
       }));
       const validated = validateOrder(payload, {
         inputMint: product.mint,

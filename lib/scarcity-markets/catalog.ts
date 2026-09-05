@@ -5,6 +5,7 @@ import {
   METAL_REFERENCE_MARKET_BY_ID,
   SCARCITY_METALS,
 } from "@/lib/scarcity";
+import { SCARCITY_METHODOLOGY_VERSION } from "@/lib/scarcity/methodology";
 import { compileMarketDocuments } from "./compiler";
 import type {
   ScarcityMarketRecord,
@@ -84,12 +85,12 @@ function questionFor(metal: (typeof INITIAL_SCARCITY_METALS)[number]): ScarcityQ
     schemaVersion: "1.0.0",
     slug: `${metal.id}-tightness-${threshold}-2026`,
     title: `${metal.name} tightness above ${threshold} at year end`,
-    question: `Will the verified Hedgents ${metal.name} market-tightness score be at least ${threshold.toFixed(2)} at 2026-12-31T23:59:59.000Z under methodology version 0.1.0?`,
+    question: `Will the verified Hedgents ${metal.name} market-tightness score be at least ${threshold.toFixed(2)} at 2026-12-31T23:59:59.000Z under methodology version ${SCARCITY_METHODOLOGY_VERSION}?`,
     metal: { id: metal.id, symbol: metal.symbol, name: metal.name },
     observation: {
       metricId: "market-tightness",
       metricLabel: "Hedgents Market Tightness Score",
-      methodologyVersion: "0.1.0",
+      methodologyVersion: SCARCITY_METHODOLOGY_VERSION,
       unit: "score-0-100",
       comparator: "greater-than-or-equal",
       threshold,

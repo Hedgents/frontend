@@ -21,6 +21,14 @@ test("blocks issuer-restricted countries and fails tokenized securities closed i
   const xstocks = solanaExecutionProducts["gold-gldx"];
   const ondo = solanaExecutionProducts["gold-gldon"];
   assert.equal(evaluateProductEligibility(xstocks, parseEligibilityEvidence({ ...evidence, countryCode: "US" }), "US").eligible, false);
+  assert.equal(evaluateProductEligibility(xstocks, parseEligibilityEvidence(evidence), "PL", {
+    production: true,
+    securityCountryAllowlist: new Set(),
+  }).eligible, true);
+  assert.equal(evaluateProductEligibility(xstocks, parseEligibilityEvidence(evidence), "PL", {
+    production: true,
+    securityCountryAllowlist: new Set(["DE"]),
+  }).eligible, false);
   assert.equal(evaluateProductEligibility(ondo, parseEligibilityEvidence(evidence), "PL", { production: true }).eligible, false);
   assert.equal(evaluateProductEligibility(ondo, parseEligibilityEvidence(evidence), "PL", {
     production: true,
@@ -30,4 +38,23 @@ test("blocks issuer-restricted countries and fails tokenized securities closed i
     production: true,
     securityCountryAllowlist: new Set(["PL"]),
   }).eligible, false);
+});
+
+test("new physical-metal policies enforce evidence and sanctions without a securities allowlist", () => {
+  for (const productId of ["gold-xaut0", "silver-silv"] as const) {
+    const product = solanaExecutionProducts[productId];
+    const allowed = evaluateProductEligibility(product, parseEligibilityEvidence(evidence), "PL", {
+      production: true,
+      securityCountryAllowlist: new Set(),
+    });
+    assert.equal(allowed.eligible, true, productId);
+    assert.match(allowed.policySourceUrl, /^https:\/\//);
+
+    const blockedEvidence = parseEligibilityEvidence({ ...evidence, countryCode: "IR" });
+    assert.equal(
+      evaluateProductEligibility(product, blockedEvidence, "IR", { production: true }).eligible,
+      false,
+      productId,
+    );
+  }
 });

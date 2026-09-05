@@ -635,6 +635,8 @@
 .portfolioEmbedHeader button:disabled { opacity: .55; cursor: wait; }
 .portfolioEmbed .positionLedger { margin: 0; border-width: 1px 0 0; }
 .curvePositionLedger { border-top: 1px solid var(--line-strong); }
+.curvePositionLedger .curvePositionSuperseded { background: color-mix(in srgb, var(--faint) 6%, transparent); }
+.curvePositionLedger .curvePositionSuperseded small { font-style: italic; }
 .curvePositionLedger > header { display: flex; align-items: center; justify-content: space-between; min-height: 38px; padding: 0 18px; color: var(--metal-tone); background: color-mix(in srgb, var(--metal-tone) 5%, transparent); font: 700 12px/1 var(--font-mono), monospace; letter-spacing: .1em; text-transform: uppercase; }
 .curvePositionLedger > header small { color: var(--faint); font-size: 10px; letter-spacing: .04em; }
 .curvePositionLedger > div { display: grid; grid-template-columns: minmax(210px, 1.7fr) repeat(3, minmax(130px, 1fr)); align-items: center; gap: 16px; min-height: 62px; padding: 9px 18px; border-top: 1px solid var(--line); }

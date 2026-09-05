@@ -101,11 +101,13 @@ const marketFeeds: Record<string, FeedSpec | null> = {
 
 const productFeeds: Record<string, FeedSpec | null> = {
   "gold-paxg": feeds.xau,
+  "gold-xaut0": feeds.xau,
   "gold-oro": feeds.xau,
   "gold-xaum": feeds.xau,
   "gold-gldx": feeds.gld,
   "gold-gldon": feeds.gld,
   "silver-slvx": feeds.slv,
+  "silver-silv": feeds.xag,
   "silver-slvon": feeds.slv,
   "uranium-urax": null,
   "uranium-uraon": null,

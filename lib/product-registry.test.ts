@@ -12,9 +12,9 @@ import {
 } from "./product-registry";
 import { validateSolanaAddress } from "./execution-validation";
 
-test("pins fifteen unique mainnet metal adapters", () => {
+test("pins seventeen unique mainnet metal adapters", () => {
   const entries = Object.entries(solanaExecutionProducts);
-  assert.equal(entries.length, 15);
+  assert.equal(entries.length, 17);
   assert.equal(new Set(entries.map(([, product]) => product.mint)).size, entries.length);
 
   for (const [productId, product] of entries) {
@@ -27,7 +27,8 @@ test("pins fifteen unique mainnet metal adapters", () => {
     assert.ok(product.execution.minimumUsd > 0);
     assert.ok(product.execution.maximumUsd >= product.execution.minimumUsd);
     assert.ok(product.execution.maximumPriceImpactPct > 0);
-    assert.ok(["paxos", "oro", "matrixdock", "xstocks", "ondo"].includes(product.eligibilityPolicyId));
+    assert.ok(Array.isArray(product.execution.excludedDexes));
+    assert.ok(["paxos", "oro", "matrixdock", "usdt0", "dominion", "xstocks", "ondo"].includes(product.eligibilityPolicyId));
     assert.equal(product.sources.some((source) => source.kind === "issuer"), true);
     assert.equal(product.sources.some((source) => source.kind === "directory"), true);
     assert.equal(product.sources.some((source) => source.kind === "explorer"), true);
@@ -48,6 +49,12 @@ test("pins the three supported Solana settlement assets", () => {
   }
 });
 
+test("GLDx carries its disclosed route-specific impact ceiling", () => {
+  assert.equal(solanaExecutionProducts["gold-gldx"].execution.maximumPriceImpactPct, 1.25);
+  assert.deepEqual(solanaExecutionProducts["gold-gldx"].execution.excludedDexes, ["Meteora DLMM"]);
+  assert.equal(solanaExecutionProducts["gold-paxg"].execution.maximumPriceImpactPct, 1);
+});
+
 test("pins the correct token program and catalog exposure for every adapter", () => {
   for (const product of Object.values(solanaExecutionProducts)) {
     assert.equal(
@@ -56,9 +63,11 @@ test("pins the correct token program and catalog exposure for every adapter", ()
     );
   }
   assert.equal(solanaExecutionProducts["gold-oro"].tokenProgram, "SPL Token");
+  assert.equal(solanaExecutionProducts["gold-xaut0"].tokenProgram, "SPL Token");
+  assert.equal(solanaExecutionProducts["silver-silv"].tokenProgram, "Token-2022");
   assert.equal(
     Object.values(solanaExecutionProducts).filter((product) => product.tokenProgram === "Token-2022").length,
-    14,
+    15,
   );
 
   const executableCatalogIds = metalMarkets.flatMap((market) =>

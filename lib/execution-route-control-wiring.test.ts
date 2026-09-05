@@ -107,7 +107,7 @@ test("orders exclude RFQ signatures and authenticate a fail-closed debit report"
   const orderRequest = route.indexOf("const raw = await getJupiterOrder(params)");
   const simulation = route.indexOf("const simulation = await simulateSolanaTransaction");
   const authorization = route.indexOf("const authorization = createExecutionAuthorization");
-  assert.match(route, /excludeRouters: "jupiterz"/);
+  assert.match(route, /excludeRouters: "jupiterz,okx,dflow"/);
   assert.ok(orderRequest >= 0 && simulation > orderRequest, "the exact Jupiter message must be simulated");
   assert.ok(authorization > simulation, "authorization must follow debit simulation");
   assert.match(route, /transactionGuard: transactionGuardCommitment\(simulation\)/);
@@ -117,6 +117,13 @@ test("orders exclude RFQ signatures and authenticate a fail-closed debit report"
   assert.match(simulator, /innerInstructions: true/);
   assert.match(simulator, /replaceRecentBlockhash: false/);
   assert.match(simulator, /assertProgramFingerprintAllowed\(report\)/);
+});
+
+test("route comparison only ranks routes the protected order path can execute", () => {
+  const route = routeSource("../app/api/execution/compare/route.ts");
+  assert.match(route, /excludeRouters: "jupiterz,okx,dflow"/);
+  assert.match(route, /product\.execution\.excludedDexes/);
+  assert.match(routeSource("../app/api/execution/order/route.ts"), /product\.execution\.excludedDexes/);
 });
 
 test("submission re-simulates the signed message before any Jupiter execution call", () => {
